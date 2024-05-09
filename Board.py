@@ -206,9 +206,10 @@ class Board:
         for a_hex in self.board_hexagons:
             if a_hex.hex_id == id_to_search_for:
                 return a_hex    #return the hex upon a match
-        return None     #If there was no match, return None
+            else:
+                return None     #If there was no match, return None
     
-    def place_initial_tiles(self):
+ #  def place_initial_tiles(self):
         
     
     

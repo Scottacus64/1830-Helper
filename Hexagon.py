@@ -1,4 +1,4 @@
-from Tile import Tile
+from TilePile import TilePile
 
 class Hexagon:
     def __init__(self, hex_id, vil_count, city_count, color, pc, rr_start):

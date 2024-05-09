@@ -1,20 +1,14 @@
-from Hexagon import Hexagon
-from Board import Board
+"""
+Created on Sun May  5 07:55:38 2024
 
+@author: scottmiller
+"""
 
-def main():
-    #a_hex = Hexagon("ID 1", 0, 1, 0, 20, False, False)
-    #a_hex.printHex()
-    the_board = Board()
-    the_board.print_board()
-
-
+import sys
+from PyQt5.QtWidgets import QApplication
+from main_window import MainWindow
 
 if __name__ == '__main__':
-    main()
-
-
-
-
-
-
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    sys.exit(app.exec_())

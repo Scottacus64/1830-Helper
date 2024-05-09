@@ -1,5 +1,4 @@
 
-
 class Tile:
     def __init__(self, tile_id, upgrade_list, path_pairs, color, station_list, assoc_hex = None):
         self.tile_id = tile_id
