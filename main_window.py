@@ -8,7 +8,7 @@ Created on Sun May  5 07:55:38 2024
 
 
 import os
-from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout
+from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout
 from PyQt5.QtGui import QPixmap, QTransform
 from hex_pushbutton import HexPushButton
 from PyQt5.QtCore import Qt
@@ -22,23 +22,30 @@ class MainWindow(QWidget):
         self.initUI()
         
     def initUI(self):
-        self.setGeometry(0, 0, 1245, 1000)
-        self.setWindowTitle('Map Grid')
+        self.setGeometry(0, 0, 1692, 1000)
+        self.setWindowTitle('1830 Game')
         
-        # Create a QVBoxLayout
-        layout = QVBoxLayout()
-        self.setLayout(layout)
+        # Create a QHBoxLayout to hold both labels
+        layout = QHBoxLayout(self)
         
-        
+        # Load map image
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        relative_path = os.path.join("resources", "map1830.jpg")
-        image_path = os.path.join(current_dir, relative_path)
-        pixmap = QPixmap(image_path)
-       
-        mapLabel = QLabel(self)
-        mapLabel.setPixmap(pixmap)
-        mapLabel.setGeometry(0, 0, 1245, 1000)
-        layout.addWidget(mapLabel)
+        map_relative_path = os.path.join("resources", "map1830.jpg")
+        map_image_path = os.path.join(current_dir, map_relative_path)
+        map_pixmap = QPixmap(map_image_path)
+        map_label = QLabel(self)
+        map_label.setPixmap(map_pixmap)
+        layout.addWidget(map_label)
+        
+        # Load sidebar image
+        sidebar_relative_path = os.path.join("resources", "sideBar.jpg")
+        sidebar_image_path = os.path.join(current_dir, sidebar_relative_path)
+        sidebar_pixmap = QPixmap(sidebar_image_path)
+        sidebar_label = QLabel(self)
+        sidebar_label.setPixmap(sidebar_pixmap)
+        layout.addWidget(sidebar_label)
+
+        self.setLayout(layout)
                
         map = [
             [0,0,0,0,0,0,0,0,0,0,0,0],
