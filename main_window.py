@@ -13,7 +13,7 @@ from PyQt5.QtGui import QPixmap, QTransform
 from hex_pushbutton import HexPushButton
 from PyQt5.QtCore import Qt
 from rotatable_label import RotatableLabel
-from Board import Board
+
 
 
 class MainWindow(QWidget):
@@ -103,8 +103,7 @@ class MainWindow(QWidget):
                     button.move(-8+(int(100 * buttonRatio) * col)+shift, 32+(int(90 * buttonRatio*.96)) * row)
 
         self.show()
-        the_board = Board()
-        the_board.print_board()
+        
         
     def getImage(self, imageName):
         current_dir = os.path.dirname(os.path.abspath(__file__))

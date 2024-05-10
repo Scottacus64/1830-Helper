@@ -6,6 +6,8 @@ class Board:
         self.board_hexagons = []
         self.tiles_on_the_board = []
         self.initialze_standard_board()
+        self.possibleTiles = [[2,60],[20,0],[11,120],[17,180]]
+        self.possibleTilesIndex = 0
 
 
     def initialze_standard_board(self):
@@ -217,6 +219,14 @@ class Board:
         for a_hex in self.board_hexagons:
             print(a_hex.hex_id, a_hex.vil_count, a_hex.city_count, a_hex.color, a_hex.pc, a_hex.rr_start)
             print("---------------")
+     
+    # This method take in information from the GUI and returns tiles that can be played 
+    def checkForPlayableTile(self, location, company, trainList):
+        returnList = self.possibleTiles[self.possibleTilesIndex]
+        self.possibleTilesIndex +=1
+        if self.possibleTilesIndex >= len(self.possibleTiles):
+            self.possibleTilesIndex = 0
+        return returnList
 
 
 

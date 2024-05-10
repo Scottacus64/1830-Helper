@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import QPushButton, QLabel
 from PyQt5.QtGui import QPainter, QPolygon, QPixmap
 from PyQt5.QtCore import QPoint, Qt
 import math
+from Board import Board
 
 class HexPushButton(QPushButton):
     def __init__(self, name, main_window, parent=None):
@@ -23,6 +24,8 @@ class HexPushButton(QPushButton):
         self.tileLabel.setGeometry(200, 200, 120, 120)
         self.clicked_locations = [False] * 132  # Initialize all locations as not clicked
         self.tile_angle = [0] * 132
+        self.theBoard = Board()
+        self.theBoard.print_board()
 
     
     def paintEvent(self, event):
@@ -80,12 +83,19 @@ class HexPushButton(QPushButton):
         if hexagon.containsPoint(event.pos(), Qt.OddEvenFill):
             super().mousePressEvent(event)
             print("Button", self.name, "was clicked")
+            tileList = []
             location = hexDictionary.get(self.name)
-            if self.clicked_locations[location] == False:
+            #if self.clicked_locations[location] == False:
+            tileList = self.theBoard.checkForPlayableTile(location, 0, 1)
+            self.MainWindow.displayTile(tileList[0], location, tileList[1])
+                
+            '''
                 self.MainWindow.displayTile(11, location, 0)
             else:
                 self.tile_angle[location] = self.tile_angle[location]+60
                 if self.tile_angle[location]>359:
                     self.tile_angle[location] = 0
                 self.MainWindow.displayTile(11, location, self.tile_angle[location])
+            '''
             self.clicked_locations[location] = True
+            
