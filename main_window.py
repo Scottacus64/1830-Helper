@@ -19,13 +19,15 @@ from rotatable_label import RotatableLabel
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
+        self.hex_Buttons = []
         self.initUI()
+        self.lastTile = 0
+        
         
     def initUI(self):
-        self.setGeometry(0, 0, 1692, 1000)
+        self.setGeometry(0, 0, 1245, 1000) #1692
         self.setWindowTitle('1830 Game')
         
-        # Create a QHBoxLayout to hold both labels
         layout = QHBoxLayout(self)
         
         # Load map image
@@ -37,6 +39,7 @@ class MainWindow(QWidget):
         map_label.setPixmap(map_pixmap)
         layout.addWidget(map_label)
         
+        '''
         # Load sidebar image
         sidebar_relative_path = os.path.join("resources", "sideBar.jpg")
         sidebar_image_path = os.path.join(current_dir, sidebar_relative_path)
@@ -44,9 +47,10 @@ class MainWindow(QWidget):
         sidebar_label = QLabel(self)
         sidebar_label.setPixmap(sidebar_pixmap)
         layout.addWidget(sidebar_label)
-
+        '''
         self.setLayout(layout)
                
+        # This a a list of all valid hexes that can be clicked
         map = [
             [0,0,0,0,0,0,0,0,0,0,0,0],
             [0,0,0,0,1,1,1,1,1,1,1,0],
@@ -61,6 +65,7 @@ class MainWindow(QWidget):
             [0,0,0,0,0,0,0,1,0,0,0,0]
             ]
 
+        # this is a list of all tile names from 1 to 70 in ascending order
         self.tileList = [
             "t1", "t2", "t3", "t4", "t7", "t8", "t9", 
             "t14", "t15", "t16", "t18", "t19",
@@ -74,8 +79,9 @@ class MainWindow(QWidget):
         buttonSize = 121
         buttonRatio = buttonSize / 120
         
-        self.labels = []
+        self.labels = []                        # list of all rotatable laels
         
+        # make the labels
         for i in range(1,12):
             for j in range(1,13):
                 label = RotatableLabel(self)
@@ -85,6 +91,7 @@ class MainWindow(QWidget):
                     label.setGeometry(-105+(j*100),-55+(i*87),115,115)
                 self.labels.append(label)
                 
+        # make the QPushbuttons for the hexes
         for row in range(11):
             for col in range(12):
                 if map[row][col] == 1:
@@ -105,34 +112,35 @@ class MainWindow(QWidget):
                         sCol = str(mCol)
                     name = sRow + sCol
                     button = HexPushButton(name, self, self)
+                    self.hex_Buttons.append(button)
+                    
                     
                     button.resize(buttonSize, int(buttonSize*.96))
                     button.move(-8+(int(100 * buttonRatio) * col)+shift, 32+(int(90 * buttonRatio*.96)) * row)
 
         self.show()
         
-        
+    # method for getting the image files
     def getImage(self, imageName):
         current_dir = os.path.dirname(os.path.abspath(__file__))
         relative_path = os.path.join("resources", imageName)
         image_path = os.path.join(current_dir, relative_path)
         pixmap = QPixmap(image_path)
         return pixmap
-        
+    
+    # method for getting and displaying tiles gotten from theBoard
     def displayTile(self, tileNumber, location, angle):
-        print(tileNumber)
-        tileName = self.tileList[tileNumber]
-        pixmap = self.getImage(tileName)
+        if tileNumber > 0:
+            tileName = self.tileList[tileNumber]
+            pixmap = self.getImage(tileName)
+        else:
+            pixmap = QPixmap() 
+            print("Pixmap set to None")
         label_widget = self.labels[location - 1]
         label_widget.setPixmap(pixmap)
         label_widget.setAlignment(Qt.AlignCenter | Qt.AlignCenter)
         label_widget.rotate(angle)
         
      
-    def rotateTile(self, location, angle):
-        print("Angle = " + str(angle))
-        tileName = "Tile8Sm.png"
-        label_widget = self.labels[location - 1]
-        label_widget.rotate(120)
-        
+
         

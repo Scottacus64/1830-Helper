@@ -46,7 +46,7 @@ class Board:
         '''
         
         # ----- off_board_hexes -----
-        off_board_hexes = [(1, 1), (1, 3), (1, 5), (1, 7), (1, 13), (1, 15), (1, 21), (1, 23),
+        self.off_board_hexes = [(1, 1), (1, 3), (1, 5), (1, 7), (1, 13), (1, 15), (1, 21), (1, 23),
                          (2, 2), (2, 4), (2, 6), (2, 8),
                          (3, 1), (3, 3), (3, 5),
                          (5, 1),
@@ -61,11 +61,11 @@ class Board:
         for i in range(1, 12): # Rows A-K
             if i % 2 == 1:
                 for j in range(1, 24, 2): # Add all valid hexes in odd rows (ones that aren't in off_board_hexes)
-                    if((i, j) not in off_board_hexes):
+                    if((i, j) not in self.off_board_hexes):
                         on_board_hexes.append((i, j))
             else:
                 for j in range(2, 25, 2): # Add all valid hexes in even rows (ones that aren't in off_board_hexes)
-                    if((i, j) not in off_board_hexes):
+                    if((i, j) not in self.off_board_hexes):
                         on_board_hexes.append((i, j))
         
         # ----- grey_hexes -----
@@ -222,11 +222,42 @@ class Board:
      
     # This method take in information from the GUI and returns tiles that can be played 
     def checkForPlayableTile(self, location, company, trainList):
+        self.findAdjacentHexes(location)
         returnList = self.possibleTiles[self.possibleTilesIndex]
         self.possibleTilesIndex +=1
         if self.possibleTilesIndex >= len(self.possibleTiles):
             self.possibleTilesIndex = 0
         return returnList
+    
+    # method to find hexes that surround the target hex
+    def findAdjacentHexes(self, location):
+        testList = []
+        hexList = []
+        locationFirst = location[0]
+        locationSecond = location[1]
+        # find the above hexes
+        if locationFirst > 1:               # get tiles above
+            if locationSecond > 1:          # get above and left
+                testList.append((locationFirst - 1, locationSecond - 1))
+            if locationSecond < 24:         # get above and right
+                testList.append((locationFirst - 1, locationSecond + 1))
+        if locationSecond >1:               # get left
+            testList.append((locationFirst, locationSecond - 1))
+        if locationSecond < 24:             # get right
+            testList.append((locationFirst, locationSecond + 1))
+        if locationFirst < 15:              # get tiles below 
+            if locationSecond > 1:          # below and left
+                testList.append((locationFirst + 1, locationSecond - 1))
+            if locationSecond < 24:         # below and right
+                testList.append((locationFirst + 1, locationSecond + 1))
+        for loc in testList:
+            if loc not in self.off_board_hexes:
+                hexList.append(loc)
+        print("Hexes around " + str (location))
+        for hex in hexList:
+            print(hex)
+        
+        
 
 
 

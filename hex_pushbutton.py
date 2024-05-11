@@ -14,6 +14,11 @@ import math
 from Board import Board
 
 class HexPushButton(QPushButton):
+    
+    # Class variable to hold the shared Board object
+    board_instance = Board()
+    board_instance.print_board()
+    
     def __init__(self, name, main_window, parent=None):
         super().__init__(parent)
         self.name = name
@@ -22,10 +27,9 @@ class HexPushButton(QPushButton):
         self.setStyleSheet("background-color: transparent; border: 2px solid black;")
         self.tileLabel = QLabel(parent)
         self.tileLabel.setGeometry(200, 200, 120, 120)
-        self.clicked_locations = [False] * 132  # Initialize all locations as not clicked
         self.tile_angle = [0] * 132
-        self.theBoard = Board()
-        self.theBoard.print_board()
+        # Use the shared Board object
+        self.theBoard = HexPushButton.board_instance
 
     
     def paintEvent(self, event):
@@ -80,22 +84,19 @@ class HexPushButton(QPushButton):
             y = centerY + sideLength * math.sin(2 * math.pi * i / 6)
             hexagon.append(QPoint(int(x), int(y)))
         
-        if hexagon.containsPoint(event.pos(), Qt.OddEvenFill):
+        if hexagon.containsPoint(event.pos(), Qt.OddEvenFill):              # if the mouse is clicked inside a hex
             super().mousePressEvent(event)
-            print("Button", self.name, "was clicked")
-            tileList = []
-            location = hexDictionary.get(self.name)
-            #if self.clicked_locations[location] == False:
-            tileList = self.theBoard.checkForPlayableTile(location, 0, 1)
+            tileList = []                                                   # list for the tile and orientation
+            locationFirst = int(self.name[:2])                              # parsing out the tuple for board to use
+            locationSecond = int(self.name[2:])
+            boardLocation = (locationFirst, locationSecond)
+            location = hexDictionary[self.name]                             # check the hex dictionary to see which label to put the tile on
+            if location != self.MainWindow.lastTile and self.MainWindow.lastTile > 0:
+                self.MainWindow.displayTile(0, self.MainWindow.lastTile, 0)
+            self.MainWindow.lastTile = location  
+            tileList = self.theBoard.checkForPlayableTile(boardLocation, 1, [0,0,2,0])  # ask theBoard for a playable tile to display 
             self.MainWindow.displayTile(tileList[0], location, tileList[1])
                 
-            '''
-                self.MainWindow.displayTile(11, location, 0)
-            else:
-                self.tile_angle[location] = self.tile_angle[location]+60
-                if self.tile_angle[location]>359:
-                    self.tile_angle[location] = 0
-                self.MainWindow.displayTile(11, location, self.tile_angle[location])
-            '''
-            self.clicked_locations[location] = True
+
+           
             
