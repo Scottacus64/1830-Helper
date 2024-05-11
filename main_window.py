@@ -8,7 +8,7 @@ Created on Sun May  5 07:55:38 2024
 
 
 import os
-from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QHBoxLayout
+from PyQt5.QtWidgets import QWidget, QLabel
 from PyQt5.QtGui import QPixmap, QTransform
 from hex_pushbutton import HexPushButton
 from PyQt5.QtCore import Qt
@@ -25,10 +25,9 @@ class MainWindow(QWidget):
         
         
     def initUI(self):
-        self.setGeometry(0, 0, 1245, 1000) #1692
+        self.setGeometry(0, 0, 1692, 1000) #1245
         self.setWindowTitle('1830 Game')
-        
-        layout = QHBoxLayout(self)
+
         
         # Load map image
         current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -36,19 +35,21 @@ class MainWindow(QWidget):
         map_image_path = os.path.join(current_dir, map_relative_path)
         map_pixmap = QPixmap(map_image_path)
         map_label = QLabel(self)
+        map_label.setGeometry(0,0,1245,1000)
         map_label.setPixmap(map_pixmap)
-        layout.addWidget(map_label)
+
         
-        '''
+        
         # Load sidebar image
         sidebar_relative_path = os.path.join("resources", "sideBar.jpg")
         sidebar_image_path = os.path.join(current_dir, sidebar_relative_path)
         sidebar_pixmap = QPixmap(sidebar_image_path)
         sidebar_label = QLabel(self)
+        sidebar_label.setGeometry(1245,0,447,1000)
         sidebar_label.setPixmap(sidebar_pixmap)
-        layout.addWidget(sidebar_label)
-        '''
-        self.setLayout(layout)
+
+        
+
                
         # This a a list of all valid hexes that can be clicked
         map = [
@@ -86,9 +87,9 @@ class MainWindow(QWidget):
             for j in range(1,13):
                 label = RotatableLabel(self)
                 if i % 2 == 0:
-                    label.setGeometry(-105+(j*100)+50,-55+(i*87),115,115)
+                    label.setGeometry(-123+(j*100)+50,-74+(i*87),115,115)
                 else:
-                    label.setGeometry(-105+(j*100),-55+(i*87),115,115)
+                    label.setGeometry(-123+(j*100),-74+(i*87),115,115)
                 self.labels.append(label)
                 
         # make the QPushbuttons for the hexes
@@ -116,7 +117,7 @@ class MainWindow(QWidget):
                     
                     
                     button.resize(buttonSize, int(buttonSize*.96))
-                    button.move(-8+(int(100 * buttonRatio) * col)+shift, 32+(int(90 * buttonRatio*.96)) * row)
+                    button.move(-26+(int(100 * buttonRatio) * col)+shift, 14+(int(90 * buttonRatio*.96)) * row)
 
         self.show()
         
