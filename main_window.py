@@ -8,10 +8,10 @@ Created on Sun May  5 07:55:38 2024
 
 
 import os
-from PyQt5.QtWidgets import QWidget, QLabel
-from PyQt5.QtGui import QPixmap, QTransform
+from PyQt5.QtWidgets import QWidget, QLabel, QPushButton
+from PyQt5.QtGui import QPixmap, QTransform, QIcon
 from hex_pushbutton import HexPushButton
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QSize
 from rotatable_label import RotatableLabel
 
 
@@ -20,9 +20,12 @@ class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
         self.hex_Buttons = []
+        self.stationButtons = []
+        self.trainButtons = []
+        self.trainList = []
         self.initUI()
         self.lastTile = 0
-        
+
         
     def initUI(self):
         self.setGeometry(0, 0, 1692, 1000) #1245
@@ -76,6 +79,9 @@ class MainWindow(QWidget):
             "t61", "t62", "t63", "t64", "t65", "t66", "t67", "t68", "t69", "t70"
             ]
         
+        # this is the number of stations per company
+        self.stationList = [2,3,3,4,3,4,2,4]
+        
         
         buttonSize = 121
         buttonRatio = buttonSize / 120
@@ -118,8 +124,43 @@ class MainWindow(QWidget):
                     
                     button.resize(buttonSize, int(buttonSize*.96))
                     button.move(-26+(int(100 * buttonRatio) * col)+shift, 14+(int(90 * buttonRatio*.96)) * row)
-
+        pad = 0           
+        for row in range(16):
+            for col in range(2):
+                if row%2 == 0 and col == 0:     # if the first row and colum then pad down by 4
+                    pad = pad + 4
+                    if row > 8:                 # after the fourth company pad an additional 2
+                        pad += 2
+                # station buttons
+                company = row//2
+                numberOfStations = self.stationList[company]
+                if numberOfStations >= (2*(row%2)) + col + 1:
+                    sName = str("stn " + str(company) + str(col+(2*(row%2))))
+                    sButton = QPushButton(sName, self)
+                    sButton.setGeometry(1360 + (col*60),pad+(row * 60), 60, 60)
+                    sButton.clicked.connect(self.stationButtonClicked)
+                    sButton.setText("")
+                    sButton.setStyleSheet("border: none;")
+                    icon = QIcon(self.getImage(str("s" + str(row//2))))
+                    sButton.setIconSize(button.size())
+                    sButton.setIcon(icon)
+                    self.stationButtons.append(sButton)
+                # train buttons
+                tName = str("t" + str(row//2) + str(col+(2*(row%2))))
+                tButton = QPushButton(tName, self)
+                tButton.setObjectName(tName)
+                tButton.setGeometry(1480 + (col*107),pad+(row * 60), 100, 60)
+                tButton.clicked.connect(self.trainButtonClicked)
+                tButton.setText("")
+                tButton.setStyleSheet("border: none;")
+                icon = QIcon(self.getImage("train1"))
+                tButton.setIconSize(button.size())
+                tButton.setIcon(icon)
+                self.trainButtons.append(tButton)
         self.show()
+        for i in range(8):
+            self.trainList.append([1,1,1,1])
+            
         
     # method for getting the image files
     def getImage(self, imageName):
@@ -142,6 +183,25 @@ class MainWindow(QWidget):
         label_widget.setAlignment(Qt.AlignCenter | Qt.AlignCenter)
         label_widget.rotate(angle)
         
-     
-
+    def stationButtonClicked(self):
+        print("station")
+    
+    
+    def trainButtonClicked(self):
+        button_name = self.sender().objectName()
+        print("Button clicked:", button_name)
+        number = button_name[1:]
+        company = int(number[:1])
+        card = int(number[1:])
+        trainList = self.trainList[company]
+        activeTrain = trainList[card]
+        activeTrain = activeTrain + 1
+        if activeTrain > 7:
+            activeTrain = 1
+        self.trainList[company][card] = activeTrain
+        print(str(activeTrain))
+        slot = (company * 4) + card
+        print(str(slot))
+        icon = QIcon(self.getImage("train" + str(activeTrain)))
+        self.trainButtons[slot].setIcon(icon)
         
