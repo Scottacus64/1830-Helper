@@ -14,7 +14,7 @@ from PyQt5.QtCore import Qt
 class RotatableLabel(QLabel):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.rotation_angle = 0
+        
 
     def setPixmap(self, pixmap):
         super().setPixmap(pixmap)

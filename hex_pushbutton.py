@@ -15,8 +15,7 @@ from Board import Board
 
 class HexPushButton(QPushButton):
     
-    # Class variable to hold the shared Board object
-    board_instance = Board()
+    board_instance = Board()                            # Class variable to hold the shared Board object
     board_instance.print_board()
     
     def __init__(self, name, main_window, parent=None):
@@ -24,12 +23,9 @@ class HexPushButton(QPushButton):
         self.name = name
         self.MainWindow = main_window
         self.setFlat(True)
+        self.rotation_angle = 0
         self.setStyleSheet("background-color: transparent; border: 2px solid black;")
-        self.tileLabel = QLabel(parent)
-        self.tileLabel.setGeometry(200, 200, 120, 120)
-        self.tile_angle = [0] * 132
-        # Use the shared Board object
-        self.theBoard = HexPushButton.board_instance
+        self.theBoard = HexPushButton.board_instance                # Use the shared Board object
 
     
     def paintEvent(self, event):
@@ -49,19 +45,14 @@ class HexPushButton(QPushButton):
             x = centerX + sideLength * math.cos(angle)
             y = centerY + sideLength * math.sin(angle)
             hexagon.append(QPoint(int(x), int(y)))
-        
-        if self.isDown():
-            painter.setBrush(self.palette().button().color().darker(120))
-        else:
-            painter.setBrush(self.palette().button())
-        
+
         painter.drawPolygon(hexagon)
         
     def mousePressEvent(self, event):
         hexagon = QPolygon()
         buttonWidth = self.width()
         buttonHeight = self.height()
-        sideLength = min(buttonWidth, buttonHeight) // 2
+        #sideLength = min(buttonWidth, buttonHeight) // 2
         centerX = buttonWidth // 2
         centerY = buttonHeight // 2
         
@@ -80,8 +71,8 @@ class HexPushButton(QPushButton):
             }
         
         for i in range(6):
-            x = centerX + sideLength * math.cos(2 * math.pi * i / 6)
-            y = centerY + sideLength * math.sin(2 * math.pi * i / 6)
+            x = centerX + buttonWidth * math.cos(2 * math.pi * i / 6)        # uses radians for trig functions (2 Pi * angle/360)
+            y = centerY + buttonHeight * math.sin(2 * math.pi * i / 6)
             hexagon.append(QPoint(int(x), int(y)))
         
         if hexagon.containsPoint(event.pos(), Qt.OddEvenFill):              # if the mouse is clicked inside a hex

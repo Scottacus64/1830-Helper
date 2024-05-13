@@ -19,7 +19,7 @@ from rotatable_label import RotatableLabel
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
-        self.hex_Buttons = []
+        self.hex_Buttons = []                   # set up these global variables before the initUI
         self.stationButtons = []
         self.trainButtons = []
         self.trainList = []
@@ -82,10 +82,8 @@ class MainWindow(QWidget):
         # this is the number of stations per company
         self.stationList = [2,3,3,4,3,4,2,4]
         
-        
-        buttonSize = 121
-        buttonRatio = buttonSize / 120
-        
+        #buttonSize = 116    #121
+        #buttonRatio = buttonSize / 120
         self.labels = []                        # list of all rotatable laels
         
         # make the labels
@@ -104,7 +102,7 @@ class MainWindow(QWidget):
                 if map[row][col] == 1:
                     shift = 0
                     if (row+1) % 2 == 0:
-                        shift = 52
+                        shift = 50
                     if row+1 < 10:
                         sRow = "0" +str(row+1)
                     else:
@@ -121,9 +119,10 @@ class MainWindow(QWidget):
                     button = HexPushButton(name, self, self)
                     self.hex_Buttons.append(button)
                     
-                    
-                    button.resize(buttonSize, int(buttonSize*.96))
-                    button.move(-26+(int(100 * buttonRatio) * col)+shift, 14+(int(90 * buttonRatio*.96)) * row)
+                    #button.resize(buttonSize, int(buttonSize*.96))
+                    button.resize(117,116)
+                    #button.move(-26+(int(100 * buttonRatio) * col)+shift, 14+(int(90 * buttonRatio*.96)) * row)
+                    button.move(-25+(100*col)+shift, 13+(87 * row))
         pad = 0           
         for row in range(16):
             for col in range(2):
@@ -171,6 +170,7 @@ class MainWindow(QWidget):
         pixmap = QPixmap(image_path)
         return pixmap
     
+    
     # method for getting and displaying tiles gotten from theBoard
     def displayTile(self, tileNumber, location, angle):
         if tileNumber > 0:
@@ -183,6 +183,7 @@ class MainWindow(QWidget):
         label_widget.setPixmap(pixmap)
         label_widget.setAlignment(Qt.AlignCenter | Qt.AlignCenter)
         label_widget.rotate(angle)
+        
         
     def stationButtonClicked(self):
         button_name = self.sender().objectName()        # find out which station was clicked
@@ -199,6 +200,7 @@ class MainWindow(QWidget):
         self.currentStation = button_name
         stationSlot = self.findStation()
         self.stationButtons[stationSlot].setIcon(QIcon())
+        
         
     def findStation(self):
         i = 0
