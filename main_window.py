@@ -9,7 +9,7 @@ Created on Sun May  5 07:55:38 2024
 
 import os
 from PyQt5.QtWidgets import QWidget, QLabel, QPushButton
-from PyQt5.QtGui import QPixmap, QTransform, QIcon
+from PyQt5.QtGui import QPixmap, QTransform, QIcon, QPalette, QColor, QPainter
 from hex_pushbutton import HexPushButton
 from PyQt5.QtCore import Qt, QSize
 from rotatable_label import RotatableLabel
@@ -23,9 +23,9 @@ class MainWindow(QWidget):
         self.stationButtons = []
         self.trainButtons = []
         self.trainList = []
-        self.initUI()
         self.lastTile = 0
-
+        self.currentStation = "stn 100"
+        self.initUI()
         
     def initUI(self):
         self.setGeometry(0, 0, 1692, 1000) #1245
@@ -137,6 +137,7 @@ class MainWindow(QWidget):
                 if numberOfStations >= (2*(row%2)) + col + 1:
                     sName = str("stn " + str(company) + str(col+(2*(row%2))))
                     sButton = QPushButton(sName, self)
+                    sButton.setObjectName(sName)
                     sButton.setGeometry(1360 + (col*60),pad+(row * 60), 60, 60)
                     sButton.clicked.connect(self.stationButtonClicked)
                     sButton.setText("")
@@ -184,24 +185,58 @@ class MainWindow(QWidget):
         label_widget.rotate(angle)
         
     def stationButtonClicked(self):
-        print("station")
-    
-    
+        button_name = self.sender().objectName()        # find out which station was clicked
+        print("Station: ", button_name)
+        print("Current station " + self.currentStation)
+        stationSlot = 100
+        print(self.currentStation[4:])
+        if int(self.currentStation[4:]) < 100:
+            stationSlot = self.findStation()
+            print("Station slot = " + str(stationSlot))
+            company = self.currentStation[4]
+            icon = QIcon(self.getImage(str("s" + company)))
+            self.stationButtons[stationSlot].setIcon(icon)
+        self.currentStation = button_name
+        stationSlot = self.findStation()
+        self.stationButtons[stationSlot].setIcon(QIcon())
+        
+    def findStation(self):
+        i = 0
+        for stationTest in self.stationButtons:
+            #print(stationTest.objectName())
+            if stationTest.objectName() == self.currentStation:
+                stationSlot = i
+            i += 1
+        return stationSlot
+        
+        
     def trainButtonClicked(self):
         button_name = self.sender().objectName()
-        print("Button clicked:", button_name)
         number = button_name[1:]
         company = int(number[:1])
         card = int(number[1:])
-        trainList = self.trainList[company]
-        activeTrain = trainList[card]
-        activeTrain = activeTrain + 1
-        if activeTrain > 7:
+        trainList = self.trainList[company]             # get the train list for the company
+        activeTrain = trainList[card]                   # get the clicked card for that company and
+        activeTrain = activeTrain + 1                   # increment the train value
+        if activeTrain > 7: 
             activeTrain = 1
-        self.trainList[company][card] = activeTrain
-        print(str(activeTrain))
-        slot = (company * 4) + card
-        print(str(slot))
-        icon = QIcon(self.getImage("train" + str(activeTrain)))
-        self.trainButtons[slot].setIcon(icon)
-        
+ 
+        self.trainList[company][card] = activeTrain                         # set the value in that company train list for export
+        slot = (company * 4) + card                                         # find which slot in the trainbuttons is active
+        icon = QIcon(self.getImage("train" + str(activeTrain)))             # get the new card icon
+        self.trainButtons[slot].setIcon(icon)                               # update the pushbutton icon
+        if activeTrain == 3:
+            train_button = self.trainButtons[slot]
+            icon = QIcon(self.getImage("train" + str(activeTrain)))         # get the new card icon
+            color = QColor(255, 0, 0, 64)  # Red color
+            pixmap = icon.pixmap(icon.availableSizes()[0])                  # Get the first available size
+            # Blend the color with the icon pixmap
+            pixmap_with_color = QPixmap(pixmap.size())
+            pixmap_with_color.fill(Qt.transparent)                          # Fill pixmap with transparency
+            painter = QPainter(pixmap_with_color)
+            painter.setCompositionMode(QPainter.CompositionMode_SourceOver)  # Blend mode
+            painter.drawPixmap(0, 0, pixmap)
+            painter.setCompositionMode(QPainter.CompositionMode_SourceAtop)  # Apply color atop the pixmap
+            painter.fillRect(pixmap.rect(), color)
+            painter.end()
+            train_button.setIcon(QIcon(pixmap_with_color))                  # Set the modified pixmap with color to the button
