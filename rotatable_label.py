@@ -27,7 +27,7 @@ class RotatableLabel(QLabel):
 
     def rotate(self, angle):
         self.rotation_angle = angle
-        if self.original_pixmap is not None:
+        if self.original_pixmap is not None:    # original pixmap because reusing and rotating casues artifacts in the image
             transform = QTransform()
             transform.rotate(self.rotation_angle)
             rotated_pixmap = self.original_pixmap.transformed(transform, Qt.SmoothTransformation)

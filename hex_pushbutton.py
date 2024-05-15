@@ -8,7 +8,7 @@ Created on Sun May  5 07:55:38 2024
 
 
 from PyQt5.QtWidgets import QPushButton, QLabel
-from PyQt5.QtGui import QPainter, QPolygon, QPixmap
+from PyQt5.QtGui import QPainter, QPolygon, QPixmap, QTransform
 from PyQt5.QtCore import QPoint, Qt
 import math
 from Board import Board
@@ -24,10 +24,12 @@ class HexPushButton(QPushButton):
         self.MainWindow = main_window
         self.setFlat(True)
         self.rotation_angle = 0
-        self.setStyleSheet("background-color: transparent; border: 2px solid black;")
+        self.setStyleSheet("background-color: transparent; border: none; padding: 0;")
+
+        #self.setStyleSheet("background-color: transparent; border: 2px solid black;")
         self.theBoard = HexPushButton.board_instance                # Use the shared Board object
 
-    
+    '''
     def paintEvent(self, event):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
@@ -47,6 +49,7 @@ class HexPushButton(QPushButton):
             hexagon.append(QPoint(int(x), int(y)))
 
         painter.drawPolygon(hexagon)
+    '''
         
     def mousePressEvent(self, event):
         hexagon = QPolygon()
@@ -56,18 +59,32 @@ class HexPushButton(QPushButton):
         centerX = buttonWidth // 2
         centerY = buttonHeight // 2
         
+        map = [
+            [0,0,0,0,0,0,0,0,0,0,0,0],
+            [0,0,0,0,1,1,1,1,1,1,1,0],
+            [0,0,0,1,1,1,1,0,1,1,1,1],
+            [1,1,1,1,1,1,1,1,1,1,1,0],
+            [0,1,1,1,0,1,1,1,1,1,1,1],       
+            [0,1,0,1,1,1,1,1,1,1,1,0],       
+            [0,1,1,1,1,1,1,1,1,1,0,0],       
+            [1,1,1,1,1,0,1,1,1,0,0,0],      
+            [0,1,1,1,1,1,1,1,1,0,0,0],         
+            [0,1,1,1,1,1,1,0,0,0,0,0],
+            
+            [0,0,0,0,0,0,0,1,0,0,0,0]
+            ]
+        
         hexDictionary = {
-            "0101":1 , "0103":2,  "0105":3,  "0107":4, " 0109":5,  "0111":6,  "0113":7,  "0115":8,  "0117":9,  "0119":10, "0121":11, "0123":12,
-            "0202":13, "0204":14, "0206":15, "0208":16, "0210":17, "0212":18, "0214":19, "0216":20, "0218":21, "0220":22, "0222":23, "0224":24,
-            "0301":25, "0303":26, "0305":27, "0307":28, "0309":29, "0311":30, "0313":31, "0315":32, "0317":33, "0319":34, "0321":35, "0323":36,
-            "0402":37, "0404":38, "0406":39, "0408":40, "0410":41, "0412":42, "0414":43, "0416":44, "0418":45, "0420":46, "0422":47, "0424":48,
-            "0501":49, "0503":50, "0505":51, "0507":52, "0509":53, "0511":54, "0513":55, "0515":56, "0517":57, "0519":58, "0521":59, "0523":60,
-            "0602":61, "0604":62, "0606":63, "0608":64, "0610":65, "0612":66, "0614":67, "0616":68, "0618":69, "0620":70, "0622":71, "0624":72,
-            "0701":73, "0703":74, "0705":75, "0707":76, "0709":77, "0711":78, "0713":79, "0715":80, "0717":81, "0719":82, "0721":83, "0723":84,
-            "0802":85, "0804":86, "0806":87, "0808":88, "0810":89, "0812":90, "0814":91, "0816":92, "0818":93, "0820":94, "0822":95, "0824":96,
-            "0901":97, "0903":98, "0905":99, "0907":100, "0909":101, "0911":102, "0913":103, "0915":104, "0917":105, "0919":106, "0921":107, "0923":108,
-            "1002":109, "1004":110, "1006":111, "1008":112, "1010":113, "1012":114, "1014":115, "1016":116, "1018":117, "1020":118, "1022":119, "1024":120,
-            "1101":121, "1103":122, "1105":123, "1107":124, "1109":125, "1111":126, "1113":127, "1115":128, "1117":129, "1119":130, "1121":131, "1123":132
+            "0210":0, "0212":1, "0214":2, "0216":3, "0218":4, "0220":5, "0222":6, 
+            "0307":7, "0309":8, "0311":9, "0313":10, "0317":11, "0319":12, "0321":13, "0323":14,
+            "0402":15, "0404":16, "0406":17, "0408":18, "0410":19, "0412":20, "0414":21, "0416":22, "0418":23, "0420":24,  "0422":25, 
+            "0503":26, "0505":27, "0507":28, "0511":29, "0513":30, "0515":31, "0517":32, "0519":33, "0521":34, "0523":35,
+            "0604":36, "0608":37, "0610":38, "0612":39, "0614":40, "0616":41, "0618":42, "0620":43, "0622":44, 
+            "0703":45, "0705":46, "0707":47, "0709":48, "0711":49, "0713":50, "0715":51, "0717":52, "0719":53,
+            "0802":54, "0804":55, "0806":56, "0808":57, "0810":58, "0814":59, "0816":60, "0818":61, 
+            "0903":62, "0905":63, "0907":64, "0909":65, "0911":66, "0913":67, "0915":68, "0917":69, 
+            "1004":70, "1006":71, "1008":72, "1010":73, "1012":74, "1014":75, 
+            "1115":76
             }
         
         for i in range(6):
@@ -88,6 +105,18 @@ class HexPushButton(QPushButton):
             tileList = self.theBoard.checkForPlayableTile(boardLocation, 1, [0,0,2,0])  # ask theBoard for a playable tile to display 
             self.MainWindow.displayTile(tileList[0], location, tileList[1])
                 
+    def rotate(self, angle):
+        self.rotation_angle = angle
+        if self.original_pixmap is not None:
+            transform = QTransform()
+            transform.rotate(self.rotation_angle)
+            rotated_pixmap = self.original_pixmap.transformed(transform, Qt.SmoothTransformation)
+            self.setQIcon(rotated_pixmap)
+        
+    def setPixmap(self, pixmap):
+        super().setPixmap(pixmap)
+        self.original_pixmap = pixmap
+
 
            
             

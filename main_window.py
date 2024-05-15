@@ -19,7 +19,7 @@ from rotatable_label import RotatableLabel
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
-        self.hex_Buttons = []                   # set up these global variables before the initUI
+        self.hexButtons = []                   # set up these global variables before the initUI
         self.stationButtons = []
         self.trainButtons = []
         self.trainList = []
@@ -82,20 +82,6 @@ class MainWindow(QWidget):
         # this is the number of stations per company
         self.stationList = [2,3,3,4,3,4,2,4]
         
-        #buttonSize = 116    #121
-        #buttonRatio = buttonSize / 120
-        self.labels = []                        # list of all rotatable laels
-        
-        # make the labels
-        for i in range(1,12):
-            for j in range(1,13):
-                label = RotatableLabel(self)
-                if i % 2 == 0:
-                    label.setGeometry(-123+(j*100)+50,-74+(i*87),115,115)
-                else:
-                    label.setGeometry(-123+(j*100),-74+(i*87),115,115)
-                self.labels.append(label)
-                
         # make the QPushbuttons for the hexes
         for row in range(11):
             for col in range(12):
@@ -116,14 +102,12 @@ class MainWindow(QWidget):
                     else:
                         sCol = str(mCol)
                     name = sRow + sCol
-                    button = HexPushButton(name, self, self)
-                    self.hex_Buttons.append(button)
-                    
-                    #button.resize(buttonSize, int(buttonSize*.96))
+                    button = HexPushButton(name, self, self)         
                     button.resize(117,116)
-                    #button.move(-26+(int(100 * buttonRatio) * col)+shift, 14+(int(90 * buttonRatio*.96)) * row)
                     button.move(-25+(100*col)+shift, 13+(87 * row))
-        pad = 0           
+                    self.hexButtons.append(button) 
+        pad = 0   
+             
         for row in range(16):
             for col in range(2):
                 if row%2 == 0 and col == 0:     # if the first row and colum then pad down by 4
@@ -176,13 +160,24 @@ class MainWindow(QWidget):
         if tileNumber > 0:
             tileName = self.tileList[tileNumber]
             pixmap = self.getImage(tileName)
+            icon = QIcon(pixmap)
         else:
-            pixmap = QPixmap() 
+            icon = QIcon()
             print("Pixmap set to None")
-        label_widget = self.labels[location - 1]
-        label_widget.setPixmap(pixmap)
-        label_widget.setAlignment(Qt.AlignCenter | Qt.AlignCenter)
-        label_widget.rotate(angle)
+        print("location = " + str(location) + " tileNumber = " + str(tileNumber))
+        hex_widget = self.hexButtons[location]
+        hex_widget.setIcon(icon)
+        hex_widget.setIconSize(QSize(117, 116))  # Set the size of the icon
+
+        # Calculate the padding to center the icon horizontally and vertically within the button
+        horizontal_padding = (hex_widget.width() - 117) / 2
+        vertical_padding = (hex_widget.height() - 116) / 2
+        
+        # Apply style sheet to adjust padding
+        hex_widget.setStyleSheet(
+            f"padding-left: {horizontal_padding}px; padding-top: {vertical_padding}px;"
+        )
+       
         
         
     def stationButtonClicked(self):
