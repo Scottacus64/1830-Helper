@@ -12,8 +12,6 @@ from PyQt5.QtWidgets import QWidget, QLabel, QPushButton
 from PyQt5.QtGui import QPixmap, QTransform, QIcon, QPalette, QColor, QPainter
 from hex_pushbutton import HexPushButton
 from PyQt5.QtCore import Qt, QSize
-from rotatable_label import RotatableLabel
-
 
 
 class MainWindow(QWidget):
@@ -22,9 +20,12 @@ class MainWindow(QWidget):
         self.hexButtons = []                   # set up these global variables before the initUI
         self.stationButtons = []
         self.trainButtons = []
+        self.companyButtons = []
         self.trainList = []
         self.lastTile = 0
         self.currentStation = "stn 100"
+        self.currentCompany = 100
+        self.stationPlaced = False
         self.initUI()
         
     def initUI(self):
@@ -141,10 +142,22 @@ class MainWindow(QWidget):
                 tButton.setIconSize(button.size())
                 tButton.setIcon(icon)
                 self.trainButtons.append(tButton)
-        self.show()
+        
         for i in range(8):
             self.trainList.append([1,1,1,1])
-            
+        
+        # set up company QPushbuttons
+        companyList = ["BMlogo", "BOlogo", "COlogo", "CPlogo", "Elogo", "NYClogo", "NYNHlogo", "PRRlogo"]
+        for i in range(8):
+            cName = str("co" + str(i))
+            cButton = QPushButton(cName, self)
+            cButton.setObjectName(cName)
+            cButton.setGeometry(1245, 125*i, 125,125)
+            cButton.clicked.connect(self.companyButtonClicked)
+            cButton.setText("")
+            cButton.setStyleSheet("border: none;")
+            self.companyButtons.append(cButton)
+        self.show()
         
     # method for getting the image files
     def getImage(self, imageName):
@@ -181,8 +194,8 @@ class MainWindow(QWidget):
         
         
     def stationButtonClicked(self):
-        button_name = self.sender().objectName()        # find out which station was clicked
-        print("Station: ", button_name)
+        buttonName = self.sender().objectName()        # find out which station was clicked
+        print("Station: ", buttonName)
         print("Current station " + self.currentStation)
         stationSlot = 100
         print(self.currentStation[4:])
@@ -192,7 +205,7 @@ class MainWindow(QWidget):
             company = self.currentStation[4]
             icon = QIcon(self.getImage(str("s" + company)))
             self.stationButtons[stationSlot].setIcon(icon)
-        self.currentStation = button_name
+        self.currentStation = buttonName
         stationSlot = self.findStation()
         self.stationButtons[stationSlot].setIcon(QIcon())
         
@@ -208,8 +221,8 @@ class MainWindow(QWidget):
         
         
     def trainButtonClicked(self):
-        button_name = self.sender().objectName()
-        number = button_name[1:]
+        buttonName = self.sender().objectName()
+        number = buttonName[1:]
         company = int(number[:1])
         card = int(number[1:])
         trainList = self.trainList[company]             # get the train list for the company
@@ -222,18 +235,42 @@ class MainWindow(QWidget):
         slot = (company * 4) + card                                         # find which slot in the trainbuttons is active
         icon = QIcon(self.getImage("train" + str(activeTrain)))             # get the new card icon
         self.trainButtons[slot].setIcon(icon)                               # update the pushbutton icon
-        if activeTrain == 3:
-            train_button = self.trainButtons[slot]
-            icon = QIcon(self.getImage("train" + str(activeTrain)))         # get the new card icon
-            color = QColor(255, 0, 0, 64)  # Red color
-            pixmap = icon.pixmap(icon.availableSizes()[0])                  # Get the first available size
-            # Blend the color with the icon pixmap
-            pixmap_with_color = QPixmap(pixmap.size())
-            pixmap_with_color.fill(Qt.transparent)                          # Fill pixmap with transparency
-            painter = QPainter(pixmap_with_color)
-            painter.setCompositionMode(QPainter.CompositionMode_SourceOver)  # Blend mode
-            painter.drawPixmap(0, 0, pixmap)
-            painter.setCompositionMode(QPainter.CompositionMode_SourceAtop)  # Apply color atop the pixmap
-            painter.fillRect(pixmap.rect(), color)
-            painter.end()
-            train_button.setIcon(QIcon(pixmap_with_color))                  # Set the modified pixmap with color to the button
+        if activeTrain > 1:
+            self.colorTrains(company, slot, card, activeTrain)
+            
+            
+    def companyButtonClicked(self):
+        buttonName = self.sender().objectName()
+        company = int(buttonName[-1])
+        print(str(company))
+        if company != self.currentCompany:
+            self.currentCompany = company
+            # this is where the code to let the board know that the tile has been finalized would go
+            self.lastTile = 0
+            if self.stationPlaced == False:
+                stationSlot = self.findStation()
+                print("Station slot = " + str(stationSlot))
+                company = self.currentStation[4]
+                icon = QIcon(self.getImage(str("s" + company)))
+                self.stationButtons[stationSlot].setIcon(icon)
+                
+    def colorTrains(self, company, slot, card, tValue):
+        colorList = [(255,0,0,64), (0,255,0,64), (0,0,255,64),(255,255,255,64)]
+        train_button = self.trainButtons[slot]
+        icon = QIcon(self.getImage("train" + str(tValue)))              # get the new card icon
+        color = QColor(*colorList[card])
+        pixmap = icon.pixmap(icon.availableSizes()[0])                  # Get the first available size
+        # Blend the color with the icon pixmap
+        pixmap_with_color = QPixmap(pixmap.size())
+        pixmap_with_color.fill(Qt.transparent)                          # Fill pixmap with transparency
+        painter = QPainter(pixmap_with_color)
+        painter.setCompositionMode(QPainter.CompositionMode_SourceOver)  # Blend mode
+        painter.drawPixmap(0, 0, pixmap)
+        painter.setCompositionMode(QPainter.CompositionMode_SourceAtop)  # Apply color atop the pixmap
+        painter.fillRect(pixmap.rect(), color)
+        painter.end()
+        train_button.setIcon(QIcon(pixmap_with_color))                  # Set the modified pixmap with color to the button
+
+        
+            
+        
