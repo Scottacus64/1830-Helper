@@ -24,7 +24,7 @@ class MainWindow(QWidget):
         self.trainList = []
         self.lastTile = 0
         self.currentStation = "stn 100"
-        self.currentCompany = 100
+        self.currentCompany = 0
         self.stationPlaced = False
         self.initUI()
         
@@ -170,18 +170,41 @@ class MainWindow(QWidget):
     
     # method for getting and displaying tiles gotten from theBoard
     def displayTile(self, tileNumber, location, angle):
-        if tileNumber > 0:
+        if tileNumber > 0:                                  # if it is a new hex
             tileName = self.tileList[tileNumber]
-            pixmap = self.getImage(tileName)
-            icon = QIcon(pixmap)
-        else:
+            icon = QIcon(self.getImage(tileName))
+        else:                                               # if it is an old icon that needs to be made blank
             icon = QIcon()
-            print("Pixmap set to None")
-        print("location = " + str(location) + " tileNumber = " + str(tileNumber))
         hex_widget = self.hexButtons[location]
-        hex_widget.setIcon(icon)
-        hex_widget.setIconSize(QSize(117, 116))  # Set the size of the icon
+        if angle > 0:
+            transform = QTransform()
+            transform.rotate(angle * 60)
+            original_pixmap = icon.pixmap(QSize(115, 115))
+            rotated_pixmap = original_pixmap.transformed(transform, Qt.SmoothTransformation)
+    
+            # Create a new QPixmap with the desired size and fill it with a transparent color
+            final_pixmap = QPixmap(QSize(115, 115))
+            final_pixmap.fill(Qt.transparent)
+    
+            # Calculate the position to draw the rotated pixmap to center it in the final pixmap
+            x_offset = (final_pixmap.width() - rotated_pixmap.width()) / 2
+            y_offset = (final_pixmap.height() - rotated_pixmap.height()) / 2
+    
+            # Draw the rotated pixmap onto the final pixmap
+            painter = QPainter(final_pixmap)
+            painter.drawPixmap(int(x_offset), int(y_offset), rotated_pixmap)
+            painter.end()
+    
+            hex_widget.setIcon(QIcon(final_pixmap))
+            hex_widget.setIconSize(QSize(115, 115))  # Set the size of the icon
+        else:
+            hex_widget.setIcon(icon)
+            hex_widget.setIconSize(QSize(115, 115))  # Set the size of the icon
 
+
+
+
+        '''
         # Calculate the padding to center the icon horizontally and vertically within the button
         horizontal_padding = (hex_widget.width() - 117) / 2
         vertical_padding = (hex_widget.height() - 116) / 2
@@ -190,7 +213,7 @@ class MainWindow(QWidget):
         hex_widget.setStyleSheet(
             f"padding-left: {horizontal_padding}px; padding-top: {vertical_padding}px;"
         )
-       
+       '''
         
         
     def stationButtonClicked(self):
@@ -247,30 +270,50 @@ class MainWindow(QWidget):
             self.currentCompany = company
             # this is where the code to let the board know that the tile has been finalized would go
             self.lastTile = 0
-            if self.stationPlaced == False:
+            if self.stationPlaced == False:                         # if a station was clicked and not placed then replace it
                 stationSlot = self.findStation()
                 print("Station slot = " + str(stationSlot))
                 company = self.currentStation[4]
                 icon = QIcon(self.getImage(str("s" + company)))
                 self.stationButtons[stationSlot].setIcon(icon)
                 
+                
     def colorTrains(self, company, slot, card, tValue):
         colorList = [(255,0,0,64), (0,255,0,64), (0,0,255,64),(255,255,255,64)]
         train_button = self.trainButtons[slot]
-        icon = QIcon(self.getImage("train" + str(tValue)))              # get the new card icon
+        icon = QIcon(self.getImage("train" + str(tValue)))               # get the new card icon
         color = QColor(*colorList[card])
-        pixmap = icon.pixmap(icon.availableSizes()[0])                  # Get the first available size
+        pixmap = icon.pixmap(icon.availableSizes()[0])                   # Get the first available size
         # Blend the color with the icon pixmap
         pixmap_with_color = QPixmap(pixmap.size())
-        pixmap_with_color.fill(Qt.transparent)                          # Fill pixmap with transparency
+        pixmap_with_color.fill(Qt.transparent)                           # Fill pixmap with transparency
         painter = QPainter(pixmap_with_color)
         painter.setCompositionMode(QPainter.CompositionMode_SourceOver)  # Blend mode
         painter.drawPixmap(0, 0, pixmap)
         painter.setCompositionMode(QPainter.CompositionMode_SourceAtop)  # Apply color atop the pixmap
         painter.fillRect(pixmap.rect(), color)
         painter.end()
-        train_button.setIcon(QIcon(pixmap_with_color))                  # Set the modified pixmap with color to the button
+        train_button.setIcon(QIcon(pixmap_with_color))                   # Set the modified pixmap with color to the button
 
+
+    def colorTiles(self, tileNumber, location, angle, train): 
+        colorList = [(255,255,0,128), (240,227,25,200), (240,227,25,200),(240,227,25,200)]
+        color = QColor(*colorList[train])
+        tileName = self.tileList[tileNumber]
+        icon = QIcon(self.getImage(tileName))
+        hex_widget = self.hexButtons[location]
+        # Blend the color with the icon pixmap       
+        pixmap = icon.pixmap(icon.availableSizes()[0])                   # Get the first available size
+        pixmap_with_color = QPixmap(pixmap.size())
+        pixmap_with_color.fill(Qt.transparent)                           # Fill pixmap with transparency
+        painter = QPainter(pixmap_with_color)
+        painter.setCompositionMode(QPainter.CompositionMode_SourceOver)  # Blend mode
+        painter.drawPixmap(0, 0, pixmap)
+        painter.setCompositionMode(QPainter.CompositionMode_SourceAtop)  # Apply color atop the pixmap
+        painter.fillRect(pixmap.rect(), color)
+        painter.end()
         
-            
+        hex_widget.setIcon(QIcon(pixmap_with_color)) 
+        hex_widget.setIconSize(QSize(115, 115))                         # Set the size of the icon
+        
         

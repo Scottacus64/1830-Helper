@@ -6,8 +6,9 @@ class Board:
         self.board_hexagons = []
         self.tiles_on_the_board = []
         self.initialze_standard_board()
-        self.possibleTiles = [[2,60],[20,0],[11,120],[17,180]]
+        self.possibleTiles = [[1,0],[1,1],[1,2],[17,0]]
         self.possibleTilesIndex = 0
+        self.lastLocation = (100,100)
 
 
     def initialze_standard_board(self):
@@ -223,11 +224,10 @@ class Board:
     # This method take in information from the GUI and returns tiles that can be played 
     def checkForPlayableTile(self, location, company, trainList):
         self.findAdjacentHexes(location)
-        returnList = self.possibleTiles[self.possibleTilesIndex]
-        self.possibleTilesIndex +=1
-        if self.possibleTilesIndex >= len(self.possibleTiles):
-            self.possibleTilesIndex = 0
-        return returnList
+        print("New Tile")
+        self.lastLocation = location
+        return self.possibleTiles
+        
     
     # method to find hexes that surround the target hex
     def findAdjacentHexes(self, location):
