@@ -31,8 +31,7 @@ class MainWindow(QWidget):
     def initUI(self):
         self.setGeometry(0, 0, 1692, 1000) #1245
         self.setWindowTitle('1830 Game')
-
-        
+  
         # Load map image
         current_dir = os.path.dirname(os.path.abspath(__file__))
         map_relative_path = os.path.join("resources", "map1830.jpg")
@@ -42,8 +41,6 @@ class MainWindow(QWidget):
         map_label.setGeometry(0,0,1245,1000)
         map_label.setPixmap(map_pixmap)
 
-        
-        
         # Load sidebar image
         sidebar_relative_path = os.path.join("resources", "sideBar.jpg")
         sidebar_image_path = os.path.join(current_dir, sidebar_relative_path)
@@ -52,9 +49,6 @@ class MainWindow(QWidget):
         sidebar_label.setGeometry(1245,0,447,1000)
         sidebar_label.setPixmap(sidebar_pixmap)
 
-        
-
-               
         # This a a list of all valid hexes that can be clicked
         map = [
             [0,0,0,0,0,0,0,0,0,0,0,0],
@@ -159,6 +153,7 @@ class MainWindow(QWidget):
             self.companyButtons.append(cButton)
         self.show()
         
+        
     # method for getting the image files
     def getImage(self, imageName):
         current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -181,43 +176,22 @@ class MainWindow(QWidget):
             transform.rotate(angle * 60)
             original_pixmap = icon.pixmap(QSize(115, 115))
             rotated_pixmap = original_pixmap.transformed(transform, Qt.SmoothTransformation)
-    
-            # Create a new QPixmap with the desired size and fill it with a transparent color
-            final_pixmap = QPixmap(QSize(115, 115))
-            final_pixmap.fill(Qt.transparent)
-    
-            # Calculate the position to draw the rotated pixmap to center it in the final pixmap
-            x_offset = (final_pixmap.width() - rotated_pixmap.width()) / 2
-            y_offset = (final_pixmap.height() - rotated_pixmap.height()) / 2
-    
-            # Draw the rotated pixmap onto the final pixmap
-            painter = QPainter(final_pixmap)
-            painter.drawPixmap(int(x_offset), int(y_offset), rotated_pixmap)
-            painter.end()
-    
+            final_pixmap = QPixmap(QSize(115, 115))                         # new QPixmap with the desired size
+            final_pixmap.fill(Qt.transparent)                               # transparent color
+            xOffset = (final_pixmap.width() - rotated_pixmap.width()) / 2   # draw the rotated pixmap to center it in the final pixmap
+            yOffset = (final_pixmap.height() - rotated_pixmap.height()) / 2
+            painter = QPainter(final_pixmap)                                # Draw the rotated pixmap onto the final pixmap
+            painter.drawPixmap(int(xOffset), int(yOffset), rotated_pixmap)
+            painter.end() 
             hex_widget.setIcon(QIcon(final_pixmap))
-            hex_widget.setIconSize(QSize(115, 115))  # Set the size of the icon
+            hex_widget.setIconSize(QSize(115, 115))                         # Set the size of the icon
         else:
             hex_widget.setIcon(icon)
-            hex_widget.setIconSize(QSize(115, 115))  # Set the size of the icon
-
-
-
-
-        '''
-        # Calculate the padding to center the icon horizontally and vertically within the button
-        horizontal_padding = (hex_widget.width() - 117) / 2
-        vertical_padding = (hex_widget.height() - 116) / 2
-        
-        # Apply style sheet to adjust padding
-        hex_widget.setStyleSheet(
-            f"padding-left: {horizontal_padding}px; padding-top: {vertical_padding}px;"
-        )
-       '''
+            hex_widget.setIconSize(QSize(115, 115))                         # Set the size of the icon
         
         
     def stationButtonClicked(self):
-        buttonName = self.sender().objectName()        # find out which station was clicked
+        buttonName = self.sender().objectName()                 # find out which station was clicked
         print("Station: ", buttonName)
         print("Current station " + self.currentStation)
         stationSlot = 100

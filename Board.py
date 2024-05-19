@@ -79,21 +79,6 @@ class Board:
                       (9, 19),
                       (11, 15)]
         
-        # ----- red_hexes -----
-        red_hexes = [(1, 9), (1, 11),
-                     (2, 24),
-                     (6, 2),
-                     (9, 1),
-                     (10, 2),
-                     (11, 13)]
-        
-        # ----- yellow_hexes -----
-        yellow_hexes = [(4, 10),
-                        (5, 5), (5, 11), (5, 23),
-                        (7, 19),
-                        (9, 15)]
-
-        
         # ----- one_city_hexes -----
         one_city_hexes = [(1, 19),
                           (2, 10), (2, 16),
@@ -131,14 +116,37 @@ class Board:
                           ((8, 12), "Pennsylvania RR"),
                           ((9, 15), "Baltimore & Ohio RR")]
         
-        # -----private_comp_hexes -----
-        private_comp_hexes = [((2, 20), "Champlain & St Lawrence"),
-                              ((4, 18), "Mohawk & Hudson"),
-                              ((6, 16), "Delaware & Hudson"),
-                              ((7, 15), "Schuykill Valley"),
-                              ((8, 18), "Camden & Amboy"),
-                              ((9, 13), "Baltimore & Ohio"), ((9, 15), "Baltimore & Ohio")]
+        # ----- entryExitStation -----
+        # (row, column), [[entry, exit, station]] exit == 0 for no exit, station == 0 for blank station, station == 10 no station
+        entryExitStationList = [((1,11), [[3,0,10],[4,0,10]]),  ((1,17),[[3,3,10]]), ((1,19), [[3.4,0]]),
+                            ((2,24), [[4,0,10]], [5,0,10]),
+                            ((4,2), [[2,3,0]]), ((4,14), [[2,5,0], [2,4,0], [4,5,0]]), ((4,25),[[4,5,10]]),
+                            ((5,19), [[0,0,0]]), ((5,23), [[1,3,0]]),
+                            ((6,2),[[1,0,10], [2,0,10], [3,0,10]]), ((6,6), [[3,4,0]]), ((6,24),[[5,6,10]]),
+                            ((7,19), [[1,0,0], [4,0,0]]),
+                            ((8,12)), [[2,5,0], [2,5,10]],
+                            ((9,1),[[2,0,10]]), ((9,15), [[2,4,0]]), ((9,19), [[5,6,10]]),
+                            ((10,2), [[1,0,10], [2,0,10]]), 
+                            ((11,13), [[1,0,10], 6,0,10]), ((11,15), [[6,0,0]])
+            ]
         
+        
+        # ----- voidSides_hexes -----
+        # (row, column), [void sides]
+        voidSidesList = [((2,10),[5]), ((2,12),[1]), ((2,14),[1,6]), ((2,16),[6]), ((2,20), [1]), ((2,22), [1,6]),
+                     ((3,7), [4,5,6]), ((3,9), [6]), ((3,11), [3]), ((3,13), [3,4]), ((3,17), [5,6]), ((3,23), [2]),
+                     ((4,4),[1,6]), ((4,6), [1,6]), ((4,12), [1,6]), ((4.16), [6]), 
+                     ((5,3), [5]), ((5.5), [3]), ((5,7), [2,3,4]), ((5,11), [5]), ((5,23), [2]),
+                     ((6,4), [2]), ((6,8), [1,5,6]), ((6,10), [6]), ((6,20), [3]), ((6,22), [3,4]),
+                     ((7,3), [5]), ((7,19), [2,3]),
+                     ((8,2),[5]), ((8,18), [2]),
+                     ((9,15),[3]), ((9,17), [3,4]),
+                     ((10,4), [3,4]), ((10,6), [3,4]), ((10,8), [3,4]), ((10,10), [3,4]), ((10,12), [4]), ((10,14), [2])
+            ]
+        
+        # ----- hexTile -----
+        hexTile = (0,0)
+
         # Create the hexagon objects
         for hex in on_board_hexes:
             #-----Hex ID-----
@@ -170,23 +178,8 @@ class Board:
             #-----Color-----
             if(hex in grey_hexes):
                 color = "grey"
-            elif(hex in red_hexes):
-                color = "red"
-            elif(hex in yellow_hexes):
-                color = "yellow"
             else:
                 color = "blank"
-        
-            #-----Private Company-----
-            hex_pc_ind = None
-            for ind, item in enumerate(private_comp_hexes): # Find if there is matching hex and get its ind
-                if(item[0] == hex):
-                    hex_pc_ind = ind
-                    break
-            if hex_pc_ind is None: # If there was no match, "", otherwise set PC to its string PC value
-                pc = ""
-            else:
-                pc = private_comp_hexes[hex_pc_ind][1]
         
             #-----Railroad Start-----
             hex_rr_ind = None
@@ -198,9 +191,33 @@ class Board:
                 rr_start = ""
             else:
                 rr_start = rr_start_hexes[hex_rr_ind][1]
+                
+            #-----EntryExitStation-----
+            entryExit = None
+            for item in entryExitStationList:
+                if item[0] == hex:
+                    entryExit = item[1]
+                    break
+            if entryExit is None:
+                entryExitStation = []
+            else:
+                entryExitStation = entryExit
+            
+            #-----VoidSides-----
+            hexVoidSides = None
+            for item in voidSidesList:
+                if item[0] == hex:
+                    hexVoidSides = item[1]
+                    break
+            if hexVoidSides is None:
+                voidSides = []
+            else:
+                voidSides = hexVoidSides
+            
+            #-----HexTile-----
         
             # Initialize the hex object
-            hex_to_append = Hexagon(hex_id, vil_count, city_count, color, pc, rr_start)
+            hex_to_append = Hexagon(hex_id, vil_count, city_count, color, rr_start, entryExitStation, voidSides, hexTile)
             self.board_hexagons.append(hex_to_append)
     
     # Create tiles that have rail on them initially
@@ -215,10 +232,9 @@ class Board:
  #  def place_initial_tiles(self):
         
     
-    
     def print_board(self):
         for a_hex in self.board_hexagons:
-            print(a_hex.hex_id, a_hex.vil_count, a_hex.city_count, a_hex.color, a_hex.pc, a_hex.rr_start)
+            print(a_hex.hex_id, a_hex.vil_count, a_hex.city_count, a_hex.color, a_hex.entryExitStation, a_hex.voidSides, a_hex.hexTile,  a_hex.rr_start)
             print("---------------")
      
     # This method take in information from the GUI and returns tiles that can be played 
