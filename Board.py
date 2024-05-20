@@ -225,8 +225,9 @@ class Board:
      
     # This method take in information from the GUI and returns tiles that can be played 
     def checkForPlayableTile(self, location, company, trainList, newStation):
-        self.findAdjacentHexes(location)
-        print("New Tile")
+        hexList = self.findAdjacentHexes(location)
+        for item in hexList:
+            print(item)
         self.lastLocation = location
         return self.possibleTiles
         
@@ -244,9 +245,9 @@ class Board:
             if locationSecond < 24:         # get above and right
                 testList.append((locationFirst - 1, locationSecond + 1))
         if locationSecond >1:               # get left
-            testList.append((locationFirst, locationSecond - 1))
+            testList.append((locationFirst, locationSecond - 2))
         if locationSecond < 24:             # get right
-            testList.append((locationFirst, locationSecond + 1))
+            testList.append((locationFirst, locationSecond + 2))
         if locationFirst < 15:              # get tiles below 
             if locationSecond > 1:          # below and left
                 testList.append((locationFirst + 1, locationSecond - 1))
@@ -255,9 +256,7 @@ class Board:
         for loc in testList:
             if loc not in self.off_board_hexes:
                 hexList.append(loc)
-        print("Hexes around " + str (location))
-        for hex in hexList:
-            print(hex)
+        return hexList
         
         
 
