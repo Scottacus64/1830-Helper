@@ -1,16 +1,15 @@
 
 class Tile:
-    def __init__(self, tile_id, upgrade_list, path_pairs, color, station_list, assoc_hex = None):
+    def __init__(self, tile_id, upgrade_list, path_pairs, station_list, assoc_hex = None):
         self.tile_id = tile_id
         self.upgrade_list = upgrade_list
         self.path_pairs = path_pairs
         self.orientation = 0
-        self.color = color
         self.station_list = station_list    #(("blank", 0), ("blank", 1)) station ownership, path pair associated with
         self.assoc_hex = assoc_hex
     
-    def with_assoc_hex(cls, tile_id, upgrade_list, path_pairs, color, station_list, assoc_hex):
-        return cls(tile_id, upgrade_list, path_pairs, color, station_list, assoc_hex)
+    def with_assoc_hex(cls, tile_id, upgrade_list, path_pairs, station_list, assoc_hex):
+        return cls(tile_id, upgrade_list, path_pairs, station_list, assoc_hex)
         
     def printHex(self):
         print(self.name_id, " is a hex!")

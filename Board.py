@@ -22,16 +22,7 @@ class Board:
             on_board_hexes
     
             grey_hexes
-            
-            red_hexes
-            
-            yellow_hexes
-            
-            non_colored_hexes
-            
-            mountain_hexes
-            
-            river_hexes
+
             
             one_city_hexes
             
@@ -42,8 +33,6 @@ class Board:
             two_villlage_hexes
             
             rr_start_hexes
-            
-            private_comp_hexes
         '''
         
         # ----- off_board_hexes -----
@@ -129,8 +118,6 @@ class Board:
                             ((10,2), [[1,0,10], [2,0,10]]), 
                             ((11,13), [[1,0,10], 6,0,10]), ((11,15), [[6,0,0]])
             ]
-        
-        
         # ----- voidSides_hexes -----
         # (row, column), [void sides]
         voidSidesList = [((2,10),[5]), ((2,12),[1]), ((2,14),[1,6]), ((2,16),[6]), ((2,20), [1]), ((2,22), [1,6]),
