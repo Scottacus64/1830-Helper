@@ -6,7 +6,7 @@ class TilePile():
         self.populate_pile()
     
     def populate_pile(self):
-        #tile_id, upgrade_list, path_pairs, color, png
+        #tile_id, upgrade_list, path_pairs, station list
         
         #----- yellow -----
         self.pile.append(Tile(1, (), ((2, 6),(3, 5)), ()))  #1

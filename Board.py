@@ -23,7 +23,6 @@ class Board:
     
             grey_hexes
 
-            
             one_city_hexes
             
             two_city_hexes
@@ -116,7 +115,7 @@ class Board:
                             ((8,12)), [[2,5,0], [2,5,10]],
                             ((9,1),[[2,0,10]]), ((9,15), [[2,4,0]]), ((9,19), [[5,6,10]]),
                             ((10,2), [[1,0,10], [2,0,10]]), 
-                            ((11,13), [[1,0,10], 6,0,10]), ((11,15), [[6,0,0]])
+                            ((11,13), [[1,0,10], [6,0,10]]), ((11,15), [[6,0,0]])
             ]
         # ----- voidSides_hexes -----
         # (row, column), [void sides]
@@ -221,11 +220,11 @@ class Board:
     
     def print_board(self):
         for a_hex in self.board_hexagons:
-            print(a_hex.hex_id, a_hex.vil_count, a_hex.city_count, a_hex.color, a_hex.entryExitStation, a_hex.voidSides, a_hex.hexTile,  a_hex.rr_start)
+            print(a_hex.hex_id, "v =", a_hex.vil_count, "c =", a_hex.city_count, "col = ", a_hex.color, "ees =", a_hex.entryExitStation, "hv =", a_hex.voidSides, "t =", a_hex.hexTile,  a_hex.rr_start)
             print("---------------")
      
     # This method take in information from the GUI and returns tiles that can be played 
-    def checkForPlayableTile(self, location, company, trainList):
+    def checkForPlayableTile(self, location, company, trainList, newStation):
         self.findAdjacentHexes(location)
         print("New Tile")
         self.lastLocation = location

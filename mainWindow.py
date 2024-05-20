@@ -10,7 +10,7 @@ Created on Sun May  5 07:55:38 2024
 import os
 from PyQt5.QtWidgets import QWidget, QLabel, QPushButton
 from PyQt5.QtGui import QPixmap, QTransform, QIcon, QPalette, QColor, QPainter
-from hex_pushbutton import HexPushButton
+from hexPushbutton import HexPushButton
 from PyQt5.QtCore import Qt, QSize
 
 
@@ -143,7 +143,7 @@ class MainWindow(QWidget):
         # set up company QPushbuttons
         companyList = ["BMlogo", "BOlogo", "COlogo", "CPlogo", "Elogo", "NYClogo", "NYNHlogo", "PRRlogo"]
         for i in range(8):
-            cName = str("co" + str(i))
+            cName = str("co" + str(i+1))
             cButton = QPushButton(cName, self)
             cButton.setObjectName(cName)
             cButton.setGeometry(1245, 125*i, 125,125)
