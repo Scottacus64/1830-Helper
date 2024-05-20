@@ -106,13 +106,14 @@ class Board:
         
         # ----- entryExitStation -----
         # (row, column), [[entry, exit, station]] exit == 0 for no exit, station == 0 for blank station, station == 10 no station
-        entryExitStationList = [((1,11), [[3,0,10],[4,0,10]]),  ((1,17),[[3,3,10]]), ((1,19), [[3.4,0]]),
-                            ((2,24), [[4,0,10]], [5,0,10]),
-                            ((4,2), [[2,3,0]]), ((4,14), [[2,5,0], [2,4,0], [4,5,0]]), ((4,25),[[4,5,10]]),
-                            ((5,19), [[0,0,0]]), ((5,23), [[1,3,0]]),
+        entryExitStationList = [((1,9), [[3,0,10]]), ((1,11), [[3,0,10],[4,0,10]]),  ((1,17),[[3,4,10]]), ((1,19), [[3,4,0]]),
+                            ((2,24), [[4,0,10], [5,0,10]]),
+                            ((3,15), [[1,5,10]]),
+                            ((4,2), [[2,3,0]]), ((4,14), [[2,5,0], [2,4,0], [4,5,0]]), ((4,24),[[4,5,10]]),
+                            ((5,9), [[6,1,10]]), ((5,19), [[0,0,0]]), ((5,23), [[1,3,0]]),
                             ((6,2),[[1,0,10], [2,0,10], [3,0,10]]), ((6,6), [[3,4,0]]), ((6,24),[[5,6,10]]),
                             ((7,19), [[1,0,0], [4,0,0]]),
-                            ((8,12)), [[2,5,0], [2,5,10]],
+                            ((8,12), [[2,5,0], [2,5,10]]),
                             ((9,1),[[2,0,10]]), ((9,15), [[2,4,0]]), ((9,19), [[5,6,10]]),
                             ((10,2), [[1,0,10], [2,0,10]]), 
                             ((11,13), [[1,0,10], [6,0,10]]), ((11,15), [[6,0,0]])
@@ -205,19 +206,7 @@ class Board:
             # Initialize the hex object
             hex_to_append = Hexagon(hex_id, vil_count, city_count, color, rr_start, entryExitStation, voidSides, hexTile)
             self.board_hexagons.append(hex_to_append)
-    
-    # Create tiles that have rail on them initially
-    # Given an id, return its corresponding hex
-    def find_hex_by_id(self, id_to_search_for):
-        for a_hex in self.board_hexagons:
-            if a_hex.hex_id == id_to_search_for:
-                return a_hex    #return the hex upon a match
-            else:
-                return None     #If there was no match, return None
-    
- #  def place_initial_tiles(self):
-        
-    
+
     def print_board(self):
         for a_hex in self.board_hexagons:
             print(a_hex.hex_id, "v =", a_hex.vil_count, "c =", a_hex.city_count, "col = ", a_hex.color, "ees =", a_hex.entryExitStation, "hv =", a_hex.voidSides, "t =", a_hex.hexTile,  a_hex.rr_start)
@@ -225,10 +214,26 @@ class Board:
      
     # This method take in information from the GUI and returns tiles that can be played 
     def checkForPlayableTile(self, location, company, trainList, newStation):
+        listOfPairedSides = [(3,6),(4,1),(2,5),(5,2),(1,4),(6,3)]
+        self.possibleTiles = []
+        listOfYellowTiles = []
         hexList = self.findAdjacentHexes(location)
-        for item in hexList:
-            print(item)
         self.lastLocation = location
+        # check for rail lines leading into hex
+        index = 0
+        for hex in hexList:
+            hexObject = self.findHex(hex) 
+            print(hexObject)
+            if hexObject is not None: 
+                for loc in hexObject.entryExitStation:
+                    # [[3,0,10],[4,0,10]]
+                    entrySide = loc[0]
+                    exitSide = loc[1]
+                    print("entry=" + str(entrySide) + " exit=" + str(exitSide) + " index=" + str(index))
+                    if entrySide == listOfPairedSides[index][0] or exitSide == listOfPairedSides[index][0]:
+                        if listOfPairedSides[index][1] not in self.possibleTiles:
+                            self.possibleTiles.append(listOfPairedSides[index][1])
+            index +=1
         return self.possibleTiles
         
     
@@ -256,8 +261,17 @@ class Board:
         for loc in testList:
             if loc not in self.off_board_hexes:
                 hexList.append(loc)
+            else:
+                hexList.append((0,0))
         return hexList
         
+    
+    def findHex(self, id):
+        print("id = " + str(id))
+        for hexObj in self.board_hexagons:
+            if hexObj.hex_id == id:
+                return hexObj    #return the hex upon a match
+        return None     #If there was no match, return None
         
 
 

@@ -73,7 +73,8 @@ class HexPushButton(QPushButton):
         newStation = 0
         self.tileList = self.theBoard.checkForPlayableTile(boardLocation, company, trainList, newStation)    # ask theBoard for a list of playable tiles to display 
         self.tileListIndex = 0
-        self.MainWindow.displayTile(self.tileList[0][0], location, self.tileList[0][1])
+        print("tileList = " + str(self.tileList))
+        #self.MainWindow.displayTile(self.tileList[0][0], location, self.tileList[0][1])
         
         
     def sameLocationClicked(self, location):
