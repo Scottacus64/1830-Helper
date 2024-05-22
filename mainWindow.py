@@ -65,14 +65,14 @@ class MainWindow(QWidget):
             ]
 
         # this is a list of all tile names from 1 to 70 in ascending order
-        self.tileList = [
-            "t1", "t2", "t3", "t4", "t7", "t8", "t9", 
-            "t14", "t15", "t16", "t18", "t19",
-            "t20", "t23", "t24", "t25", "t26", "t27", "t28", "t29", 
-            "t39", "t40", "t41", 't42', "t43", "t44", "t45", "t46", "t47",
-            "t53", "t54,", "t55", "t56", "t57", "t58", "t59",
-            "t61", "t62", "t63", "t64", "t65", "t66", "t67", "t68", "t69", "t70"
-            ]
+        self.tileDictionary = {
+            1:"t1", 2:"t2", 3:"t3", 4:"t4", 7:"t7", 8:"t8", 9:"t9", 
+            14:"t14", 15:"t15", 16:"t16", 18:"t18", 19:"t19",
+            20:"t20", 23:"t23", 24:"t24", 25:"t25", 26:"t26", 27:"t27", 28:"t28", 29:"t29", 
+            39:"t39", 40:"t40", 41:"t41", 42:"t42", 43:"t43", 44:"t44", 45:"t45", 46:"t46", 47:"t47",
+            53:"t53", 54:"t54,", 55:"t55", 56:"t56", 57:"t57", 58:"t58", 59:"t59",
+            61:"t61", 62:"t62", 63:"t63", 64:"t64", 65:"t65", 66:"t66", 67:"t67", 68:"t68", 69:"t69", 70:"t70"
+            }
         
         # this is the number of stations per company
         self.stationList = [2,3,3,4,3,4,2,4]
@@ -156,6 +156,7 @@ class MainWindow(QWidget):
         
     # method for getting the image files
     def getImage(self, imageName):
+        print("Image Name = " + imageName)
         current_dir = os.path.dirname(os.path.abspath(__file__))
         relative_path = os.path.join("resources", imageName)
         image_path = os.path.join(current_dir, relative_path)
@@ -166,7 +167,8 @@ class MainWindow(QWidget):
     # method for getting and displaying tiles gotten from theBoard
     def displayTile(self, tileNumber, location, angle):
         if tileNumber > 0:                                  # if it is a new hex
-            tileName = self.tileList[tileNumber]
+            print("tileNumber = " + str(tileNumber))
+            tileName = self.tileDictionary[tileNumber]
             icon = QIcon(self.getImage(tileName))
         else:                                               # if it is an old icon that needs to be made blank
             icon = QIcon()
@@ -273,7 +275,7 @@ class MainWindow(QWidget):
     def colorTiles(self, tileNumber, location, angle, train): 
         colorList = [(255,255,0,128), (240,227,25,200), (240,227,25,200),(240,227,25,200)]
         color = QColor(*colorList[train])
-        tileName = self.tileList[tileNumber]
+        tileName = self.tileDictionary[tileNumber]
         icon = QIcon(self.getImage(tileName))
         hex_widget = self.hexButtons[location]
         # Blend the color with the icon pixmap       
