@@ -256,16 +256,14 @@ class Board:
         print ("Void sides = " + str(voidInDirection))
         print("CityCount = " + str(locationHex.city_count))
         possibleTiles = []
-        if locationHex.hexTile is None:       # hex with no tile to upgrade
+        if locationHex.hexTile is None:                                     # hex with no tile to upgrade
             if railInDirection:
-                startTiles = [1, 2, 3, 4, 7, 8, 9, 55, 56, 57, 58, 69]
+                startTiles = [1, 2, 3, 4, 7, 8, 9, 55, 56, 57, 58, 69]      # base yellow tiles to upgrade to
                 
-                for tileNumber in startTiles:
+                for tileNumber in startTiles:                               # go through each of these tiles and choose tiles that match vil and city cts
                     testTile = self.checkThroughUnplayedTiles(tileNumber) 
                     if testTile.city_count == locationHex.city_count and testTile.village_count == locationHex.vil_count:
                         possibleTiles.append(tileNumber)
-                        print(str(len(testTile.path_pairs)))
-                print(possibleTiles)
             
         else:                               # hex with tile associated with it
             possibleTiles = location.upgrade_list
@@ -273,15 +271,11 @@ class Board:
         # this section looks through each tile in possibleTiles and selects and rotates the legal placements
         for tTile in possibleTiles:                                         # look through each possible tile number
             tile = self.checkThroughUnplayedTiles(tTile)                    # get the tile object for that number
-            print(tile)
-            print(tile.path_pairs)
-            print(len(tile.path_pairs))
-            
+
             pairList = []                                                   # make a list of all teh tuple values for pair sides
             for ee in range (len(tile.path_pairs)):
                 for i in range(2):
                     pairList.append(tile.path_pairs[ee][i])
-            print(pairList)
             
             for hexRailDirection in railInDirection:                        # look at each hex side that faces a rail
                 for eeSide in pairList:                                     # look at each enrty/exit side on the tile
@@ -299,30 +293,7 @@ class Board:
                             validRotation = False                           # if so set the flag to exclude this rotation for the tile
                     if validRotation == True:
                         self.possibleTiles.append((tile.tile_id, offset))   # add the tile number and rotation to the list
-                    
-            '''
-            for hexRailDirection in railInDirection:                        # look at each hex side that faces a rail
-                for j in range(len(tile.path_pairs)):
-                    for i in range(2):                                      # tiles have pairs of connected sides so need 0 and 1
-                        print(tile.path_pairs[j][i])
-                        offset = hexRailDirection - int(tile.path_pairs[j][i])
-                        if offset < 0:                                      # tle entry/exit left of hex rail direction
-                            offset += 6                                     # adding 6 will make the neg pos ie -1 -> +5
-                        if i == 0:                                          # if dealing with the first value in e/e pair
-                            tileExitSide = int(tile.path_pairs[j][1] )           # get the exit side
-                            newExit = tileExitSide + offset                 # rotate the exit side by the offset
-                            if newExit > 6:                                 # if rotating pushes the side past six then...
-                                newExit -=6                                 # subtract 6 ie 8 -> 2
-                            if newExit not in locationHex.voidSides:        # if the newExit is not pointing to a hex void side
-                                self.possibleTiles.append((tile.tile_id, offset))   # add the tuple of tile # and rotation to possibleTiles
-                        else:
-                             tileExitSide = int(tile.path_pairs[j][0])              # get the exit side
-                             newExit = tileExitSide + offset                # rotate the exit side by the offset
-                             if newExit > 6:                                # if rotating pushes the side past six then...
-                                 newExit -=6                                # subtract 6 ie 8 -> 2
-                             if newExit not in locationHex.voidSides:       # if the newExit is not pointing to a hex void side
-                                 self.possibleTiles.append((tile.tile_id, offset))   # add the tuple of tile # and rotation to possibleTiles
-            '''           
+                            
         return self.possibleTiles
         
     

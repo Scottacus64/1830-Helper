@@ -25,6 +25,7 @@ class MainWindow(QWidget):
         self.lastTile = 0
         self.currentStation = "stn 100"
         self.currentCompany = 0
+        self.stationClicked = False
         self.stationPlaced = False
         self.initUI()
         
@@ -109,6 +110,7 @@ class MainWindow(QWidget):
                     pad = pad + 4
                     if row > 8:                 # after the fourth company pad an additional 2
                         pad += 2
+                        
                 # station buttons
                 company = row//2
                 numberOfStations = self.stationList[company]
@@ -124,6 +126,7 @@ class MainWindow(QWidget):
                     sButton.setIconSize(button.size())
                     sButton.setIcon(icon)
                     self.stationButtons.append(sButton)
+                    
                 # train buttons
                 tName = str("t" + str(row//2) + str(col+(2*(row%2))))
                 tButton = QPushButton(tName, self)
@@ -156,7 +159,6 @@ class MainWindow(QWidget):
         
     # method for getting the image files
     def getImage(self, imageName):
-        print("Image Name = " + imageName)
         current_dir = os.path.dirname(os.path.abspath(__file__))
         relative_path = os.path.join("resources", imageName)
         image_path = os.path.join(current_dir, relative_path)
@@ -196,17 +198,19 @@ class MainWindow(QWidget):
         buttonName = self.sender().objectName()                 # find out which station was clicked
         print("Station: ", buttonName)
         print("Current station " + self.currentStation)
-        stationSlot = 100
-        print(self.currentStation[4:])
-        if int(self.currentStation[4:]) < 100:
+        if int(self.currentCompany) == int(buttonName[4]) + 1:      # check to see if the button clicked matches the current company
+            self.stationClicked = True
+            stationSlot = 100
+            print(self.currentStation[4:])
+            if int(self.currentStation[4:]) < 100:
+                stationSlot = self.findStation()
+                print("Station slot = " + str(stationSlot))
+                company = self.currentStation[4]
+                icon = QIcon(self.getImage(str("s" + company)))
+                self.stationButtons[stationSlot].setIcon(icon)
+            self.currentStation = buttonName
             stationSlot = self.findStation()
-            print("Station slot = " + str(stationSlot))
-            company = self.currentStation[4]
-            icon = QIcon(self.getImage(str("s" + company)))
-            self.stationButtons[stationSlot].setIcon(icon)
-        self.currentStation = buttonName
-        stationSlot = self.findStation()
-        self.stationButtons[stationSlot].setIcon(QIcon())
+            self.stationButtons[stationSlot].setIcon(QIcon())
         
         
     def findStation(self):
@@ -241,12 +245,12 @@ class MainWindow(QWidget):
     def companyButtonClicked(self):
         buttonName = self.sender().objectName()
         company = int(buttonName[-1])
-        print(str(company))
+        print("Current Company = " + str(company))
         if company != self.currentCompany:
             self.currentCompany = company
             # this is where the code to let the board know that the tile has been finalized would go
             self.lastTile = 0
-            if self.stationPlaced == False:                         # if a station was clicked and not placed then replace it
+            if self.stationClicked == True and self.stationPlaced == False:  # if a station was clicked and not placed then replace it
                 stationSlot = self.findStation()
                 print("Station slot = " + str(stationSlot))
                 company = self.currentStation[4]
