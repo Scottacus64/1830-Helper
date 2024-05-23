@@ -275,9 +275,11 @@ class Board:
                 
                 for tileNumber in startTiles:                               # go through each of these tiles and choose tiles that match vil and city cts
                     testTile = self.checkThroughUnplayedTiles(tileNumber) 
-                    if testTile.city_count == locationHex.city_count and testTile.village_count == locationHex.vil_count:
-                        possibleTiles.append(tileNumber)
-            
+                    print(tileNumber)
+                    if testTile is not None:
+                        if testTile.city_count == locationHex.city_count and testTile.village_count == locationHex.vil_count:
+                            possibleTiles.append(tileNumber)
+                
         else:                               # hex with tile associated with it
             possibleTiles = location.upgrade_list
             
@@ -354,6 +356,7 @@ class Board:
                 return self.unplayedTiles[ind]
             else:
                 ind += 1
+        return None
                 
     def updateHexWithTile(self, tileNumber, location, angle):
         hexLocation = self.hexDictionary[location]
@@ -390,6 +393,9 @@ class Board:
         hex.entryExitStation = rotatedEntryExit
         print ("HexTile = " + str(hex.hexTile))
         print ("Hex EE = " + str(hex.entryExitStation))
+        print("played = " + str(len(self.playedTiles)))
+        print("unplayed = " + str(len(self.unplayedTiles)))
+              
         
     def removeTileFromUnplayedTiles(self, tileNumber):
         index = 0

@@ -4,7 +4,7 @@ save_data_on_exit = True
 save_history = True
 save_non_project_files = False
 project_type = 'empty-project-type'
-recent_files = ['mainWindow.py', 'Board.py', 'Hexagon.py', 'TilePile.py', 'Tile.py', 'hexPushbutton.py', 'main.py']
+recent_files = ['mainWindow.py', 'Board.py', 'TilePile.py', 'hexPushbutton.py', 'main.py', 'Hexagon.py', 'Tile.py']
 
 [main]
 version = 0.2.0
