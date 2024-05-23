@@ -71,15 +71,17 @@ class HexPushButton(QPushButton):
         self.tileList = self.theBoard.checkForPlayableTile(boardLocation, company, trainList, newStation)    # ask theBoard for a list of playable tiles to display 
         self.tileListIndex = 0
         print("tileList = " + str(self.tileList))
-        self.MainWindow.displayTile(self.tileList[0][0], location, self.tileList[0][1])
+        if self.tileList:
+            self.MainWindow.displayTile(self.tileList[0][0], location, self.tileList[0][1])
         
         
     def sameLocationClicked(self, location):
-        self.tileListIndex +=1
-        if self.tileListIndex >= len(self.tileList):
-            self.tileListIndex = 0
-        ind = self.tileListIndex
-        self.MainWindow.displayTile(self.tileList[ind][0], location, self.tileList[ind][1])
+        if self.tileList:
+            self.tileListIndex +=1
+            if self.tileListIndex >= len(self.tileList):
+                self.tileListIndex = 0
+            ind = self.tileListIndex
+            self.MainWindow.displayTile(self.tileList[ind][0], location, self.tileList[ind][1])
 
 
     def findOverlappingButtons(self, pos):
