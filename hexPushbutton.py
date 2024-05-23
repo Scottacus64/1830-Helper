@@ -6,17 +6,14 @@ from Board import Board
 
 class HexPushButton(QPushButton):
     
-    board_instance = Board()  # Class variable to hold the shared Board object
-    board_instance.print_board()
-    
-    def __init__(self, name, main_window, parent=None):
+    def __init__(self, name, main_window, board, parent=None):
         super().__init__(parent)
         self.name = name
         self.MainWindow = main_window
         self.setFlat(True)
         self.rotation_angle = 0
         self.setStyleSheet("background-color: transparent; border: none; padding: 0;")
-        self.theBoard = HexPushButton.board_instance  # Use the shared Board object
+        self.theBoard = board  # Use the shared Board object
         self.rotationAngle = 0
         self.tileList = []
         self.tileListIndex = 0
@@ -67,7 +64,7 @@ class HexPushButton(QPushButton):
         self.MainWindow.lastTile = location                                                 # set the lastTile to this new location
         company = self.MainWindow.currentCompany
         trainList = self.MainWindow.trainList[company]
-        locationFirst = int(self.name[:2])                              # parsing out the tuple for board to use
+        locationFirst = int(self.name[:2])                                                  # parsing out the tuple for board to use
         locationSecond = int(self.name[2:])
         boardLocation = (locationFirst, locationSecond)
         newStation = 0

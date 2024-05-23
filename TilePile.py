@@ -6,7 +6,7 @@ class TilePile():
         self.populate_pile()
     
     def populate_pile(self):
-        #tile_id, upgrade_list, path_pairs, station list, village_count, city_count
+        #tile_id, upgrade_list, path_pairs, station list (owner followed by tuple associated with the station), village_count, city_count
         
         #----- yellow -----
         self.pile.append(Tile(1, (), ((2, 6),(3, 5)), (), 2, 0))  #1
@@ -24,7 +24,7 @@ class TilePile():
         self.pile.append(Tile(55, (), ((2, 5),(3, 6)), (), 2, 0)) #55
         self.pile.append(Tile(56, (), ((1, 3),(2, 6)), (), 2, 0)) #56
         for i in range(0, 4):
-            self.pile.append(Tile(57, (14, 15), [(3, 6)], (("blank", 0)), 0, 1))  #57
+            self.pile.append(Tile(57, (14, 15), [(3, 6)], [("blank", 0)], 0, 1))  #57
         for i in range(0, 2):
             self.pile.append(Tile(58, (), [(3, 5)], (), 1, 0))    #58
         self.pile.append(Tile(69, (), ((1, 5),(3, 6)), (), 2, 0)) #69

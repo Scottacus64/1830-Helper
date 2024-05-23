@@ -11,12 +11,14 @@ import os
 from PyQt5.QtWidgets import QWidget, QLabel, QPushButton
 from PyQt5.QtGui import QPixmap, QTransform, QIcon, QPalette, QColor, QPainter
 from hexPushbutton import HexPushButton
+from Board import Board
 from PyQt5.QtCore import Qt, QSize
 
 
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
+        self.board = Board()
         self.hexButtons = []                   # set up these global variables before the initUI
         self.stationButtons = []
         self.trainButtons = []
@@ -27,6 +29,7 @@ class MainWindow(QWidget):
         self.currentCompany = 0
         self.stationClicked = False
         self.stationPlaced = False
+        self.currentTile = [0,0,0]
         self.initUI()
         
     def initUI(self):
@@ -98,7 +101,7 @@ class MainWindow(QWidget):
                     else:
                         sCol = str(mCol)
                     name = sRow + sCol
-                    button = HexPushButton(name, self, self)         
+                    button = HexPushButton(name, self, self.board, self)         
                     button.resize(117,116)
                     button.move(-25+(100*col)+shift, 13+(87 * row))
                     self.hexButtons.append(button) 
@@ -140,7 +143,7 @@ class MainWindow(QWidget):
                 tButton.setIcon(icon)
                 self.trainButtons.append(tButton)
         
-        for i in range(8):
+        for i in range(9):
             self.trainList.append([1,1,1,1])
         
         # set up company QPushbuttons
@@ -168,11 +171,12 @@ class MainWindow(QWidget):
     
     # method for getting and displaying tiles gotten from theBoard
     def displayTile(self, tileNumber, location, angle):
-        if tileNumber > 0:                                  # if it is a new hex
+        if tileNumber > 0:                                      # if it is a new hex
+            self.currentTile = [tileNumber, location, angle]    # variable to know if any tiles have been clicked and what the tile info is
             print("tileNumber = " + str(tileNumber))
             tileName = self.tileDictionary[tileNumber]
             icon = QIcon(self.getImage(tileName))
-        else:                                               # if it is an old icon that needs to be made blank
+        else:                                                   # if it is an old icon that needs to be made blank
             icon = QIcon()
         hex_widget = self.hexButtons[location]
         if angle > 0:
@@ -256,7 +260,13 @@ class MainWindow(QWidget):
                 company = self.currentStation[4]
                 icon = QIcon(self.getImage(str("s" + company)))
                 self.stationButtons[stationSlot].setIcon(icon)
+            if self.currentTile != [0,0,0]:
+                print("tile = " + str(self.currentTile[0]))
+                print ("location =  " + str(self.currentTile[1]))
+                print("angle = " + str(self.currentTile[2]))
                 
+                self.board.updateHexWithTile(self.currentTile[0], self.currentTile[1] , self.currentTile[2])
+                self.currentTile = [0,0,0]
                 
     def colorTrains(self, company, slot, card, tValue):
         colorList = [(255,0,0,64), (0,255,0,64), (0,0,255,64),(255,255,255,64)]

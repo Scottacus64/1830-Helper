@@ -12,6 +12,19 @@ class Board:
         self.possibleTiles = [[1,0],[1,1],[1,2],[17,0]]
         self.possibleTilesIndex = 0
         self.lastLocation = (100,100)
+        
+        self.hexDictionary = {
+            0:"0210", 1:"0212", 2:"0214", 3:"0216", 4:"0218", 5:"0220", 6:"0222", 
+            7:"0307", 8:"0309", 9:"0311", 10:"0313", 11:"0317", 12:"0319", 13:"0321", 14:"0323",
+            15:"0402", 16:"0404", 17:"0406", 18:"0408", 19:"0410", 20:"0412", 21:"0414", 22:"0416", 23:"0418", 24:"0420",  25:"0422", 
+            26:"0503", 27:"0505", 28:"0507", 29:"0511", 30:"0513", 31:"0515", 32:"0517", 33:"0519", 34:"05214", 35:"0523",
+            36:"0604", 37:"0608", 38:"0610", 39:"0612", 40:"0614", 41:"0616", 42:"0618", 43:"0620", 44:"0622", 
+            45:"0703", 46:"0705", 47:"0707", 48:"0709", 49:"0711", 50:"0713", 51:"0715", 52:"0717", 53:"0719",
+            54:"0802", 55:"0804", 56:"0806", 57:"0808", 58:"0810", 59:"0814", 60:"0816", 61:"0818", 
+            62:"0903", 63:"0905", 64:"0907", 65:"0909", 66:"0911", 67:"0913", 68:"0915", 69:"0917", 
+            70:"1004", 71:"1006", 72:"1008", 73:"1010", 74:"1012", 75:"1014", 
+            76:"1115"
+            }
 
         
 
@@ -125,7 +138,7 @@ class Board:
         # ----- voidSides_hexes -----
         # (row, column), [void sides]
         voidSidesList = [((2,10),[5]), ((2,12),[1]), ((2,14),[1,6]), ((2,16),[6]), ((2,20), [1]), ((2,22), [1,6]),
-                     ((3,7), [1,4,5,6]), ((3,9), [6]), ((3,11), [3]), ((3,13), [3,4]), ((3,17), [5,6]), ((3,23), [2]),
+                     ((3,7), [1,4,5,6]), ((3,9), [6]), ((3,11), [3]), ((3,13), [3,4]), ((3,17), [5,6]), ((3,23), [2,3]),
                      ((4,2), [4,5,6,1]), ((4,4),[1,6]), ((4,6), [1,6]), ((4,12), [1,6]), ((4,14), [1,6]), ((4,16), [6]), 
                      ((5,3), [5]), ((5,5), [3]), ((5,7), [2,3,4]), ((5,11), [5]), ((5,23), [2]),
                      ((6,4), [2]), ((6,8), [1,5,6]), ((6,10), [6]), ((6,20), [3]), ((6,22), [3,4]),
@@ -185,8 +198,8 @@ class Board:
                 rr_start = rr_start_hexes[hex_rr_ind][1]
                 
             #-----EntryExitStation-----
-            entryExit = None
-            for item in entryExitStationList:
+            entryExit = None                        # list that contains the entry and exit sides of a hex and station associated with thsoe sides
+            for item in entryExitStationList:       # station = 0 for station without a company assigned to it station = 10 for no station
                 if item[0] == hex:
                     entryExit = item[1]
                     break
@@ -196,7 +209,7 @@ class Board:
                 entryExitStation = entryExit
             
             #-----VoidSides-----
-            hexVoidSides = None
+            hexVoidSides = None                     # void sides are sides that are illegal to send rails to like off ap or water
             for item in voidSidesList:
                 if item[0] == hex:
                     hexVoidSides = item[1]
@@ -341,6 +354,51 @@ class Board:
                 return self.unplayedTiles[ind]
             else:
                 ind += 1
+                
+    def updateHexWithTile(self, tileNumber, location, angle):
+        hexLocation = self.hexDictionary[location]
+        locationFirst = int(hexLocation[:2])                                                  # parsing out the tuple for board to use
+        locationSecond = int(hexLocation[2:])
+        boardLocation = (locationFirst, locationSecond)
+        hex = self.findHex(boardLocation)
+        tile = self.removeTileFromUnplayedTiles(tileNumber)
+        hex.hexTile = tileNumber
+        tileStations = tile.station_list
+        tileEntryExit = tile.path_pairs
+        rotatedEntryExit = []
+        index = 0
+        if angle > 0:
+            for pair in tileEntryExit:
+                tEntry = int(pair[0])
+                tExit = int(pair[1])
+                tEntry += angle
+                if tEntry > 6:
+                    tEntry -= 6
+                tExit += angle
+                if tExit > 6:
+                    tExit -= 6
+                if tileStations == ():
+                    rotatedEntryExit.append((tEntry, tExit, 10))
+                else:
+                    for station in tileStations:
+                        if int(station[1]) == index:
+                            rotatedEntryExit.append((tEntry, tExit, 0))                 
+                index +=1
+        else:
+            rotatedEntryExit = tileEntryExit                     
+
+        hex.entryExitStation = rotatedEntryExit
+        print ("HexTile = " + str(hex.hexTile))
+        print ("Hex EE = " + str(hex.entryExitStation))
+        
+    def removeTileFromUnplayedTiles(self, tileNumber):
+        index = 0
+        for tile in self.unplayedTiles:
+            if tile.tile_id == tileNumber:
+                poppedTile = self.unplayedTiles.pop(index)
+                self.playedTiles.append(poppedTile)
+                return poppedTile
+            index +=1
 
 
 
