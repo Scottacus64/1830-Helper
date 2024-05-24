@@ -370,6 +370,13 @@ class Board:
         locationSecond = int(hexLocation[2:])
         boardLocation = (locationFirst, locationSecond)
         hex = self.findHex(boardLocation)                               # get the hex object...
+        
+        oldTile = hex.hexTile
+        if oldTile > 0:
+            swapTile = self.addTileBackOnUnplayedList(oldTile)
+            if swapTile:
+                self.unplayedTiles.append(swapTile)
+        
         tile = self.removeTileFromUnplayedTiles(tileNumber)             # remove the tile from the unplayed list and add to played list
         hex.hexTile = tileNumber                                        # get the tile number assigned to the hex
         tileStations = tile.station_list
@@ -413,11 +420,20 @@ class Board:
                 return poppedTile
             index +=1
             
+            
+    def addTileBackOnUnplayedList(self, oldTile):
+        index = 0
+        for tile in self.playedTiles:
+            if tile.tile_id == oldTile:
+                swapTile = self.playedTiles.pop(index)
+                return swapTile
+            index +=1
+         
+            
     def playedTileLookUp(self, tileNumber):
         for tile in self.playedTiles:
             if tile.tile_id == tileNumber:
                 return tile
-
 
 
 
