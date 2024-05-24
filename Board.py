@@ -271,8 +271,7 @@ class Board:
         possibleTiles = []
         if locationHex.hexTile is None:                                     # hex with no tile to upgrade
             if railInDirection:
-                startTiles = [1, 2, 3, 4, 7, 8, 9, 55, 56, 57, 58, 69]      # base yellow tiles to upgrade to
-                
+                startTiles = [1, 2, 3, 4, 7, 8, 9, 55, 56, 57, 58, 69]      # base yellow tiles to upgrade to         
                 for tileNumber in startTiles:                               # go through each of these tiles and choose tiles that match vil and city cts
                     testTile = self.checkThroughUnplayedTiles(tileNumber) 
                     print(tileNumber)
@@ -281,7 +280,10 @@ class Board:
                             possibleTiles.append(tileNumber)
                 
         else:                               # hex with tile associated with it
-            possibleTiles = location.upgrade_list
+            hexTileNumber = locationHex.hexTile
+            tileToUpgrade = self.playedTileLookUp(hexTileNumber)
+            possibleTiles = tileToUpgrade.upgrade_list
+            
             
         # this section looks through each tile in possibleTiles and selects and rotates the legal placements
         for tTile in possibleTiles:                                         # look through each possible tile number
@@ -405,6 +407,11 @@ class Board:
                 self.playedTiles.append(poppedTile)
                 return poppedTile
             index +=1
+            
+    def playedTileLookUp(self, tileNumber):
+        for tile in self.playedTiles:
+            if tile.tile_id == tileNumber:
+                return tile
 
 
 
