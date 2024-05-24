@@ -24,7 +24,7 @@ class MainWindow(QWidget):
         self.trainButtons = []
         self.companyButtons = []
         self.trainList = []
-        self.lastTile = 0
+        self.lastHex = 0
         self.currentStation = "stn 100"
         self.currentCompany = 0
         self.stationClicked = False
@@ -253,7 +253,7 @@ class MainWindow(QWidget):
         if company != self.currentCompany:
             self.currentCompany = company
             # this is where the code to let the board know that the tile has been finalized would go
-            self.lastTile = 0
+            self.lastHex = 0
             if self.stationClicked == True and self.stationPlaced == False:  # if a station was clicked and not placed then replace it
                 stationSlot = self.findStation()
                 print("Station slot = " + str(stationSlot))

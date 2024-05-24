@@ -50,7 +50,7 @@ class HexPushButton(QPushButton):
         if hexagon.containsPoint(event.pos(), Qt.OddEvenFill):              # if the mouse is clicked inside a hex
             super().mousePressEvent(event)          
             location = hexDictionary[self.name]                             # check the hex dictionary to get the hex value
-            if location != self.MainWindow.lastTile: #and self.MainWindow.lastTile > 0:   # if the hex clicked is new
+            if location != self.MainWindow.lastHex:                        # if the hex clicked is new
                 self.newLocationClicked((location))
             else:
                  self.sameLocationClicked(location)
@@ -60,11 +60,29 @@ class HexPushButton(QPushButton):
             
             
     def newLocationClicked(self, location):
-        self.MainWindow.displayTile(0, self.MainWindow.lastTile, 0)                         # set the previous hex to blank
-        self.MainWindow.lastTile = location                                                 # set the lastTile to this new location
+        if self.MainWindow.lastHex > 0:
+            lastHexNumber = self.MainWindow.lastHex
+            hexLocation = self.theBoard.hexDictionary[lastHexNumber]
+            locationFirst = int(hexLocation[:2])                            # parsing out the tuple for board to use
+            locationSecond = int(hexLocation[2:])
+            boardLocation = (locationFirst, locationSecond)
+            lastHex = self.theBoard.findHex(boardLocation)
+            print("Last hex id = " + str(lastHex.hex_id) + " Last hex tile = " + str(lastHex.hexTile))
+            
+            hexLocation = self.theBoard.hexDictionary[location]
+            locationFirst = int(hexLocation[:2])                            # parsing out the tuple for board to use
+            locationSecond = int(hexLocation[2:])
+            boardLocation = (locationFirst, locationSecond)
+            hex = self.theBoard.findHex(boardLocation)
+            print("*******New hex clicked ************")
+            print("Hex id = " + str(hex.hex_id) + " old tile = " + str(hex.hexTile))
+            self.MainWindow.displayTile(lastHex.hexTile, self.MainWindow.lastHex, lastHex.angle)
+        else:
+            self.MainWindow.displayTile(0, self.MainWindow.lastHex, 0)     # set the previous hex to blank
+        self.MainWindow.lastHex = location                                 # set the lastHex to this new location
         company = self.MainWindow.currentCompany
         trainList = self.MainWindow.trainList[company]
-        locationFirst = int(self.name[:2])                                                  # parsing out the tuple for board to use
+        locationFirst = int(self.name[:2])                                  # parsing out the tuple for board to use
         locationSecond = int(self.name[2:])
         boardLocation = (locationFirst, locationSecond)
         newStation = 0

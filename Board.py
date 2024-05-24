@@ -134,7 +134,7 @@ class Board:
                             ((9,1),[[2,0,10]]), ((9,15), [[2,4,0]]), ((9,19), [[5,6,10]]),
                             ((10,2), [[1,0,10], [2,0,10]]), 
                             ((11,13), [[1,0,10], [6,0,10]]), ((11,15), [[6,0,0]])
-            ]
+                            ]
         # ----- voidSides_hexes -----
         # (row, column), [void sides]
         voidSidesList = [((2,10),[5]), ((2,12),[1]), ((2,14),[1,6]), ((2,16),[6]), ((2,20), [1]), ((2,22), [1,6]),
@@ -147,15 +147,12 @@ class Board:
                      ((9,15),[3]), ((9,17), [3,4]),
                      ((10,4), [3,4]), ((10,6), [3,4]), ((10,8), [3,4]), ((10,10), [3,4]), ((10,12), [4]), ((10,14), [2]),
                      ((11,15), [1,2,3,4,5])
-            ]
-        
-        # ----- hexTile -----
-        hexTile = None
+                     ]
 
         # Create the hexagon objects
         for hex in on_board_hexes:
             #-----Hex ID-----
-            hex_id = hex
+            hex_id = hex                # value tuple like (3,7)
             
             #-----Village Count-----
             if(hex in one_village_hexes):
@@ -218,11 +215,14 @@ class Board:
                 voidSides = []
             else:
                 voidSides = hexVoidSides
+                
+            angle = 0
             
             #-----HexTile-----
+            hexTile = 0
         
             # Initialize the hex object
-            hex_to_append = Hexagon(hex_id, vil_count, city_count, color, rr_start, entryExitStation, voidSides, hexTile)
+            hex_to_append = Hexagon(hex_id, vil_count, city_count, color, rr_start, entryExitStation, voidSides, hexTile, angle)
             self.board_hexagons.append(hex_to_append)
 
     def print_board(self):
@@ -269,7 +269,7 @@ class Board:
         print ("Void sides = " + str(voidInDirection))
         print("CityCount = " + str(locationHex.city_count))
         possibleTiles = []
-        if locationHex.hexTile is None:                                     # hex with no tile to upgrade
+        if locationHex.hexTile == 0:                                     # hex with no tile to upgrade
             if railInDirection:
                 startTiles = [1, 2, 3, 4, 7, 8, 9, 55, 56, 57, 58, 69]      # base yellow tiles to upgrade to         
                 for tileNumber in startTiles:                               # go through each of these tiles and choose tiles that match vil and city cts
@@ -278,7 +278,7 @@ class Board:
                     if testTile is not None:
                         if testTile.city_count == locationHex.city_count and testTile.village_count == locationHex.vil_count:
                             possibleTiles.append(tileNumber)
-                
+                print("Possible tiles = " + str(possibleTiles))
         else:                                                                   # hex with tile associated with it
             hexTileNumber = locationHex.hexTile
             tileToUpgrade = self.playedTileLookUp(hexTileNumber)
@@ -312,9 +312,10 @@ class Board:
                                 if newTestSide in locationHex.voidSides:            # check if that rotated side is lined up with a hex void side
                                     validRotation = False                           # if so set the flag to exclude this rotation for the tile
                             if validRotation == True:
-                                self.possibleTiles.append((tile.tile_id, offset))   # add the tile number and rotation to the list
+                                if (tile.tile_id, offset) not in self.possibleTiles:
+                                    self.possibleTiles.append((tile.tile_id, offset))   # add the tile number and rotation to the list
                                     
-                    return self.possibleTiles
+            return self.possibleTiles
         
     
     # method to find hexes that surround the target hex
@@ -365,28 +366,28 @@ class Board:
                 
     def updateHexWithTile(self, tileNumber, location, angle):
         hexLocation = self.hexDictionary[location]
-        locationFirst = int(hexLocation[:2])                                                  # parsing out the tuple for board to use
+        locationFirst = int(hexLocation[:2])                            # parsing out the tuple for board to use
         locationSecond = int(hexLocation[2:])
         boardLocation = (locationFirst, locationSecond)
-        hex = self.findHex(boardLocation)
-        tile = self.removeTileFromUnplayedTiles(tileNumber)
-        hex.hexTile = tileNumber
+        hex = self.findHex(boardLocation)                               # get the hex object...
+        tile = self.removeTileFromUnplayedTiles(tileNumber)             # remove the tile from the unplayed list and add to played list
+        hex.hexTile = tileNumber                                        # get the tile number assigned to the hex
         tileStations = tile.station_list
         tileEntryExit = tile.path_pairs
         rotatedEntryExit = []
         index = 0
-        if angle > 0:
-            for pair in tileEntryExit:
+        if angle > 0:                                                   # if the angle is greater than zero then rotate the tile...
+            for pair in tileEntryExit:                                  # entry and exit by the rotation angle
                 tEntry = int(pair[0])
                 tExit = int(pair[1])
                 tEntry += angle
-                if tEntry > 6:
-                    tEntry -= 6
+                if tEntry > 6:                                          # if the angles are greater than 6 get them back into the...
+                    tEntry -= 6                                         # range of zero to six
                 tExit += angle
                 if tExit > 6:
                     tExit -= 6
-                if tileStations == ():
-                    rotatedEntryExit.append((tEntry, tExit, 10))
+                if tileStations == ():                                  # need to add entry/exit/station to the hex so add the...
+                    rotatedEntryExit.append((tEntry, tExit, 10))        # station to the entry/exit pair 0=no company 10=no station
                 else:
                     for station in tileStations:
                         if int(station[1]) == index:
@@ -395,7 +396,8 @@ class Board:
         else:
             rotatedEntryExit = tileEntryExit                     
 
-        hex.entryExitStation = rotatedEntryExit
+        hex.entryExitStation = rotatedEntryExit                         # set the hex's ees value
+        hex.angle = angle                                               # set the hex's angle value
         print ("HexTile = " + str(hex.hexTile))
         print ("Hex EE = " + str(hex.entryExitStation))
         print("played = " + str(len(self.playedTiles)))
