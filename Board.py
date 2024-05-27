@@ -49,6 +49,14 @@ class Board:
             two_villlage_hexes
             
             rr_start_hexes
+            
+            entryExitStation
+            
+            voidSides
+            
+            hexTile
+            
+            angle
         '''
         
         # ----- off_board_hexes -----
@@ -85,15 +93,16 @@ class Board:
                       (11, 15)]
         
         # ----- one_city_hexes -----
-        one_city_hexes = [(1, 19),
-                          (2, 10), (2, 16),
-                          (4, 2), (4, 14),
-                          (5, 19), (5, 23),
-                          (6, 4), (6, 6), (6, 16), (6, 22),
-                          (8, 4), (8, 10), (8, 12), (8, 16),
-                          (9, 15),
-                          (10, 14),
-                          (11, 15)]
+        one_city_hexes = [[(1, 19),"0"],
+                          [(2, 10), "0"], [(2, 16), "0"],
+                          [(4, 2), "0"], [(4, 14), "0"],
+                          [(5, 19), "0"], [(5, 23), "Boston"],
+                          [(6, 4), "0"], [(6, 6), "0"], [(6, 16), "0"], [(6, 22), "0"],
+                          [(8, 4), "0"], [(8, 10), "0"], [(8, 12), "0"], [(8, 16), "0"],
+                          [(9, 15), "Baltimore"],
+                          [(10, 14), "0"],
+                          [(11, 15), "0"]
+                          ]
         
         # ----- two_city_hexes -----
         two_city_hexes = [((4, 10), "OO"),
@@ -154,6 +163,9 @@ class Board:
             #-----Hex ID-----
             hex_id = hex                # value tuple like (3,7)
             
+            #-----HexTile-----
+            hexTile = 0
+            
             #-----Village Count-----
             if(hex in one_village_hexes):
                 vil_count = 1
@@ -163,19 +175,26 @@ class Board:
                 vil_count = 0
             
             #-----City Count-----
-            hex_city_count_ind = None
+            city_count = 0
+            print(str(hex))
+            for cityList in one_city_hexes:
+                print("CL = " + str(cityList[0]))
+                if cityList[0] == hex: # Case for checking if there is only one city
+                    city_count = 1
+                    if cityList[1] == "Boston":
+                        hexTile = 81
+                    if cityList[1] == "Baltimore":
+                        hexTile = 80
             
-            if(hex in one_city_hexes): # Case for checking if there is only one city
-                city_count = 1
-            else: # Case hit for two cities or no cities
-                for ind, item in enumerate(two_city_hexes): # Find if there is matching hex and get its ind
-                    if(item[0] == hex):
-                        hex_city_count_ind = ind
-                        break
-                if hex_city_count_ind is None: # If there was no match, then city_count is 0
-                    city_count = 0
-                else:
-                    city_count = two_city_hexes[hex_city_count_ind][1] # If there are two cities, then return OO or NY
+            for twoCityList in two_city_hexes: # Find if there is matching hex and get its ind
+                if twoCityList[0] == hex:
+                    city_count = 2
+                    if twoCityList[1]  == "NY":
+                        hexTile = 82
+                    else:
+                        hexTile = 83
+            print("")
+              
             
             #-----Color-----
             if(hex in grey_hexes):
@@ -218,12 +237,13 @@ class Board:
                 
             angle = 0
             
-            #-----HexTile-----
-            hexTile = 0
+
         
             # Initialize the hex object
             hex_to_append = Hexagon(hex_id, vil_count, city_count, color, rr_start, entryExitStation, voidSides, hexTile, angle)
             self.board_hexagons.append(hex_to_append)
+            
+        self.print_board()
 
     def print_board(self):
         for a_hex in self.board_hexagons:
@@ -267,6 +287,7 @@ class Board:
         print ("Void sides = " + str(voidInDirection))
         print("CityCount = " + str(locationHex.city_count))
         possibleTiles = []
+        upgradeTile = False
         hexDelta = 0
         # check a hex with no tile placed to upgreade
         if locationHex.hexTile == 0:                                        # hex with no tile to upgrade
@@ -277,9 +298,9 @@ class Board:
                     print(tileNumber)
                     if testTile is not None:
                         if testTile.city_count == locationHex.city_count and testTile.village_count == locationHex.vil_count:
-                            possibleTiles.append(tileNumber)
+                            possibleTiles.append((tileNumber, 0))
                 print("Possible tiles = " + str(possibleTiles))
-                hexDelta = 0                                                # hexDelta is the distance between the two entry exit sides
+                                                               # hexDelta is the distance between the two entry exit sides
                 
         # the hex already has a tile so the upgrade list is used
         else:                                                                   # hex with tile associated with it
@@ -287,17 +308,23 @@ class Board:
             tileToUpgrade = self.playedTileLookUp(hexTileNumber)
             possibleTiles = tileToUpgrade.upgrade_list
             print("possible Tiles = " + str(possibleTiles))
+            upgradeTile = True
+            '''
             hexDelta = locationHex.entryExitStation[0][0] - locationHex.entryExitStation[0][1]  # subtract two rail sides
             if hexDelta < 0:                                                                    # if this makes a negative value add 6 to make pos
                 hexDelta +=6                                                                    # this gives five discrete values which can give rotation information
             print(locationHex.entryExitStation)
             print("hexDelta = " + str(hexDelta))
+            '''
             
         # this section looks through each tile in possibleTiles and selects and rotates the legal placements
         if possibleTiles:
+            validRotation = True
             for tTile in possibleTiles:                                         # look through each possible tile number
-                tile = self.checkThroughUnplayedTiles(tTile)                    # get the tile object for that number
-                tileSides = self.findSides(tile)
+                tile = self.checkThroughUnplayedTiles(tTile[0])                 # get the tile object for that number
+                angle = tTile[1]
+                tileSides = self.findSides(tile, angle)                                # get a list of all sides of the tile that have a rail on them
+                '''
                 pairList = []                                                   # make a list of all the tuple values for pair sides/delta
                 if tile.path_pairs: 
                     for ee in range (len(tile.path_pairs)):                     # go through each tile.path_pairs
@@ -315,41 +342,73 @@ class Board:
                                 pairDelta +=6                                   # make negative distances positive
                             if ((outputPair), pairDelta) not in pairList:       # if this is a new entry (ie don't add 3 twice ([1,4],3), ([1,4],3)
                                 pairList.append(((outputPair), pairDelta))       # add the entry to the pairList
-                        
+                      
                     print("********Pair List*********" + str(pairList) + " HexDelta ="  + str(hexDelta))
-                    # the current code when upgrding makes tracks always trun to the left (counterclockwise) whe replaciing a turning track
+                    '''
+                    
+                if upgradeTile == False:
                     for hexRailDirection in railInDirection:                    # look at each hex side that faces a rail
-                        for eeSideList in pairList:                             # look at each enrty/exit/delta on the tile
+                        for eeSide in tileSides:                                # look at each rail side for the tile
                             validRotation = True                                # flag to tell if the rotation being tested is valid
-                            offset = hexRailDirection - eeSideList[0][0]        # find the number of rotation steps needed to line up the rails
+                            offset = hexRailDirection - eeSide                  # find the number of rotation steps needed to line up the rails
                             if offset < 0:                                      # tile entry/exit is left of hex rail direction
                                 offset += 6  
-                            print("TileSides = " + str(eeSideList) + " offset = " + str(offset) + " tileSides = " + str(tileSides))
-                            if eeSideList[1] == hexDelta or hexDelta == 0:      # if the tile's config matches the one on the hex or hex not set  
-                                for side in tileSides:                          # look at each side a rail touches on the tile
-                                    if eeSideList[0][0] == side:                # if the side is the one that set the rotation, skip it
-                                        continue
-                                    print("side = " + str(side) + " offset = " + str(offset))
-                                    newTestSide = side + offset     # rotate the test side to match the tile rotation
-                                    if newTestSide > 6:
-                                        newTestSide -=6
-                                    print("NTS = " + str(newTestSide) + " Void sides = " + str(locationHex.voidSides))
-                                    if newTestSide in locationHex.voidSides:    # check if that rotated side is lined up with a hex void side
-                                        validRotation = False                   # if so set the flag to exclude this rotation for the tile
-                                if validRotation == True:
-                                    if (tile.tile_id, offset) not in self.possibleTiles:
-                                        self.possibleTiles.append((tile.tile_id, offset))   # add the tile number and rotation to the list
-            print("Hex Void sides = " + str(locationHex.voidSides))       
+                            for i in range(2):
+                                testSide = tileSides[i] + offset
+                                if testSide > 6:
+                                    testSide -=6
+                                if testSide in locationHex.voidSides:
+                                    validRotation = False
+                            if validRotation == True:
+                                if (tile.tile_id, offset) not in self.possibleTiles:
+                                    self.possibleTiles.append((tile.tile_id, offset)) 
+                else:
+                    validRotation = True
+                    angle = angle + locationHex.angle
+                    if angle > 6:
+                        angle -=6
+                    print("TileSides = " + str(tileSides) + " angle = " + str(angle) + " voidSides = " + str(locationHex.voidSides))
+                    for eeSide in tileSides:
+                        testSide = eeSide + angle
+                        if testSide > 6:
+                            testSide -=6
+                        if testSide in locationHex.voidSides:
+                            validRotation = False
+                    offset = angle
+                    '''
+                    print("TileSides = " + str(eeSide) + " offset = " + str(offset) + " tileSides = " + str(tileSides))
+                    if eeSideList[1] == hexDelta or hexDelta == 0:      # if the tile's config matches the one on the hex or hex not set  
+                        for side in tileSides:                          # look at each side a rail touches on the tile
+                            if eeSideList[0][0] == side:                # if the side is the one that set the rotation, skip it
+                                continue
+                            print("side = " + str(side) + " offset = " + str(offset))
+                            newTestSide = side + offset     # rotate the test side to match the tile rotation
+                            if newTestSide > 6:
+                                newTestSide -=6
+                            print("NTS = " + str(newTestSide) + " Void sides = " + str(locationHex.voidSides))
+                            if newTestSide in locationHex.voidSides:    # check if that rotated side is lined up with a hex void side
+                                validRotation = False                   # if so set the flag to exclude this rotation for the tile
+                        if validRotation == True:
+                            if (tile.tile_id, offset) not in self.possibleTiles:
+                                self.possibleTiles.append((tile.tile_id, offset))   # add the tile number and rotation to the list
+                    '''    
+                if validRotation == True:
+                    if (tile.tile_id, offset) not in self.possibleTiles:
+                        self.possibleTiles.append((tile.tile_id, offset))   # add the tile number and rotation to the list
             print("****" + str(self.possibleTiles))
             return self.possibleTiles
         
-    # method to find all sides touched by rails on a tile   
-    def findSides(self, tile):
+        
+    # method to rotate a tile, find all sides touched by rails and output a list of unique sides with rails (no repeats)
+    def findSides(self, tile, angle):
         listOfSides = []
         for pair in tile.path_pairs:
             for i in range(2):
-                if pair[i] not in listOfSides:
-                    listOfSides.append(pair[i])
+                pairSide = pair[i]
+                if pairSide > 6:
+                    pairSide -=6
+                if pairSide not in listOfSides:
+                    listOfSides.append(pairSide)
         return listOfSides
         
     
