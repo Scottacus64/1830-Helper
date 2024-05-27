@@ -317,7 +317,7 @@ class Board:
                                 pairList.append(((outputPair), pairDelta))       # add the entry to the pairList
                         
                     print("********Pair List*********" + str(pairList) + " HexDelta ="  + str(hexDelta))
-                    
+                    # the current code when upgrding makes tracks always trun to the left (counterclockwise) whe replaciing a turning track
                     for hexRailDirection in railInDirection:                    # look at each hex side that faces a rail
                         for eeSideList in pairList:                             # look at each enrty/exit/delta on the tile
                             validRotation = True                                # flag to tell if the rotation being tested is valid
@@ -327,7 +327,6 @@ class Board:
                             print("TileSides = " + str(eeSideList) + " offset = " + str(offset) + " tileSides = " + str(tileSides))
                             if eeSideList[1] == hexDelta or hexDelta == 0:      # if the tile's config matches the one on the hex or hex not set  
                                 for side in tileSides:                          # look at each side a rail touches on the tile
-                                    print("eeSide = " + str(eeSideList[0][i]))
                                     if eeSideList[0][0] == side:                # if the side is the one that set the rotation, skip it
                                         continue
                                     print("side = " + str(side) + " offset = " + str(offset))
