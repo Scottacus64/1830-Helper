@@ -259,7 +259,7 @@ class MainWindow(QWidget):
             self.sender().setIcon(pixmap)
             self.currentCompany = company
             # this is where the code to let the board know that the tile has been finalized would go
-            self.lastHex = -1
+            self.lastHex = -1       # set to -1 not 0 so that if hex 0 is clicked it will register as a new hex and not be rejected
             if self.stationClicked == True and self.stationPlaced == False:  # if a station was clicked and not placed then replace it
                 stationSlot = self.findStation()
                 print("Station slot = " + str(stationSlot))

@@ -288,9 +288,9 @@ class Board:
         possibleTiles = []
         upgradeTile = False
 
-        # check a hex with no tile placed to upgreade
+        # check to see if a hex has a tile placed to upgreade
         if locationHex.hexTile == 0:                                        # hex with no tile to upgrade
-            if railInDirection:
+            if railInDirection:                                             # since this is a hex with no tiles check to see if rails lead into the hex
                 startTiles = [1, 2, 3, 4, 7, 8, 9, 55, 56, 57, 58, 69]      # base yellow tiles to upgrade to         
                 for tileNumber in startTiles:                               # go through each of these tiles and choose tiles that match vil and city cts
                     testTile = self.checkThroughUnplayedTiles(tileNumber) 
@@ -314,7 +314,7 @@ class Board:
                 tile = self.checkThroughUnplayedTiles(tTile[0])                 # get the tile object for that number
                 angle = tTile[1]
                 tileSides = self.findSides(tile, angle)                         # get a list of all sides of the tile that have a rail on them
-                    
+                print("**** tileSides = " + str(tileSides))  
                 if upgradeTile == False:                                        # this is a hex with no previous tile on it
                     for hexRailDirection in railInDirection:                    # look at each hex side that faces a rail
                         for eeSide in tileSides:                                # look at each rail side for the tile
@@ -322,8 +322,8 @@ class Board:
                             offset = hexRailDirection - eeSide                  # find the number of rotation steps needed to line up the rails
                             if offset < 0:                                      # tile entry/exit is left of hex rail direction
                                 offset += 6  
-                            for i in range(2):
-                                testSide = tileSides[i] + offset
+                            for tSide in tileSides:  
+                                testSide = tSide + offset
                                 if testSide > 6:
                                     testSide -=6
                                 if testSide in locationHex.voidSides:
