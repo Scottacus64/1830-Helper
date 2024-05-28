@@ -15,27 +15,6 @@ class Tile:
         print(self.name_id, " is a hex!")
     
     
-    '''
-    Functions needed
-    -----------------
-    place tile function():
-        Parameters:
-            hex_id (row, col)
-            hex_color (grey, red, blank, yellow, green, brown)
-        Functionality:
-            Check if current company is able to place the hex_id passed in
-            Check the color to see if it is a new tile being placed or an upgrade of an existing tile
-            If upgrade:
-                1) check to see if the current tile's upgrade_list is empty
-                    a) if it is empty, there are no valid upgrades
-                    b) if there is at least one value, then an upgrade may be possible
-                2) see what trains are available to see if an upgrade is allowed to the next color
-            If new tile:
-                1) If it's NYC's turn, and their rr_start is blank, allow for tile placement
-            
-    
-    '''
-    
     
     
     

@@ -17,6 +17,7 @@ class HexPushButton(QPushButton):
         self.rotationAngle = 0
         self.tileList = []
         self.tileListIndex = 0
+        self.firstPress = True
         
         # this is a list of all tile names from 1 to 70 in ascending order
         self.tileKey = [
@@ -50,8 +51,10 @@ class HexPushButton(QPushButton):
         if hexagon.containsPoint(event.pos(), Qt.OddEvenFill):              # if the mouse is clicked inside a hex
             super().mousePressEvent(event)          
             location = hexDictionary[self.name]                             # check the hex dictionary to get the hex value
-            if location != self.MainWindow.lastHex:                        # if the hex clicked is new
+            print("location = " + str(location) + " MW LastHex = " + str (self.MainWindow.lastHex))
+            if location != self.MainWindow.lastHex or self.firstPress == True: # if the hex clicked is new
                 self.newLocationClicked((location))
+                self.firstPress = False
             else:
                  self.sameLocationClicked(location)
             
@@ -60,7 +63,7 @@ class HexPushButton(QPushButton):
             
             
     def newLocationClicked(self, location):
-        if self.MainWindow.lastHex > 0:
+        if self.MainWindow.lastHex > -1:
             lastHexNumber = self.MainWindow.lastHex
             hexLocation = self.theBoard.hexDictionary[lastHexNumber]
             locationFirst = int(hexLocation[:2])                            # parsing out the tuple for board to use

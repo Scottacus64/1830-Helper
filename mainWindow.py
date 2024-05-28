@@ -74,8 +74,9 @@ class MainWindow(QWidget):
             14:"t14", 15:"t15", 16:"t16", 18:"t18", 19:"t19",
             20:"t20", 23:"t23", 24:"t24", 25:"t25", 26:"t26", 27:"t27", 28:"t28", 29:"t29", 
             39:"t39", 40:"t40", 41:"t41", 42:"t42", 43:"t43", 44:"t44", 45:"t45", 46:"t46", 47:"t47",
-            53:"t53", 54:"t54,", 55:"t55", 56:"t56", 57:"t57", 58:"t58", 59:"t59",
-            61:"t61", 62:"t62", 63:"t63", 64:"t64", 65:"t65", 66:"t66", 67:"t67", 68:"t68", 69:"t69", 70:"t70"
+            53:"t53", 54:"t54", 55:"t55", 56:"t56", 57:"t57", 58:"t58", 59:"t59",
+            61:"t61", 62:"t62", 63:"t63", 64:"t64", 65:"t65", 66:"t66", 67:"t67", 68:"t68", 69:"t69", 
+            70:"t70", 80:"t80", 81:"t81", 82:"t82", 83:"t83"
             }
         
         # this is the number of stations per company
@@ -152,10 +153,11 @@ class MainWindow(QWidget):
             cName = str("co" + str(i+1))
             cButton = QPushButton(cName, self)
             cButton.setObjectName(cName)
-            cButton.setGeometry(1245, 125*i, 125,125)
+            cButton.setGeometry(1237, 125*i, 125,125)
             cButton.clicked.connect(self.companyButtonClicked)
             cButton.setText("")
             cButton.setStyleSheet("border: none;")
+            cButton.setIconSize(QSize(125,125))
             self.companyButtons.append(cButton)
         self.show()
         
@@ -173,7 +175,6 @@ class MainWindow(QWidget):
     def displayTile(self, tileNumber, location, angle):
         if tileNumber > 0:                                      # if it is a new hex
             self.currentTile = [tileNumber, location, angle]    # variable to know if any tiles have been clicked and what the tile info is
-            print("tileNumber = " + str(tileNumber))
             tileName = self.tileDictionary[tileNumber]
             icon = QIcon(self.getImage(tileName))
         else:                                                   # if it is an old icon that needs to be made blank
@@ -248,12 +249,17 @@ class MainWindow(QWidget):
             
     def companyButtonClicked(self):
         buttonName = self.sender().objectName()
+        pixmap =QIcon(self.getImage(buttonName))    
         company = int(buttonName[-1])
         print("Current Company = " + str(company))
         if company != self.currentCompany:
+            for cButton in self.companyButtons:
+                icon = QIcon ()
+                cButton.setIcon(icon)
+            self.sender().setIcon(pixmap)
             self.currentCompany = company
             # this is where the code to let the board know that the tile has been finalized would go
-            self.lastHex = 0
+            self.lastHex = -1
             if self.stationClicked == True and self.stationPlaced == False:  # if a station was clicked and not placed then replace it
                 stationSlot = self.findStation()
                 print("Station slot = " + str(stationSlot))
