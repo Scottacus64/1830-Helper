@@ -51,7 +51,6 @@ class HexPushButton(QPushButton):
         if hexagon.containsPoint(event.pos(), Qt.OddEvenFill):              # if the mouse is clicked inside a hex
             super().mousePressEvent(event)          
             location = hexDictionary[self.name]                             # check the hex dictionary to get the hex value
-            print("location = " + str(location) + " MW LastHex = " + str (self.MainWindow.lastHex))
             if location != self.MainWindow.lastHex or self.firstPress == True: # if the hex clicked is new
                 self.newLocationClicked((location))
                 self.firstPress = False
@@ -70,15 +69,11 @@ class HexPushButton(QPushButton):
             locationSecond = int(hexLocation[2:])
             boardLocation = (locationFirst, locationSecond)
             lastHex = self.theBoard.findHex(boardLocation)
-            print("Last hex id = " + str(lastHex.hex_id) + " Last hex tile = " + str(lastHex.hexTile))
-            
             hexLocation = self.theBoard.hexDictionary[location]
             locationFirst = int(hexLocation[:2])                            # parsing out the tuple for board to use
             locationSecond = int(hexLocation[2:])
             boardLocation = (locationFirst, locationSecond)
             hex = self.theBoard.findHex(boardLocation)
-            print("*******New hex clicked ************")
-            print("Hex id = " + str(hex.hex_id) + " old tile = " + str(hex.hexTile))
             self.MainWindow.displayTile(lastHex.hexTile, self.MainWindow.lastHex, lastHex.angle)
         else:
             self.MainWindow.displayTile(0, self.MainWindow.lastHex, 0)     # set the previous hex to blank
@@ -91,7 +86,6 @@ class HexPushButton(QPushButton):
         newStation = 0
         self.tileList = self.theBoard.checkForPlayableTile(boardLocation, company, trainList, newStation)    # ask theBoard for a list of playable tiles to display 
         self.tileListIndex = 0
-        print("tileList = " + str(self.tileList))
         if self.tileList:
             self.MainWindow.displayTile(self.tileList[0][0], location, self.tileList[0][1])
         

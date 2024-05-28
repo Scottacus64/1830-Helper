@@ -221,7 +221,6 @@ class MainWindow(QWidget):
     def findStation(self):
         i = 0
         for stationTest in self.stationButtons:
-            #print(stationTest.objectName())
             if stationTest.objectName() == self.currentStation:
                 stationSlot = i
             i += 1
