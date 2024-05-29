@@ -62,6 +62,7 @@ class HexPushButton(QPushButton):
             
             
     def newLocationClicked(self, location):
+        print("New Location")
         if self.MainWindow.lastHex > -1:
             lastHexNumber = self.MainWindow.lastHex
             hexLocation = self.theBoard.hexDictionary[lastHexNumber]
@@ -91,6 +92,7 @@ class HexPushButton(QPushButton):
         
         
     def sameLocationClicked(self, location):
+        print("Same Location")
         if self.tileList:
             self.tileListIndex +=1
             if self.tileListIndex >= len(self.tileList):

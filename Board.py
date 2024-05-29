@@ -12,6 +12,7 @@ class Board:
         self.possibleTiles = []
         self.possibleTilesIndex = 0
         self.lastLocation = (100,100)
+        self.largestTrain = 0
         
         self.hexDictionary = {
             0:"0210", 1:"0212", 2:"0214", 3:"0216", 4:"0218", 5:"0220", 6:"0222", 
@@ -327,19 +328,22 @@ class Board:
                                         self.possibleTiles.append((tile.tile_id, offset)) 
                                         
                     else:                                                           # this is a hex with a tile to upgrade
-                        validRotation = True
-                        angle = angle + locationHex.angle       # add the rotation of the tile already there to the preset rotation on the new tile
-                        if angle > 6:
-                            angle -=6
-                        print("TileSides = " + str(tileSides) + " angle = " + str(angle) + " voidSides = " + str(locationHex.voidSides))
-                        for eeSide in tileSides:                                # look at each side with a rail on it
-                            if eeSide > 0:
-                                testSide = eeSide + angle                           # rotate to the angle
-                                if testSide > 6:
-                                    testSide -=6
-                                if testSide in locationHex.voidSides:               # see if it is in voidSides
-                                    validRotation = False
-                        offset = angle  
+                        validRotation = False
+                        colorOk = self.checkTileColor(tile.tile_id)
+                        if colorOk == True:
+                            validRotation = True
+                            angle = angle + locationHex.angle       # add the rotation of the tile already there to the preset rotation on the new tile
+                            if angle > 6:
+                                angle -=6
+                            print("TileSides = " + str(tileSides) + " angle = " + str(angle) + " voidSides = " + str(locationHex.voidSides))
+                            for eeSide in tileSides:                                # look at each side with a rail on it
+                                if eeSide > 0:
+                                    testSide = eeSide + angle                           # rotate to the angle
+                                    if testSide > 6:
+                                        testSide -=6
+                                    if testSide in locationHex.voidSides:               # see if it is in voidSides
+                                        validRotation = False
+                            offset = angle  
                     if validRotation == True:
                         if (tile.tile_id, offset) not in self.possibleTiles:
                             self.possibleTiles.append((tile.tile_id, offset))   # add the tile number and rotation to the list
@@ -475,6 +479,14 @@ class Board:
             if tile.tile_id == tileNumber:
                 return tile
 
+
+    def checkTileColor(self, tileNumber):
+        green = [14,15,16,18,19,20,23,24,25,26,27,28,29,53,54,59]
+        brown = [39,40,41,42,43,44,45,46,47,61,62,63,64,65,66,67,68,70]
+        if tileNumber in green and self.largestTrain > 2 or tileNumber in brown and self.largestTrain > 4:
+            return True
+        else:   
+            return False
 
 
 

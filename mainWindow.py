@@ -24,9 +24,10 @@ class MainWindow(QWidget):
         self.trainButtons = []
         self.companyButtons = []
         self.trainList = []
+        
         self.lastHex = 0
         self.currentStation = "stn 100"
-        self.currentCompany = 0
+        self.currentCompany = 9
         self.stationClicked = False
         self.stationPlaced = False
         self.currentTile = [0,0,0]
@@ -144,7 +145,7 @@ class MainWindow(QWidget):
                 tButton.setIcon(icon)
                 self.trainButtons.append(tButton)
         
-        for i in range(9):
+        for i in range(10):
             self.trainList.append([1,1,1,1])
         
         # set up company QPushbuttons
@@ -232,18 +233,25 @@ class MainWindow(QWidget):
         number = buttonName[1:]
         company = int(number[:1])
         card = int(number[1:])
-        trainList = self.trainList[company]             # get the train list for the company
-        activeTrain = trainList[card]                   # get the clicked card for that company and
-        activeTrain = activeTrain + 1                   # increment the train value
-        if activeTrain > 7: 
-            activeTrain = 1
- 
-        self.trainList[company][card] = activeTrain                         # set the value in that company train list for export
-        slot = (company * 4) + card                                         # find which slot in the trainbuttons is active
-        icon = QIcon(self.getImage("train" + str(activeTrain)))             # get the new card icon
-        self.trainButtons[slot].setIcon(icon)                               # update the pushbutton icon
-        if activeTrain > 1:
-            self.colorTrains(company, slot, card, activeTrain)
+        if company == self.currentCompany - 1:
+            trainList = self.trainList[company]             # get the train list for the company
+            activeTrain = trainList[card]                   # get the clicked card for that company and
+            activeTrain = activeTrain + 1                   # increment the train value
+            if activeTrain > 7: 
+                activeTrain = 1
+     
+            self.trainList[company][card] = activeTrain                         # set the value in that company train list for export
+            slot = (company * 4) + card                                         # find which slot in the trainbuttons is active
+            icon = QIcon(self.getImage("train" + str(activeTrain)))             # get the new card icon
+            self.trainButtons[slot].setIcon(icon)                               # update the pushbutton icon
+            if activeTrain > 1:
+                self.colorTrains(company, slot, card, activeTrain)
+            self.board.largestTrain = 1
+            for i in range(8):
+                for j in range(4):
+                    if self.trainList[i][j] > self.board.largestTrain:
+                        self.board.largestTrain = self.trainList[i][j]
+            print("Largest Train = " + str(self.board.largestTrain))
             
             
     def companyButtonClicked(self):
