@@ -24,6 +24,7 @@ class MainWindow(QWidget):
         self.trainButtons = []
         self.companyButtons = []
         self.trainList = []
+        self.stationTokens = []
         
         self.lastHex = 0
         self.currentStation = "stn 100"
@@ -35,7 +36,7 @@ class MainWindow(QWidget):
         
     def initUI(self):
         self.setGeometry(0, 0, 1692, 1000) #1245
-        self.setWindowTitle('1830 Game')
+        self.setWindowTitle('1830 Game Helper')
   
         # Load map image
         current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -144,6 +145,11 @@ class MainWindow(QWidget):
                 tButton.setIconSize(button.size())
                 tButton.setIcon(icon)
                 self.trainButtons.append(tButton)
+                
+        for i in range(76):
+            hex = self.board.findByNumber(i)
+            if hex and hex.city_count == 1:
+                print("City at " + str(i))
         
         for i in range(10):
             self.trainList.append([1,1,1,1])

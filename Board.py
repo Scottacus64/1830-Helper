@@ -30,34 +30,6 @@ class Board:
 
     def initialze_standard_board(self):
         # NOTE: Odd rows only have odd columns, even rows only have even columns
-        '''
-        This function will build out a standard board of 1830, it'll do so by categorizing each hex
-        Categories include:
-        -----------------------
-            off_board_hexes
-            
-            on_board_hexes
-    
-            grey_hexes
-
-            one_city_hexes
-            
-            two_city_hexes
-            
-            one_village_hexes
-            
-            two_villlage_hexes
-            
-            rr_start_hexes
-            
-            entryExitStation
-            
-            voidSides
-            
-            hexTile
-            
-            angle
-        '''
         
         # ----- off_board_hexes -----
         self.off_board_hexes = [(1, 1), (1, 3), (1, 5), (1, 7), (1, 13), (1, 15), (1, 21), (1, 23),
@@ -74,11 +46,11 @@ class Board:
         on_board_hexes = []
         for i in range(1, 12): # Rows A-K
             if i % 2 == 1:
-                for j in range(1, 24, 2): # Add all valid hexes in odd rows (ones that aren't in off_board_hexes)
+                for j in range(1, 24, 2): # Add all valid hexes in odd rows 
                     if((i, j) not in self.off_board_hexes):
                         on_board_hexes.append((i, j))
             else:
-                for j in range(2, 25, 2): # Add all valid hexes in even rows (ones that aren't in off_board_hexes)
+                for j in range(2, 25, 2): # Add all valid hexes in even rows 
                     if((i, j) not in self.off_board_hexes):
                         on_board_hexes.append((i, j))
         
@@ -94,21 +66,21 @@ class Board:
         
         # ----- one_city_hexes -----
         one_city_hexes = [[(1, 19),"0"],
-                          [(2, 10), "0"], [(2, 16), "0"],
-                          [(4, 2), "0"], [(4, 14), "0"],
-                          [(5, 19), "0"], [(5, 23), "Boston"],
-                          [(6, 4), "0"], [(6, 6), "0"], [(6, 16), "0"], [(6, 22), "0"],
-                          [(8, 4), "0"], [(8, 10), "0"], [(8, 12), "0"], [(8, 16), "0"],
+                          [(2, 10), 1], [(2, 16), 3],
+                          [(4, 2), 15], [(4, 14), 21],
+                          [(5, 19), 33], [(5, 23), "Boston"],
+                          [(6, 4), 35], [(6, 6), "0"], [(6, 16), 41], [(6, 22), 44],
+                          [(8, 4), 55], [(8, 10), 58], [(8, 12), "0"], [(8, 16), 60],
                           [(9, 15), "Baltimore"],
-                          [(10, 14), "0"],
-                          [(11, 15), "0"]
+                          [(10, 14), 75],
+                          [(11, 15), 76]
                           ]
         
         # ----- two_city_hexes -----
-        two_city_hexes = [((4, 10), "OO"),
-                          ((5, 5), "OO"), ((5, 11), "OO"),
+        two_city_hexes = [((4, 10), 19),
+                          ((5, 5), 27), ((5, 11), 29),
                           ((7, 19), "NY"),
-                          ((8, 18), "OO")]
+                          ((8, 18), 61)]
         
         # ----- one_village_hexes -----
         one_village_hexes = [(2, 20),
@@ -181,7 +153,7 @@ class Board:
                     city_count = 1
                     if cityList[1] == "Boston":
                         hexTile = 81
-                    if cityList[1] == "Baltimore":
+                    elif cityList[1] == "Baltimore":
                         hexTile = 80
             
             for twoCityList in two_city_hexes: # Find if there is matching hex and get its ind
@@ -189,8 +161,7 @@ class Board:
                     city_count = 2
                     if twoCityList[1]  == "NY":
                         hexTile = 82
-                    else:
-                        hexTile = 83
+     
             
             #-----Color-----
             if(hex in grey_hexes):
@@ -398,6 +369,21 @@ class Board:
             if hexObj.hex_id == id:
                 return hexObj    #return the hex upon a match
         return None     #If there was no match, return None
+    
+    
+    def findByNumber(self, number):
+        hexLocation = self.hexDictionary[number]
+        locationFirst = int(hexLocation[:2])                            # parsing out the tuple for board to use
+        locationSecond = int(hexLocation[2:])
+        boardLocation = (locationFirst, locationSecond)
+        return self.findHex(boardLocation)                               # get the hex object...
+    
+    
+    def findByHexTile(self, hexTile):
+        for hexObj in self.board_hexagons:
+            if hexObj.hexTile == hexTile:
+                return hexObj
+        return None
         
     
     def checkThroughUnplayedTiles(self, targetTile):
@@ -411,11 +397,14 @@ class Board:
             
     
     def updateHexWithTile(self, tileNumber, location, angle):
+        hex = self.findByNumber(location)
+        '''
         hexLocation = self.hexDictionary[location]
         locationFirst = int(hexLocation[:2])                            # parsing out the tuple for board to use
         locationSecond = int(hexLocation[2:])
         boardLocation = (locationFirst, locationSecond)
         hex = self.findHex(boardLocation)                               # get the hex object...
+        '''
         
         oldTile = hex.hexTile
         if oldTile > 0:
