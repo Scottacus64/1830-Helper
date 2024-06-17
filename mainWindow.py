@@ -108,7 +108,10 @@ class MainWindow(QWidget):
                     button.resize(117,116)
                     button.move(-25+(100*col)+shift, 13+(87 * row))
                     self.hexButtons.append(button) 
-        pad = 0   
+                    location = str(sRow + sCol)
+                    print(location)
+                    self.checkForStation(location, col, row, shift)
+        pad = 0 
              
         for row in range(16):
             for col in range(2):
@@ -145,11 +148,24 @@ class MainWindow(QWidget):
                 tButton.setIconSize(button.size())
                 tButton.setIcon(icon)
                 self.trainButtons.append(tButton)
-                
+        '''     
+        index = 0      
         for i in range(76):
             hex = self.board.findByNumber(i)
             if hex and hex.city_count == 1:
                 print("City at " + str(i))
+                stName = str("st" + str(i))
+                index +=1
+                stButton = QPushButton(stName, self)
+                stButton.setGeometry((100+(40*index)), 500, 40, 40)
+                stButton.clicked.connect(self.stButtonClicked)    
+                stButton.setText("")   
+                stButton.setStyleSheet("border: none;")
+                icon = QIcon(self.getImage("s3"))
+                stButton.setIconSize(button.size())
+                stButton.setIcon(icon)
+                self.stationTokens.append(stButton)
+        '''
         
         for i in range(10):
             self.trainList.append([1,1,1,1])
@@ -167,6 +183,22 @@ class MainWindow(QWidget):
             cButton.setIconSize(QSize(125,125))
             self.companyButtons.append(cButton)
         self.show()
+        
+        
+    def checkForStation(self, location, col, row, shift):
+        hex = self.board.findHexName(location)
+        if hex and hex.city_count == 1:
+            print("city found at: " + str(location))
+            stName = str("st" + str(hex.hex_id))
+            stButton = QPushButton(stName, self)
+            stButton.setGeometry(12+(100*col)+shift, 53+(87 * row), 40, 40)
+            stButton.clicked.connect(self.stButtonClicked)    
+            stButton.setText("")   
+            stButton.setStyleSheet("border: none;")
+            icon = QIcon(self.getImage("s3"))
+            stButton.setIconSize(stButton.size())
+            stButton.setIcon(icon)
+            self.stationTokens.append(stButton)
         
         
     # method for getting the image files
@@ -286,6 +318,9 @@ class MainWindow(QWidget):
                 
                 self.board.updateHexWithTile(self.currentTile[0], self.currentTile[1] , self.currentTile[2])
                 self.currentTile = [0,0,0]
+                
+    def stButtonClicked(self, company):
+        print("")
                 
     def colorTrains(self, company, slot, card, tValue):
         colorList = [(255,0,0,64), (0,255,0,64), (0,0,255,64),(255,255,255,64)]

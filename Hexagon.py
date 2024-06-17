@@ -1,8 +1,9 @@
 
 
 class Hexagon:
-    def __init__(self, hex_id, vil_count, city_count, color, rr_start, entryExitStation, voidSides, hexTile, angle):
+    def __init__(self, hex_id, hex_name, vil_count, city_count, color, rr_start, entryExitStation, voidSides, hexTile, angle):
         self.hex_id = hex_id
+        self.hex_name = hex_name
         self.vil_count = vil_count
         self.city_count = city_count
         self.color = color

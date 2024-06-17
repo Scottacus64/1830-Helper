@@ -69,12 +69,16 @@ class HexPushButton(QPushButton):
             locationFirst = int(hexLocation[:2])                            # parsing out the tuple for board to use
             locationSecond = int(hexLocation[2:])
             boardLocation = (locationFirst, locationSecond)
+            
+            #lastHex = self.theBoard.findHex(hexLocation)
             lastHex = self.theBoard.findHex(boardLocation)
             hexLocation = self.theBoard.hexDictionary[location]
-            locationFirst = int(hexLocation[:2])                            # parsing out the tuple for board to use
-            locationSecond = int(hexLocation[2:])
+            locationFirst = int(hexLocation[:2])                            # parsing out the tuple for board to use       
+            locationSecond = int(hexLocation[2:])        
             boardLocation = (locationFirst, locationSecond)
+            
             hex = self.theBoard.findHex(boardLocation)
+
             self.MainWindow.displayTile(lastHex.hexTile, self.MainWindow.lastHex, lastHex.angle)
         else:
             self.MainWindow.displayTile(0, self.MainWindow.lastHex, 0)     # set the previous hex to blank

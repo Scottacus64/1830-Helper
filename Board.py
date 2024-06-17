@@ -133,7 +133,22 @@ class Board:
         # Create the hexagon objects
         for hex in on_board_hexes:
             #-----Hex ID-----
-            hex_id = hex                # value tuple like (3,7)
+            hex_id = hex                    # tuple like (3,7)
+            
+            #-----hex_name-----
+            hexFirst = hex[0]
+            hexSecond = hex[1]
+            if hexFirst < 10:
+                hexFirstStr = str("0" + str(hex[0]))
+            else:
+                hexFirstStr = str(hex[0])
+            if hexSecond < 10:
+                hexSecondStr = str("0" + str(hex[1]))
+            else:
+                hexSecondStr = str(hex[1])
+            hexName = str(hexFirstStr + hexSecondStr)
+            print(hexName)
+            hex_name = hexName                # string like 0307
             
             #-----HexTile-----
             hexTile = 0
@@ -207,9 +222,10 @@ class Board:
 
         
             # Initialize the hex object
-            hex_to_append = Hexagon(hex_id, vil_count, city_count, color, rr_start, entryExitStation, voidSides, hexTile, angle)
+            hex_to_append = Hexagon(hex_id, hex_name, vil_count, city_count, color, rr_start, entryExitStation, voidSides, hexTile, angle)
             self.board_hexagons.append(hex_to_append)
             
+        print("")
         # add city tiles to playedTile list
         cityTiles = [80, 81, 82, 83, 83, 83, 83]
         for tileNumber in cityTiles:
@@ -367,8 +383,16 @@ class Board:
     def findHex(self, id):
         for hexObj in self.board_hexagons:
             if hexObj.hex_id == id:
+                print(id)
                 return hexObj    #return the hex upon a match
         return None     #If there was no match, return None
+    
+    def findHexName(self, name):
+        for hexObj in self.board_hexagons:
+            if hexObj.hex_name == name:
+                return hexObj    #return the hex upon a match
+        return None     #If there was no match, return None
+    
     
     
     def findByNumber(self, number):
@@ -384,7 +408,7 @@ class Board:
             if hexObj.hexTile == hexTile:
                 return hexObj
         return None
-        
+    
     
     def checkThroughUnplayedTiles(self, targetTile):
         ind = 0
