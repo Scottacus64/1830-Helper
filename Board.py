@@ -240,7 +240,7 @@ class Board:
         print("Found Tile " + str(foundTile.tile_id))
             
      
-    # This method take in information from the GUI and returns tiles that can be played 
+    # This method takes in information from the GUI and returns tiles that can be played 
     def checkForPlayableTile(self, location, company, trainList, newStation):
         # this is a list of the hexes rail spurs around the location with the correcponding side of the location in that direction
         # for example the first hex returned by findAdjacentHexes is above and to the left, if that hex has a rail on
@@ -254,7 +254,7 @@ class Board:
         # check for rail lines leading into hex
         index = 0
         for hex in hexList:
-            hexObject = self.findHex(hex) 
+            hexObject = self.findHexTuple(hex) 
             if hexObject is not None: 
                 for loc in hexObject.entryExitStation:
                     # [[3,0,10],[4,0,10]]
@@ -264,9 +264,9 @@ class Board:
                         if listOfPairedSides[index][1] not in railInDirection:
                             railInDirection.append(listOfPairedSides[index][1])
             index +=1
-            
+        print("Rail in direction = " + str(railInDirection))  
         # check for void sides on the location hex
-        locationHex = self.findHex(location)
+        locationHex = self.findHexTuple(location)
         voidInDirection = []
         voidInDirection = locationHex.voidSides
         possibleTiles = []
@@ -380,27 +380,27 @@ class Board:
         return hexList
         
     
-    def findHex(self, id):
+    def findHexTuple(self, id):
         for hexObj in self.board_hexagons:
             if hexObj.hex_id == id:
-                print(id)
-                return hexObj    #return the hex upon a match
-        return None     #If there was no match, return None
+                print("ID = " + str(id))
+                return hexObj                       #return the hex upon a match
+        return None                                 #If there was no match, return None
+    
     
     def findHexName(self, name):
         for hexObj in self.board_hexagons:
             if hexObj.hex_name == name:
-                return hexObj    #return the hex upon a match
-        return None     #If there was no match, return None
-    
+                return hexObj                       #return the hex upon a match
+        return None                                 #If there was no match, return None
     
     
     def findByNumber(self, number):
         hexLocation = self.hexDictionary[number]
-        locationFirst = int(hexLocation[:2])                            # parsing out the tuple for board to use
+        locationFirst = int(hexLocation[:2])                    # parsing out the tuple for board to use
         locationSecond = int(hexLocation[2:])
         boardLocation = (locationFirst, locationSecond)
-        return self.findHex(boardLocation)                               # get the hex object...
+        return self.findHexTuple(boardLocation)                 # get the hex object...
     
     
     def findByHexTile(self, hexTile):
@@ -420,16 +420,9 @@ class Board:
         return None
             
     
-    def updateHexWithTile(self, tileNumber, location, angle):
+    def updateHexWithTile(self, tileNumber, location, angle):           # this is run after a hex is finalized
         hex = self.findByNumber(location)
-        '''
-        hexLocation = self.hexDictionary[location]
-        locationFirst = int(hexLocation[:2])                            # parsing out the tuple for board to use
-        locationSecond = int(hexLocation[2:])
-        boardLocation = (locationFirst, locationSecond)
-        hex = self.findHex(boardLocation)                               # get the hex object...
-        '''
-        
+
         oldTile = hex.hexTile
         if oldTile > 0:
             swapTile = self.addTileBackOnUnplayedList(oldTile)

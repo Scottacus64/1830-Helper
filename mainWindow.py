@@ -148,24 +148,6 @@ class MainWindow(QWidget):
                 tButton.setIconSize(button.size())
                 tButton.setIcon(icon)
                 self.trainButtons.append(tButton)
-        '''     
-        index = 0      
-        for i in range(76):
-            hex = self.board.findByNumber(i)
-            if hex and hex.city_count == 1:
-                print("City at " + str(i))
-                stName = str("st" + str(i))
-                index +=1
-                stButton = QPushButton(stName, self)
-                stButton.setGeometry((100+(40*index)), 500, 40, 40)
-                stButton.clicked.connect(self.stButtonClicked)    
-                stButton.setText("")   
-                stButton.setStyleSheet("border: none;")
-                icon = QIcon(self.getImage("s3"))
-                stButton.setIconSize(button.size())
-                stButton.setIcon(icon)
-                self.stationTokens.append(stButton)
-        '''
         
         for i in range(10):
             self.trainList.append([1,1,1,1])
