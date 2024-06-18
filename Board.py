@@ -256,6 +256,7 @@ class Board:
         for hex in hexList:
             hexObject = self.findHexTuple(hex) 
             if hexObject is not None: 
+                print("Hex EES = " + str(hexObject.entryExitStation))
                 for loc in hexObject.entryExitStation:
                     # [[3,0,10],[4,0,10]]
                     entrySide = loc[0]
@@ -432,28 +433,37 @@ class Board:
         tile = self.removeTileFromUnplayedTiles(tileNumber)             # remove the tile from the unplayed list and add to played list
         hex.hexTile = tileNumber                                        # get the tile number assigned to the hex
         tileStations = tile.station_list
+        print("tile station list = " + str(tileStations))
         tileEntryExit = tile.path_pairs
+        print("hexPathPairs = " + str (tileEntryExit))
         rotatedEntryExit = []
-        index = 0
-        if angle > 0:                                                   # if the angle is greater than zero then rotate the tile...
-            for pair in tileEntryExit:                                  # entry and exit by the rotation angle
-                tEntry = int(pair[0])
-                tExit = int(pair[1])
-                tEntry += angle
-                if tEntry > 6:                                          # if the angles are greater than 6 get them back into the...
-                    tEntry -= 6                                         # range of zero to six
-                tExit += angle
-                if tExit > 6:
-                    tExit -= 6
-                if tileStations == ():                                  # need to add entry/exit/station to the hex so add the...
-                    rotatedEntryExit.append([tEntry, tExit, 10])        # station to the entry/exit pair 0=no company 10=no station
-                else:
-                    for station in tileStations:
-                        if int(station[1]) == index:
-                            rotatedEntryExit.append([tEntry, tExit, 0])                 
-                index +=1
-        else:
-            rotatedEntryExit = tileEntryExit                     
+
+        #if angle > 0:                                                   # if the angle is greater than zero then rotate the tile...
+        
+        for pair in tileEntryExit:                                  # entry and exit by the rotation angle
+            index = 0
+            tEntry = int(pair[0])
+            tExit = int(pair[1])
+            tEntry += angle
+            if tEntry > 6:                                          # if the angles are greater than 6 get them back into the...
+                tEntry -= 6                                         # range of zero to six
+            tExit += angle
+            if tExit > 6:
+                tExit -= 6
+            if tileStations == ():                                  # need to add entry/exit/station to the hex so add the...
+                rotatedEntryExit.append([tEntry, tExit, 10])        # station to the entry/exit pair 0=no company 10=no station
+            else:
+                for station in tileStations:
+                    if int(station[0]) == index:
+                        if [tEntry, tExit, index] not in rotatedEntryExit:
+                            rotatedEntryExit.append([tEntry, tExit, index])   
+                    else:
+                        if [tEntry, tExit, index] not in rotatedEntryExit:
+                            rotatedEntryExit.append([tEntry, tExit, 100])
+                    index +=1
+            
+        #else:
+        #    rotatedEntryExit = tileEntryExit                     
 
         hex.entryExitStation = rotatedEntryExit                         # set the hex's ees value
         hex.angle = angle                                               # set the hex's angle value
