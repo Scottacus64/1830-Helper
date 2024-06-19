@@ -78,13 +78,14 @@ class HexPushButton(QPushButton):
             if lastHex:
                 self.MainWindow.displayTile(lastHex.hexTile, lastHexNumber, lastHex.angle) # tile number, location,angle
             else:
-                self.MainWindow.displayTile(0, lastHexNumber, 0)     # set the previous hex to blank
+                self.MainWindow.displayTile(0, lastHexNumber, 0)            # set the previous hex to blank
             hexLocation = self.theBoard.hexDictionary[location]
             locationFirst = int(hexLocation[:2])                            # parsing out the tuple for board to use       
             locationSecond = int(hexLocation[2:])        
             boardLocation = (locationFirst, locationSecond)
             lastHex = self.theBoard.findHexTuple(boardLocation)
             print("lastHex = " + str(lastHex))
+            print("LastHex tile = " + str(lastHex.hexTile))
             self.MainWindow.lastHex = location
 
             self.MainWindow.displayTile(lastHex.hexTile, self.MainWindow.lastHex, lastHex.angle)
