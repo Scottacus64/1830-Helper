@@ -63,35 +63,22 @@ class HexPushButton(QPushButton):
             
     def newLocationClicked(self, location):
         print("******** New Location")
-        if self.MainWindow.lastHex > -1:                                    # because there is a '0' hex
+        # check if the player clicked on a second tile this turn, if so we need toe ither blank out the previous tile or reset it to its original tile
+        if self.MainWindow.lastHex > -1:                                    # this case there was a previous tile, -1 because there is a '0' hex
             lastHexNumber = self.MainWindow.lastHex                         # restore the last hex's tile
-            print("LastHexNumber = " + str(lastHexNumber))
-            print("Location = " + str(location))
             hexLocation = self.theBoard.hexDictionary[lastHexNumber]
-            print("Hex Location = " + str(hexLocation))
             locationFirst = int(hexLocation[:2])                            # parsing out the tuple for board to use
             locationSecond = int(hexLocation[2:])
             boardLocation = (locationFirst, locationSecond)
-            print("BoardLocation = " + str(boardLocation))
             lastHex = self.theBoard.findHexTuple(boardLocation)
-            print("Last Hex = " + str(lastHex))
             if lastHex:
                 self.MainWindow.displayTile(lastHex.hexTile, lastHexNumber, lastHex.angle) # tile number, location,angle
             else:
-                self.MainWindow.displayTile(0, lastHexNumber, 0)            # set the previous hex to blank
-            hexLocation = self.theBoard.hexDictionary[location]
-            locationFirst = int(hexLocation[:2])                            # parsing out the tuple for board to use       
-            locationSecond = int(hexLocation[2:])        
-            boardLocation = (locationFirst, locationSecond)
-            lastHex = self.theBoard.findHexTuple(boardLocation)
-            print("lastHex = " + str(lastHex))
-            print("LastHex tile = " + str(lastHex.hexTile))
-            self.MainWindow.lastHex = location
-
-            self.MainWindow.displayTile(lastHex.hexTile, self.MainWindow.lastHex, lastHex.angle)
-        else:
-            self.MainWindow.displayTile(0, self.MainWindow.lastHex, 0)     # set the previous hex to blank
-        self.MainWindow.lastHex = location                                 # set the lastHex to this new location
+                self.MainWindow.displayTile(0, lastHexNumber, 0)            # set the previous hex to blank  
+        else:                                                               # this case there was no previous tile so just blank it out
+            self.MainWindow.displayTile(0, self.MainWindow.lastHex, 0)      # set the previous hex to blank
+            
+        self.MainWindow.lastHex = location                                  # set the lastHex to this new location
         company = self.MainWindow.currentCompany
         trainList = self.MainWindow.trainList[company]
         locationFirst = int(self.name[:2])                                  # parsing out the tuple for board to use

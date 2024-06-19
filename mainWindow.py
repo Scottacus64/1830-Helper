@@ -25,6 +25,7 @@ class MainWindow(QWidget):
         self.companyButtons = []
         self.trainList = []
         self.stationTokens = []
+        self.stationIndex = 0
         
         self.lastHex = 0
         self.currentStation = "stn 100"
@@ -109,7 +110,6 @@ class MainWindow(QWidget):
                     button.move(-25+(100*col)+shift, 13+(87 * row))
                     self.hexButtons.append(button) 
                     location = str(sRow + sCol)
-                    print(location)
                     self.checkForStation(location, col, row, shift)
         pad = 0 
              
@@ -167,20 +167,28 @@ class MainWindow(QWidget):
         self.show()
         
         
+ 
+    # ******** add in code to center station buttons for those that are off by a bit *******
+        
     def checkForStation(self, location, col, row, shift):
+        stationAdj = [(0,0), (2,0), (0,0), (0,0), (0,0), (2,-2), (5,-5), (2,-1), (2,-2), (5,-5), (0,5), (-15,-15)]  
         hex = self.board.findHexName(location)
         if hex and hex.city_count == 1:
             print("city found at: " + str(location))
-            stName = str("st" + str(hex.hex_id))
-            stButton = QPushButton(stName, self)
-            stButton.setGeometry(12+(100*col)+shift, 53+(87 * row), 40, 40)
-            stButton.clicked.connect(self.stButtonClicked)    
-            stButton.setText("")   
-            stButton.setStyleSheet("border: none;")
-            icon = QIcon(self.getImage("s3"))
-            stButton.setIconSize(stButton.size())
-            stButton.setIcon(icon)
-            self.stationTokens.append(stButton)
+            if hex.rr_start == 100:
+                adjX = stationAdj[self.stationIndex][0]
+                adjY = stationAdj[self.stationIndex][1]
+                stName = str("st" + str(hex.hex_id))
+                stButton = QPushButton(stName, self)
+                stButton.setGeometry(12+(100*col)+shift+adjX, 53+(87 * row)+ adjY, 40, 40)
+                stButton.clicked.connect(self.stButtonClicked)    
+                stButton.setText("")   
+                stButton.setStyleSheet("border: none;")
+                icon = QIcon(self.getImage("s3"))
+                stButton.setIconSize(stButton.size())
+                stButton.setIcon(icon)
+                self.stationTokens.append(stButton)
+                self.stationIndex +=1
         
         
     # method for getting the image files
