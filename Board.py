@@ -387,6 +387,7 @@ class Board:
         
     
     def findHexTuple(self, id):
+        print("In tuple")
         for hexObj in self.board_hexagons:
             if hexObj.hex_id == id:
                 print("ID = " + str(id))

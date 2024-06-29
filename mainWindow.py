@@ -177,7 +177,7 @@ class MainWindow(QWidget):
             if hex.rr_start == 100:
                 adjX = stationAdj[self.stationIndex][0]
                 adjY = stationAdj[self.stationIndex][1]
-                stName = str("st" + str(hex.hex_id))
+                stName = str("st" + str(location))
                 stButton = QPushButton(stName, self)
                 stButton.setObjectName(stName)
                 stButton.setGeometry(12+(100*col)+shift+adjX, 53+(87 * row)+ adjY, 40, 40)
@@ -261,6 +261,7 @@ class MainWindow(QWidget):
             if stationTest.objectName() == self.currentStation:
                 stationSlot = i
             i += 1
+            
         return stationSlot
         
         
@@ -329,6 +330,10 @@ class MainWindow(QWidget):
             self.stationTokens[stationSlot].setIcon(icon)
         print("Button Name = " + buttonName)
         if int(self.currentStation[4:]) < 100:                  # if a station icon was clicked set the station token to that icon
+            hexName = buttonName[2:]
+            hex = self.board.findHexName(hexName)
+            print(hex)
+            print("hex name: " + str(hexName))
             print("station button active" + self.currentStation)
             stationSlot = self.findStToken(buttonName)
             icon = QIcon(self.getImage(str("s" + self.currentStation[4])))
