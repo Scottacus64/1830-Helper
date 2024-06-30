@@ -17,7 +17,6 @@ class HexPushButton(QPushButton):
         self.rotationAngle = 0
         self.tileList = []
         self.tileListIndex = 0
-        self.firstPress = True
         
         # this is a list of all tile names from 1 to 70 in ascending order
         self.tileKey = [
@@ -51,9 +50,9 @@ class HexPushButton(QPushButton):
         if hexagon.containsPoint(event.pos(), Qt.OddEvenFill):              # if the mouse is clicked inside a hex
             super().mousePressEvent(event)          
             location = hexDictionary[self.name]                             # check the hex dictionary to get the hex value
-            if location != self.MainWindow.lastHex or self.firstPress == True: # if the hex clicked is new
+            if location != self.MainWindow.lastHex or self.MainWindow.endTurn == True: # if the hex clicked is new
                 self.newLocationClicked((location))
-                self.firstPress = False
+                self.MainWindow.endTurn = False
             else:
                  self.sameLocationClicked(location)
             

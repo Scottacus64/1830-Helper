@@ -9,8 +9,11 @@ class Tile:
         self.village_count = village_count
         self.city_count = city_count
     
+    
     def with_assoc_hex(cls, tile_id, upgrade_list, path_pairs, station_list, village_count, city_count):
         return cls(tile_id, upgrade_list, path_pairs, station_list, village_count, city_count)
+    
+    
     def printHex(self):
         print(self.name_id, " is a hex!")
     

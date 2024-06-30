@@ -26,6 +26,7 @@ class MainWindow(QWidget):
         self.trainList = []
         self.stationTokens = []
         self.stationIndex = 0
+        self.endTurn = True
         
         self.lastHex = 0
         self.currentStation = "stn 100"
@@ -202,6 +203,7 @@ class MainWindow(QWidget):
     
     # method for getting and displaying tiles gotten from theBoard
     def displayTile(self, tileNumber, location, angle):
+        self.resetStToken()
         if tileNumber > 0:                                      # if it is a new hex
             self.currentTile = [tileNumber, location, angle]    # variable to know if any tiles have been clicked and what the tile info is
             tileName = self.tileDictionary[tileNumber]
@@ -241,8 +243,8 @@ class MainWindow(QWidget):
                 print("Station slot = " + str(stationSlot))
                 company = self.currentStation[4]
                 icon = QIcon(self.getImage(str("s" + company)))
-                self.stationButtons[stationSlot].setIcon(icon)      # resets a station back to its original icon
-                if self.lastStToken != "":
+                if self.lastStToken != "": 
+                    self.stationButtons[stationSlot].setIcon(icon)      # resets a station back to its original icon
                     icon = QIcon()
                     stationSlot = self.findStToken(self.lastStToken)
                     self.stationTokens[stationSlot].setIcon(icon)
@@ -261,7 +263,7 @@ class MainWindow(QWidget):
             if stationTest.objectName() == self.currentStation:
                 stationSlot = i
             i += 1
-            
+        print("station slot = " + str(stationSlot))         
         return stationSlot
         
         
@@ -289,6 +291,7 @@ class MainWindow(QWidget):
                     if self.trainList[i][j] > self.board.largestTrain:
                         self.board.largestTrain = self.trainList[i][j]
             print("Largest Train = " + str(self.board.largestTrain))
+            self.endTurn = True
             
             
     def companyButtonClicked(self):
@@ -303,9 +306,12 @@ class MainWindow(QWidget):
                 cButton.setIcon(icon)
             self.sender().setIcon(pixmap)
             self.currentCompany = company
+            
             # this is where the code to let the board know that the tile has been finalized would go
-            self.lastStToken = ""                                           # set the station token back to blank as the "turn" is ended
+            self.lastStToken = ""                               # set the station token back to blank as the "turn" is ended
             self.lastHex = -1                                   # set to -1 not 0 so that if hex 0 is clicked it will register as a new hex and not be rejected
+            self.endTurn = True
+            
             if self.stationClicked == True and self.stationPlaced == False:  # if a station was clicked and not placed then replace it
                 stationSlot = self.findStation()
                 print("Station slot = " + str(stationSlot))
@@ -320,27 +326,47 @@ class MainWindow(QWidget):
                 
                 self.board.updateHexWithTile(self.currentTile[0], self.currentTile[1] , self.currentTile[2])
                 self.currentTile = [0,0,0]
+            self.currentStation = "stn 100"
+            
                 
                 
     def stButtonClicked(self, company):
         buttonName = self.sender().objectName()
-        if self.lastStToken:                                    # used to blank out a station icon if another station is clicked before finalizing with company
-            icon = QIcon()
-            stationSlot = self.findStToken(self.lastStToken)
-            self.stationTokens[stationSlot].setIcon(icon)
-        print("Button Name = " + buttonName)
+        print("buttonName: " + str(buttonName))
+        print("lastStToken =  " + str(self.lastStToken))
+        if self.lastStToken != "":                              # used to blank out a station icon if another station is clicked before finalizing with company
+            self.resetStToken()
         if int(self.currentStation[4:]) < 100:                  # if a station icon was clicked set the station token to that icon
             hexName = buttonName[2:]
-            hex = self.board.findHexName(hexName)
-            print(hex)
-            print("hex name: " + str(hexName))
-            print("station button active" + self.currentStation)
+            hex = self.board.findHexName(hexName)               # get the hex for the loaction of the station
+            hexName = hex.hex_name                              # find the name of the hex
+            curTile = self.currentTile[1]                       # get the current tile's numeric value (ie 58)
+            curHex = self.board.hexDictionary[curTile]          # use the dictionary to find the corresponding name
+            if curHex == hexName:                               # if the two match then the tile we just selected is the one with the station on it
+                self.setStToken(buttonName)                     # if so set the icon, this method section is needed since the hex's tile has not been set yet            
+            if hex.hexTile:                                     # if there's a tile here
+                for hList in hex.entryExitStation:              # check to see if the hex's station has been set yet
+                    if int(hList[2]) == 100:                    # if 100 then no station has been placed yet, prevents overwritting previous stations
+                        self.setStToken(buttonName)
+                        
+    def setStToken(self, buttonName):                           # method for setting the icon of a station token
+        if self.currentStation != "stn 100":
             stationSlot = self.findStToken(buttonName)
             icon = QIcon(self.getImage(str("s" + self.currentStation[4])))
             self.stationTokens[stationSlot].setIcon(icon)
-            self.lastStToken = buttonName                       # used to reset this station t0 blank if another station is clicked before finalized
+            self.lastStToken = buttonName                            # used to reset this station t0 blank if another station is clicked before finalized
+            self.stationPlaced = True
            
-            
+    def resetStToken(self):
+        print("in reset token")
+        icon = QIcon()
+        if self.lastStToken != "":
+            stationSlot = self.findStToken(self.lastStToken)
+            self.stationTokens[stationSlot].setIcon(icon)
+            self.stationPlaced = False
+            self.lastStToken = ""
+        
+                        
     def findStToken(self, stToken):
         i = 0
         stattionSlot = 0
@@ -350,6 +376,7 @@ class MainWindow(QWidget):
             i += 1
         return stationSlot
                 
+    
     def colorTrains(self, company, slot, card, tValue):
         colorList = [(255,0,0,64), (0,255,0,64), (0,0,255,64),(255,255,255,64)]
         train_button = self.trainButtons[slot]
