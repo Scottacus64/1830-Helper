@@ -30,6 +30,7 @@ class MainWindow(QWidget):
         
         self.lastHex = 0
         self.currentStation = "stn 100"
+        self.currentStationNumber = 0
         self.currentCompany = 9
         self.stationClicked = False
         self.stationPlaced = False
@@ -291,7 +292,7 @@ class MainWindow(QWidget):
                     if self.trainList[i][j] > self.board.largestTrain:
                         self.board.largestTrain = self.trainList[i][j]
             print("Largest Train = " + str(self.board.largestTrain))
-            self.endTurn = True
+            self.endTurn = True         # this forced the method to choose new hex rather than same hex since there may be upgrade tiles now available
             
             
     def companyButtonClicked(self):
@@ -323,8 +324,9 @@ class MainWindow(QWidget):
                 print("tile = " + str(self.currentTile[0]))
                 print ("location =  " + str(self.currentTile[1]))
                 print("angle = " + str(self.currentTile[2]))
-                
-                self.board.updateHexWithTile(self.currentTile[0], self.currentTile[1] , self.currentTile[2])
+                station = int(self.currentStation[4:])
+                print("station = " + str(station))
+                self.board.updateHexWithTile(self.currentTile[0], self.currentTile[1] , self.currentTile[2], self.currentStationNumber, station)
                 self.currentTile = [0,0,0]
             self.currentStation = "stn 100"
             
@@ -346,7 +348,7 @@ class MainWindow(QWidget):
                 self.setStToken(buttonName)                     # if so set the icon, this method section is needed since the hex's tile has not been set yet            
             if hex.hexTile:                                     # if there's a tile here
                 for hList in hex.entryExitStation:              # check to see if the hex's station has been set yet
-                    if int(hList[2]) == 100:                    # if 100 then no station has been placed yet, prevents overwritting previous stations
+                    if int(hList[3]) == 100:                    # if 100 then no station has been placed yet, prevents overwritting previous stations
                         self.setStToken(buttonName)
                         
     def setStToken(self, buttonName):                           # method for setting the icon of a station token

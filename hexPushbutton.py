@@ -83,8 +83,7 @@ class HexPushButton(QPushButton):
         locationFirst = int(self.name[:2])                                  # parsing out the tuple for board to use
         locationSecond = int(self.name[2:])
         boardLocation = (locationFirst, locationSecond)
-        newStation = 0
-        self.tileList = self.theBoard.checkForPlayableTile(boardLocation, company, trainList, newStation)    # ask theBoard for a list of playable tiles to display 
+        self.tileList = self.theBoard.checkForPlayableTile(boardLocation, company, trainList)    # ask theBoard for a list of playable tiles to display 
         self.tileListIndex = 0
         if self.tileList:
             self.MainWindow.displayTile(self.tileList[0][0], location, self.tileList[0][1])

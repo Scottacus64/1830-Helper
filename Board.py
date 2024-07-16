@@ -55,14 +55,17 @@ class Board:
                         on_board_hexes.append((i, j))
         
         # ----- grey_hexes -----
-        grey_hexes = [(1, 17), (1, 19),
-                      (3, 15),
-                      (4, 2), (4, 14), (4, 24),
-                      (5, 9),
-                      (6, 6), (6, 24),
-                      (8, 12),
-                      (9, 19),
-                      (11, 15)]
+        station_ct_list = [[(1, 19),1],
+                          [(2, 10), 1], [(2, 16), 1],
+                          [(4, 2), 1], [(4,10), 2], [(4, 14), 1],
+                          [(5,5), 2], [(5,11), 2], [(5, 19), 1], [(5, 23), 1],
+                          [(6, 4), 1], [(6, 6), 1], [(6, 16), 1], [(6, 22), 1],
+                          [(7,19), 2],
+                          [(8, 4), 1], [(8, 10), 1], [(8, 12), 1], [(8, 16), 1], [(8,18), 2], 
+                          [(9, 15), 1], 
+                          [(10, 14), 1], 
+                          [(11, 15), 1]
+                          ]
         
         # ----- one_city_hexes -----
         one_city_hexes = [[(1, 19),"0"],
@@ -104,17 +107,17 @@ class Board:
         
         # ----- entryExitStation -----
         # (row, column), [[entry, exit, station]] exit == 0 for no exit, station == 0 for blank station, station == 10 no station
-        entryExitStationList = [((1,9), [[3,0,10]]), ((1,11), [[3,0,10],[4,0,10]]),  ((1,17),[[3,4,10]]), ((1,19), [[3,4,3]]),
-                            ((2,24), [[4,0,10], [5,0,10]]),
-                            ((3,15), [[1,5,10]]),
-                            ((4,2), [[2,3,0]]), ((4,14), [[2,5,0], [2,4,0], [4,5,0]]), ((4,24),[[4,5,10]]),
-                            ((5,9), [[6,1,10]]), ((5,19), [[0,0,0]]), ((5,23), [[1,3,0]]),
-                            ((6,2),[[1,0,10], [2,0,10], [3,0,10]]), ((6,6), [[3,4,2]]), ((6,24),[[5,6,10]]),
-                            ((7,19), [[1,0,6], [4,0,0]]),
-                            ((8,12), [[2,5,7], [2,5,10]]),
-                            ((9,1),[[2,0,10]]), ((9,15), [[2,4,1]]), ((9,19), [[5,6,10]]),
-                            ((10,2), [[1,0,10], [2,0,10]]), 
-                            ((11,13), [[1,0,10], [6,0,10]]), ((11,15), [[6,0,0]])
+        entryExitStationList = [((1,9), [[3,0,0,10]]), ((1,11), [[3,0,0,10],[4,0,0,10]]),  ((1,17),[[3,4,0,10]]), ((1,19), [[3,4,0,3]]),
+                            ((2,24), [[4,0,0,10], [5,0,0,10]]),
+                            ((3,15), [[1,5,0,10]]),
+                            ((4,2), [[2,3,0,0]]), ((4,14), [[2,5,0,0], [2,4,0,0], [4,5,0,0]]), ((4,24),[[4,5,0,10]]),
+                            ((5,9), [[6,1,0,10]]), ((5,19), [[0,0,0,0]]), ((5,23), [[1,3,0,0]]),
+                            ((6,2),[[1,0,0,10], [2,0,0,10], [3,0,0,10]]), ((6,6), [[3,4,0,2]]), ((6,24),[[5,6,0,10]]),
+                            ((7,19), [[1,0,0,6], [4,0,0,0]]),
+                            ((8,12), [[2,5,0,7], [2,5,1,10]]),
+                            ((9,1),[[2,0,0,10]]), ((9,15), [[2,4,0,1]]), ((9,19), [[5,6,0,10]]),
+                            ((10,2), [[1,0,0,10], [2,0,10,0]]), 
+                            ((11,13), [[1,0,0,10], [6,0,0,10]]), ((11,15), [[6,0,0,0]])
                             ]
         # ----- voidSides_hexes -----
         # (row, column), [void sides]
@@ -179,15 +182,15 @@ class Board:
                     else:
                         hexTile = 83
                         
-            #-----Station-----
+            #-----Station Count-----
+            station_count = 0
+            for stationList in station_ct_list:
+                if stationList[0] == hex:
+                    station_count = stationList[1]
+                    break
+            print(str(hex) + str(station_count))
             
      
-            
-            #-----Color-----
-            if(hex in grey_hexes):
-                color = "grey"
-            else:
-                color = "blank"
         
             #-----Railroad Start-----
             hex_rr_ind = None
@@ -227,7 +230,7 @@ class Board:
 
         
             # Initialize the hex object
-            hex_to_append = Hexagon(hex_id, hex_name, vil_count, city_count, color, rr_start, entryExitStation, voidSides, hexTile, angle)
+            hex_to_append = Hexagon(hex_id, hex_name, vil_count, city_count, station_count, rr_start, entryExitStation, voidSides, hexTile, angle)
             self.board_hexagons.append(hex_to_append)
             
         print("")
@@ -246,7 +249,7 @@ class Board:
             
      
     # This method takes in information from the GUI and returns tiles that can be played 
-    def checkForPlayableTile(self, location, company, trainList, newStation):
+    def checkForPlayableTile(self, location, company, trainList):
         # this is a list of the hexes rail spurs around the location with the correcponding side of the location in that direction
         # for example the first hex returned by findAdjacentHexes is above and to the left, if that hex has a rail on
         # side 3 then that correspnds to side 6 on the location hex [(3,6), ...]
@@ -427,7 +430,7 @@ class Board:
         return None
             
     
-    def updateHexWithTile(self, tileNumber, location, angle):           # this is run after a hex is finalized
+    def updateHexWithTile(self, tileNumber, location, angle, stationNumber, stationCompany):           # this is run after a hex is finalized
         hex = self.findByNumber(location)
 
         oldTile = hex.hexTile
@@ -460,12 +463,12 @@ class Board:
                 rotatedEntryExit.append([tEntry, tExit, 10])        # station to the entry/exit pair 0=no company 10=no station
             else:
                 for station in tileStations:
-                    if int(station[0]) == index:
+                    if int(station[1]) == stationNumber:
                         if [tEntry, tExit, index] not in rotatedEntryExit:
-                            rotatedEntryExit.append([tEntry, tExit, index])   
+                            rotatedEntryExit.append([tEntry, tExit, stationNumber, stationCompany])   
                     else:
                         if [tEntry, tExit, index] not in rotatedEntryExit:
-                            rotatedEntryExit.append([tEntry, tExit, 100])
+                            rotatedEntryExit.append([tEntry, tExit, 0, 100])
                     index +=1
             
         #else:
