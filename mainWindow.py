@@ -109,7 +109,7 @@ class MainWindow(QWidget):
                         sCol = str(mCol)
                     name = sRow + sCol
                     button = HexPushButton(name, self, self.board, self)         
-                    button.resize(117,116)
+                    button.resize(117,116) 
                     button.move(-25+(100*col)+shift, 13+(87 * row))
                     self.hexButtons.append(button) 
                     location = str(sRow + sCol)

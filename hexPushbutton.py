@@ -15,8 +15,7 @@ class HexPushButton(QPushButton):
         self.setStyleSheet("background-color: transparent; border: none; padding: 0;")
         self.theBoard = board  # Use the shared Board object
         self.rotationAngle = 0
-        self.tileList = []
-        self.tileListIndex = 0
+       
         
         # this is a list of all tile names from 1 to 70 in ascending order
         self.tileKey = [
@@ -29,36 +28,93 @@ class HexPushButton(QPushButton):
             ]
 
     def mousePressEvent(self, event):
-        hexagon = QPolygon()
+        hexagon = QPolygon([
+            QPoint(58, 0),
+            QPoint(7, 29),
+            QPoint(7, 87),
+            QPoint(58, 117),
+            QPoint(110, 87),
+            QPoint(110, 29)
+        ])  # corners of the hexagon
         
+        overlapping_buttons = self.findOverlappingButtons(event.pos())
+        print("..........")
+        for cButton in overlapping_buttons:
+            print(cButton.name)
+
+         
         hexDictionary = {
-            "0210":0, "0212":1, "0214":2, "0216":3, "0218":4, "0220":5, "0222":6, 
-            "0307":7, "0309":8, "0311":9, "0313":10, "0317":11, "0319":12, "0321":13, "0323":14,
-            "0402":15, "0404":16, "0406":17, "0408":18, "0410":19, "0412":20, "0414":21, "0416":22, "0418":23, "0420":24,  "0422":25, 
-            "0503":26, "0505":27, "0507":28, "0511":29, "0513":30, "0515":31, "0517":32, "0519":33, "0521":34, "0523":35,
-            "0604":36, "0608":37, "0610":38, "0612":39, "0614":40, "0616":41, "0618":42, "0620":43, "0622":44, 
-            "0703":45, "0705":46, "0707":47, "0709":48, "0711":49, "0713":50, "0715":51, "0717":52, "0719":53,
-            "0802":54, "0804":55, "0806":56, "0808":57, "0810":58, "0814":59, "0816":60, "0818":61, 
-            "0903":62, "0905":63, "0907":64, "0909":65, "0911":66, "0913":67, "0915":68, "0917":69, 
-            "1004":70, "1006":71, "1008":72, "1010":73, "1012":74, "1014":75, 
-            "1115":76
-            }
-        
-        hexPoints = [(58,0), (0,29), (0,87), (58,117), (117,87), (117,29)]  # these are the corners of the hexagon
-        for i in range(6):
-            hexagon.append(QPoint(hexPoints[i][0], hexPoints[i][1]))           
-        if hexagon.containsPoint(event.pos(), Qt.OddEvenFill):              # if the mouse is clicked inside a hex
-            super().mousePressEvent(event)          
-            location = hexDictionary[self.name]                             # check the hex dictionary to get the hex value
-            if location != self.MainWindow.lastHex or self.MainWindow.endTurn == True: # if the hex clicked is new
-                self.newLocationClicked((location))
+            "0210": 0, "0212": 1, "0214": 2, "0216": 3, "0218": 4, "0220": 5, "0222": 6, 
+            "0307": 7, "0309": 8, "0311": 9, "0313": 10, "0317": 11, "0319": 12, "0321": 13, "0323": 14,
+            "0402": 15, "0404": 16, "0406": 17, "0408": 18, "0410": 19, "0412": 20, "0414": 21, "0416": 22, "0418": 23, "0420": 24, "0422": 25, 
+            "0503": 26, "0505": 27, "0507": 28, "0511": 29, "0513": 30, "0515": 31, "0517": 32, "0519": 33, "0521": 34, "0523": 35,
+            "0604": 36, "0608": 37, "0610": 38, "0612": 39, "0614": 40, "0616": 41, "0618": 42, "0620": 43, "0622": 44, 
+            "0703": 45, "0705": 46, "0707": 47, "0709": 48, "0711": 49, "0713": 50, "0715": 51, "0717": 52, "0719": 53,
+            "0802": 54, "0804": 55, "0806": 56, "0808": 57, "0810": 58, "0814": 59, "0816": 60, "0818": 61, 
+            "0903": 62, "0905": 63, "0907": 64, "0909": 65, "0911": 66, "0913": 67, "0915": 68, "0917": 69, 
+            "1004": 70, "1006": 71, "1008": 72, "1010": 73, "1012": 74, "1014": 75, 
+            "1115": 76
+        }        
+
+        if hexagon.containsPoint(event.pos(), Qt.OddEvenFill):
+            location = hexDictionary[self.name]
+            newLoc = ""
+            print(location)
+            if location != self.MainWindow.lastHex or self.MainWindow.endTurn:
+                self.newLocationClicked(location)
                 self.MainWindow.endTurn = False
             else:
-                 self.sameLocationClicked(location)
+                self.sameLocationClicked(location)
+        elif len(overlapping_buttons) > 0:
+            if len(overlapping_buttons) == 2:
+                newLoc = self.cellAbove(overlapping_buttons[1].name,0)
+                print("correctlocation " + newLoc)
+            else:
+                if event.pos().x() < 60:
+                    newLoc = self.cellAbove(overlapping_buttons[0].name,0)
+                    print("correct location " + newLoc)
+                else:
+                    newLoc = self.cellAbove(overlapping_buttons[0].name,1)
+                    print("correct location " + newLoc)
+            if newLoc in hexDictionary:
+                location = hexDictionary[newLoc]
+                print(location)
+            if location != self.MainWindow.lastHex or self.MainWindow.endTurn:
+                self.newLocationClicked(location)
+                self.MainWindow.endTurn = False
+            else:
+                self.sameLocationClicked(location)
+        else:
+            print("not a hex")
+            super().mousePressEvent(event)
             
             # This might be used to color in tiles that are a part of a train route
-            #self.MainWindow.colorTiles(tileList[0], location, tileList[1], 0)
-            
+            # self.MainWindow.colorTiles(tileList[0], location, tileList[1], 0)
+     
+        
+    def findOverlappingButtons(self, pos):
+        overlapping_buttons = []
+        for button in self.MainWindow.hexButtons:
+            if button.geometry().contains(self.mapToGlobal(pos)):
+                overlapping_buttons.append(button)
+        return overlapping_buttons         
+             
+    
+    def cellAbove(self, name, direction):
+        firstTwo = name[:2]
+        lastTwo = name[-2:]
+        newFirst = int(firstTwo) - 1
+        if direction == 0:
+            newLast = int(lastTwo) - 1
+        else:
+            newLast = int(lastTwo) + 1
+        if newFirst < 10:
+            newFirst = str("0" + str(newFirst))
+        if newLast < 10:
+            newLast = str("0" + str(newLast))
+        newLoc = str(str(newFirst) + str(newLast)) 
+        return newLoc
+       
             
     def newLocationClicked(self, location):
         print("******** New Location")
@@ -80,31 +136,29 @@ class HexPushButton(QPushButton):
         self.MainWindow.lastHex = location                                  # set the lastHex to this new location
         company = self.MainWindow.currentCompany
         trainList = self.MainWindow.trainList[company]
-        locationFirst = int(self.name[:2])                                  # parsing out the tuple for board to use
-        locationSecond = int(self.name[2:])
+        name = self.theBoard.hexDictionary[location]
+        locationFirst = int(name[:2])                                  # parsing out the tuple for board to use
+        locationSecond = int(name[2:])
         boardLocation = (locationFirst, locationSecond)
-        self.tileList = self.theBoard.checkForPlayableTile(boardLocation, company, trainList)    # ask theBoard for a list of playable tiles to display 
-        self.tileListIndex = 0
-        if self.tileList:
-            self.MainWindow.displayTile(self.tileList[0][0], location, self.tileList[0][1])
+        self.theBoard.tileList = self.theBoard.checkForPlayableTile(boardLocation, company, trainList)    # ask theBoard for a list of playable tiles to display 
+        self.theBoard.tileListIndex = 0
+        if self.theBoard.tileList:
+            self.MainWindow.displayTile(self.theBoard.tileList[0][0], location, self.theBoard.tileList[0][1])
+
         
         
     def sameLocationClicked(self, location):
-        print("Same Location")
-        if self.tileList:
-            self.tileListIndex +=1
-            if self.tileListIndex >= len(self.tileList):
-                self.tileListIndex = 0
-            ind = self.tileListIndex
-            self.MainWindow.displayTile(self.tileList[ind][0], location, self.tileList[ind][1])
+
+        print("******** Same Location")
+        if self.theBoard.tileList:
+            self.theBoard.tileListIndex +=1
+            if self.theBoard.tileListIndex >= len(self.theBoard.tileList):
+                self.theBoard.tileListIndex = 0
+            ind = self.theBoard.tileListIndex
+            self.MainWindow.displayTile(self.theBoard.tileList[ind][0], location, self.theBoard.tileList[ind][1])
 
 
-    def findOverlappingButtons(self, pos):
-        overlapping_buttons = []
-        for button in self.MainWindow.hexButtons:
-            if button.geometry().contains(self.mapToGlobal(pos)):
-                overlapping_buttons.append(button)
-        return overlapping_buttons
+
 
 
 

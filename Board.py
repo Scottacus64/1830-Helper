@@ -13,6 +13,8 @@ class Board:
         self.possibleTilesIndex = 0
         self.lastLocation = (100,100)
         self.largestTrain = 0
+        self.tileList = []
+        self.tileListIndex = 0
         
         self.hexDictionary = {
             0: "0210",  1:"0212",  2:"0214",  3:"0216",  4:"0218",  5:"0220",  6:"0222", 
@@ -150,7 +152,6 @@ class Board:
             else:
                 hexSecondStr = str(hex[1])
             hexName = str(hexFirstStr + hexSecondStr)
-            print(hexName)
             hex_name = hexName                # string like 0307
             
             #-----HexTile-----
@@ -187,10 +188,7 @@ class Board:
             for stationList in station_ct_list:
                 if stationList[0] == hex:
                     station_count = stationList[1]
-                    break
-            print(str(hex) + str(station_count))
-            
-     
+                    break    
         
             #-----Railroad Start-----
             hex_rr_ind = None
