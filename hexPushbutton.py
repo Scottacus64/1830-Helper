@@ -78,12 +78,14 @@ class HexPushButton(QPushButton):
                     print("correct location " + newLoc)
             if newLoc in hexDictionary:
                 location = hexDictionary[newLoc]
-                print(location)
-            if location != self.MainWindow.lastHex or self.MainWindow.endTurn:
-                self.newLocationClicked(location)
-                self.MainWindow.endTurn = False
             else:
-                self.sameLocationClicked(location)
+                location = 100
+            if location < 100:
+                if location != self.MainWindow.lastHex or self.MainWindow.endTurn:
+                    self.newLocationClicked(location)
+                    self.MainWindow.endTurn = False
+                else:
+                    self.sameLocationClicked(location)
         else:
             print("not a hex")
             super().mousePressEvent(event)
