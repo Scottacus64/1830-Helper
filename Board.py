@@ -225,22 +225,20 @@ class Board:
                 
             angle = 0
             
-
-        
             # Initialize the hex object
             hex_to_append = Hexagon(hex_id, hex_name, vil_count, city_count, station_count, rr_start, entryExitStation, voidSides, hexTile, angle)
             self.board_hexagons.append(hex_to_append)
             
-        print("")
         # add city tiles to playedTile list
         cityTiles = [80, 81, 82, 83, 83, 83, 83]
         for tileNumber in cityTiles:
             tile = self.removeTileFromUnplayedTiles(tileNumber) 
             self.playedTiles.append(tile)
 
+
     def print_board(self):
         for a_hex in self.board_hexagons:
-            print(a_hex.hex_id, "v =", a_hex.vil_count, "c =", a_hex.city_count, "col = ", a_hex.color, "ees =", a_hex.entryExitStation, "hv =", a_hex.voidSides, "t =", a_hex.hexTile,  a_hex.rr_start)
+            print(a_hex.hex_id, "v =", a_hex.vil_count, "c =", a_hex.city_count, "stn = ", a_hex.station_count, "ees =", a_hex.entryExitStation, "hv =", a_hex.voidSides, "t =", a_hex.hexTile,  a_hex.rr_start)
             print("---------------")  
         foundTile = self.checkThroughUnplayedTiles(57)
         print("Found Tile " + str(foundTile.tile_id))
