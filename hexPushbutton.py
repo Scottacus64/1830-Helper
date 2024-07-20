@@ -146,6 +146,11 @@ class HexPushButton(QPushButton):
         self.theBoard.tileListIndex = 0
         if self.theBoard.tileList:
             self.MainWindow.displayTile(self.theBoard.tileList[0][0], location, self.theBoard.tileList[0][1])
+            tile = self.theBoard.unplayedTileLookUp(self.theBoard.tileList[0][0])
+            cityCount = tile.city_count
+            print(f"City count = {cityCount}")
+            if cityCount == 2:
+                self.MainWindow.activateSecondCity(self, tile.tile_id)      # if there is a second city that appears with this tile, activate it
 
         
         

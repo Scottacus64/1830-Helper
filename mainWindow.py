@@ -178,21 +178,32 @@ class MainWindow(QWidget):
         if hex and hex.city_count == 1:
             print("city found at: " + str(location))
             if hex.rr_start == 100:
-                adjX = oneCityAdj[self.oneCityIndex][0]
-                adjY = oneCityAdj[self.oneCityIndex][1]
-                cityName = str("city" + str(location) + "0")
-                cityButton = QPushButton(cityName, self)
-                cityButton.setObjectName(cityName)
-                cityButton.setGeometry(12+(100*col)+shift+adjX, 53+(87 * row)+ adjY, 40, 40)
-                cityButton.clicked.connect(self.cityButtonClicked)    
-                cityButton.setText("")   
-                cityButton.setStyleSheet("border: none;")
-                icon = QIcon()
-                cityButton.setIconSize(cityButton.size())
-                cityButton.setIcon(icon)
-                self.cityButtons.append(cityButton)
-                self.oneCityIndex +=1
-        twoCityAdj =[[(-26,16),(-19,-24)], [(15,16),(-28,5)], [(-23,3),(16,-25)], [(-2,17),(18,-25)], [(-12,21),(17,-30)]]
+                for i in range(2):
+                    if i == 1:
+                        adjX = oneCityAdj[self.oneCityIndex][0]
+                        adjY = oneCityAdj[self.oneCityIndex][1]
+                    else:
+                        adjX = 0
+                        adjY = 0
+                    cityName = str("city" + str(location) + str(i))
+                    cityButton = QPushButton(cityName, self)
+                    cityButton.setObjectName(cityName)
+                    cityButton.setGeometry(12+(100*col)+shift+adjX, 53+(87 * row)+ adjY, 40, 40)
+                    cityButton.clicked.connect(self.cityButtonClicked)    
+                    cityButton.setText("")  
+                    if i == 0:
+                        cityButton.setStyleSheet("border: 2px solid red;")
+                    else:
+                        cityButton.setStyleSheet("border: 2px solid blue;")
+                    icon = QIcon()
+                    cityButton.setIconSize(cityButton.size())
+                    cityButton.setIcon(icon)
+                    if i == 0:
+                        cityButton.setEnabled(False)
+                    self.cityButtons.append(cityButton)
+                    if i > 0:
+                        self.oneCityIndex +=1
+        twoCityAdj =[[(-26,16),(-19,-24)], [(-28,5),(15,16)], [(-23,3),(16,-25)], [(-2,17),(18,-25)], [(-12,21),(17,-30)]]
         if hex and hex.city_count == 2:
             print(f"2 cities at {location}")
             for i in range(2):
@@ -284,7 +295,7 @@ class MainWindow(QWidget):
             if stationTest.objectName() == self.currentStation:
                 stationSlot = i
             i += 1
-        print("station slot = " + str(stationSlot))         
+        #print("station slot = " + str(stationSlot))         
         return stationSlot
         
         
@@ -358,7 +369,7 @@ class MainWindow(QWidget):
         if self.lastcityButton != "":                           # used to blank out a station icon if another station is clicked before finalizing with company
             self.resetCityButton()
         if int(self.currentStation[4:]) < 100:                  # if a station icon was clicked set the station token to that icon
-            hexName = buttonName[2:]
+            hexName = buttonName[4:8]
             hex = self.board.findHexName(hexName)               # get the hex for the loaction of the station
             hexName = hex.hex_name                              # find the name of the hex
             curTile = self.currentTile[1]                       # get the current tile's numeric value (ie 58)
@@ -369,6 +380,7 @@ class MainWindow(QWidget):
                 for hList in hex.entryExitStation:              # check to see if the hex's station has been set yet
                     if int(hList[3]) == 100:                    # if 100 then no station has been placed yet, prevents overwritting previous stations
                         self.setCityButton(buttonName)
+                
                         
     def setCityButton(self, buttonName):                        # method for setting the icon of a station token
         if self.currentStation != "stn 100":
@@ -378,6 +390,7 @@ class MainWindow(QWidget):
             self.lastcityButton = buttonName                     # used to reset this station t0 blank if another station is clicked before finalized
             self.stationPlaced = True
            
+            
     def resetCityButton(self):
         print("in reset token")
         icon = QIcon()
@@ -386,6 +399,24 @@ class MainWindow(QWidget):
             self.cityButtons[stationSlot].setIcon(icon)
             self.stationPlaced = False
             self.lastcityButton = ""
+            
+            
+    def activateSecondCity(self, hex, tileNumber):
+        print(f"Hex {hex} and tileNumber {tileNumber}")
+        print(f"hexPB name = {hex.name}")
+        city0 = self.findCityObj(str("city" + hex.name + "0"))
+        print(f" ******* {city0}")
+        city0.setEnabled(True)
+        city1 = self.findCityObj(str("city" + hex.name + "1"))
+        hexCol =int( hex.name[-2:])-1
+        hexRow = int(hex.name[:2])-1
+        print(f"col =  {hexCol} row = {hexRow}")
+        shift = 0
+        if (hexRow) % 2 == 0:
+            shift = 50
+        city0.setGeometry(12+(50*hexCol)+shift, 33+(87 * hexRow), 40, 40)
+        city1.setGeometry(12+(50*hexCol)+shift, 73+(87 * hexRow), 40, 40)
+        
         
                         
     def findCityButton(self, cityButton):
@@ -396,6 +427,12 @@ class MainWindow(QWidget):
                 stationSlot = i
             i += 1
         return stationSlot
+    
+    
+    def findCityObj(self, cityName):
+        for city in self.cityButtons:
+            if city.objectName() == cityName:
+                return city
                 
     
     def colorTrains(self, company, slot, card, tValue):

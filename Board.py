@@ -383,7 +383,7 @@ class Board:
             else:
                 hexList.append((0,0))
         return hexList
-        
+    
     
     def findHexTuple(self, id):
         print("In tuple")
@@ -497,6 +497,12 @@ class Board:
             
     def playedTileLookUp(self, tileNumber):
         for tile in self.playedTiles:
+            if tile.tile_id == tileNumber:
+                return tile
+            
+    
+    def unplayedTileLookUp(self, tileNumber):
+        for tile in self.unplayedTiles:
             if tile.tile_id == tileNumber:
                 return tile
 
