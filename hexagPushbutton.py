@@ -4,7 +4,7 @@ from PyQt5.QtGui import  QPolygon, QTransform, QIcon
 from PyQt5.QtCore import QPoint, Qt
 from Board import Board
 
-class HexPushButton(QPushButton):
+class hexagPushButton(QPushButton):
     
     def __init__(self, name, main_window, board, parent=None):
         super().__init__(parent)
@@ -43,7 +43,7 @@ class HexPushButton(QPushButton):
             print(cButton.name)
 
          
-        hexDictionary = {
+        hexagDictionary = {
             "0210": 0, "0212": 1, "0214": 2, "0216": 3, "0218": 4, "0220": 5, "0222": 6, 
             "0307": 7, "0309": 8, "0311": 9, "0313": 10, "0317": 11, "0319": 12, "0321": 13, "0323": 14,
             "0402": 15, "0404": 16, "0406": 17, "0408": 18, "0410": 19, "0412": 20, "0414": 21, "0416": 22, "0418": 23, "0420": 24, "0422": 25, 
@@ -57,10 +57,10 @@ class HexPushButton(QPushButton):
         }        
 
         if hexagon.containsPoint(event.pos(), Qt.OddEvenFill):
-            location = hexDictionary[self.name]
+            location = hexagDictionary[self.name]
             newLoc = ""
             print(location)
-            if location != self.MainWindow.lastHex or self.MainWindow.endTurn:
+            if location != self.MainWindow.lastHexag or self.MainWindow.endTurn:
                 self.newLocationClicked(location)
                 self.MainWindow.endTurn = False
             else:
@@ -76,18 +76,18 @@ class HexPushButton(QPushButton):
                 else:
                     newLoc = self.cellAbove(overlapping_buttons[0].name,1)
                     print("correct location " + newLoc)
-            if newLoc in hexDictionary:
-                location = hexDictionary[newLoc]
+            if newLoc in hexagDictionary:
+                location = hexagDictionary[newLoc]
             else:
                 location = 100
             if location < 100:
-                if location != self.MainWindow.lastHex or self.MainWindow.endTurn:
+                if location != self.MainWindow.lastHexag or self.MainWindow.endTurn:
                     self.newLocationClicked(location)
                     self.MainWindow.endTurn = False
                 else:
                     self.sameLocationClicked(location)
         else:
-            print("not a hex")
+            print("not a hexag")
             super().mousePressEvent(event)
             
             # This might be used to color in tiles that are a part of a train route
@@ -96,7 +96,7 @@ class HexPushButton(QPushButton):
         
     def findOverlappingButtons(self, pos):
         overlapping_buttons = []
-        for button in self.MainWindow.hexButtons:
+        for button in self.MainWindow.hexagButtons:
             if button.geometry().contains(self.mapToGlobal(pos)):
                 overlapping_buttons.append(button)
         return overlapping_buttons         
@@ -121,27 +121,29 @@ class HexPushButton(QPushButton):
     def newLocationClicked(self, location):
         print("******** New Location")
         # check if the player clicked on a second tile this turn, if so we need toe ither blank out the previous tile or reset it to its original tile
-        if self.MainWindow.lastHex > -1:                                    # this case there was a previous tile, -1 because there is a '0' hex
-            lastHexNumber = self.MainWindow.lastHex                         # restore the last hex's tile
-            hexLocation = self.theBoard.hexDictionary[lastHexNumber]
-            locationFirst = int(hexLocation[:2])                            # parsing out the tuple for board to use
-            locationSecond = int(hexLocation[2:])
+        if self.MainWindow.lastHexag > -1:                                    # this case there was a previous tile, -1 because there is a '0' hexag
+            lastHexagNumber = self.MainWindow.lastHexag                         # restore the last hexag's tile
+            hexagLocation = self.theBoard.hexagDictionary[lastHexagNumber]
+            locationFirst = int(hexagLocation[:2])                            # parsing out the tuple for board to use
+            locationSecond = int(hexagLocation[2:])
             boardLocation = (locationFirst, locationSecond)
-            lastHex = self.theBoard.findHexTuple(boardLocation)
-            if lastHex:
-                self.MainWindow.displayTile(lastHex.hexTile, lastHexNumber, lastHex.angle) # tile number, location,angle
+            lastHexag = self.theBoard.findhexagTuple(boardLocation)
+            self.MainWindow.resetCityButton(lastHexag)
+            if lastHexag:
+                self.MainWindow.displayTile(lastHexag.hexagTile, lastHexagNumber, lastHexag.angle,) # tile number, location,angle
             else:
-                self.MainWindow.displayTile(0, lastHexNumber, 0)            # set the previous hex to blank  
+                self.MainWindow.displayTile(0, lastHexagNumber, 0)            # set the previous hexag to blank  
         else:                                                               # this case there was no previous tile so just blank it out
-            self.MainWindow.displayTile(0, self.MainWindow.lastHex, 0)      # set the previous hex to blank
+            self.MainWindow.displayTile(0, self.MainWindow.lastHexag, 0)      # set the previous hexag to blank
             
-        self.MainWindow.lastHex = location                                  # set the lastHex to this new location
+        self.MainWindow.lastHexag = location                                  # set the lastHexag to this new location
         company = self.MainWindow.currentCompany
         trainList = self.MainWindow.trainList[company]
-        name = self.theBoard.hexDictionary[location]
+        name = self.theBoard.hexagDictionary[location]
         locationFirst = int(name[:2])                                  # parsing out the tuple for board to use
         locationSecond = int(name[2:])
         boardLocation = (locationFirst, locationSecond)
+        hexag = self.theBoard.findhexagTuple(boardLocation)
         self.theBoard.tileList = self.theBoard.checkForPlayableTile(boardLocation, company, trainList)    # ask theBoard for a list of playable tiles to display 
         self.theBoard.tileListIndex = 0
         if self.theBoard.tileList:
@@ -149,7 +151,7 @@ class HexPushButton(QPushButton):
             tile = self.theBoard.unplayedTileLookUp(self.theBoard.tileList[0][0])
             cityCount = tile.city_count
             print(f"City count = {cityCount}")
-            if cityCount == 2:
+            if cityCount == 2 and tile.color == "green":
                 self.MainWindow.activateSecondCity(self, tile.tile_id)      # if there is a second city that appears with this tile, activate it
 
         

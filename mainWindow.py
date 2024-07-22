@@ -10,7 +10,7 @@ Created on Sun May  5 07:55:38 2024
 import os
 from PyQt5.QtWidgets import QWidget, QLabel, QPushButton
 from PyQt5.QtGui import QPixmap, QTransform, QIcon, QPalette, QColor, QPainter
-from hexPushbutton import HexPushButton
+from hexagPushbutton import hexagPushButton
 from Board import Board
 from PyQt5.QtCore import Qt, QSize
 
@@ -19,7 +19,7 @@ class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
         self.board = Board()
-        self.hexButtons = []                   # set up these global variables before the initUI
+        self.hexagButtons = []                   # set up these global variables before the initUI
         self.stationButtons = []
         self.trainButtons = []
         self.companyButtons = []
@@ -29,7 +29,7 @@ class MainWindow(QWidget):
         self.twoCityIndex = 0
         self.endTurn = True
         
-        self.lastHex = 0
+        self.lastHexag = 0
         self.currentStation = "stn 100"
         self.currentStationNumber = 0
         self.currentCompany = 9
@@ -37,7 +37,7 @@ class MainWindow(QWidget):
         self.stationPlaced = False
         self.currentTile = [0,0,0]
         self.initUI()
-        self.lastcityButton = ""
+        self.lastCityButton = ""
         
     def initUI(self):
         self.setGeometry(0, 0, 1692, 1000) #1245
@@ -60,7 +60,7 @@ class MainWindow(QWidget):
         sidebar_label.setGeometry(1245,0,447,1000)
         sidebar_label.setPixmap(sidebar_pixmap)
 
-        # This a a list of all valid hexes that can be clicked
+        # This a a list of all valid hexages that can be clicked
         map = [
             [0,0,0,0,0,0,0,0,0,0,0,0],
             [0,0,0,0,1,1,1,1,1,1,1,0],
@@ -89,7 +89,7 @@ class MainWindow(QWidget):
         # this is the number of stations per company
         self.stationList = [2,3,3,4,3,4,2,4]
         
-        # make the QPushbuttons for the hexes
+        # make the QPushbuttons for the hexages
         for row in range(11):
             for col in range(12):
                 if map[row][col] == 1:
@@ -109,12 +109,12 @@ class MainWindow(QWidget):
                     else:
                         sCol = str(mCol)
                     name = sRow + sCol
-                    button = HexPushButton(name, self, self.board, self)         
+                    button = hexagPushButton(name, self, self.board, self)         
                     button.resize(117,116) 
                     button.move(-25+(100*col)+shift, 13+(87 * row))
-                    self.hexButtons.append(button) 
+                    self.hexagButtons.append(button) 
                     location = str(sRow + sCol)
-                    self.checkForCity(location, col, row, shift)     # check to see if the hex has a city on it
+                    self.checkForCity(location, col, row, shift)     # check to see if the hexag has a city on it
         pad = 0 
         
         # set uo side bar train and company buttons
@@ -129,20 +129,20 @@ class MainWindow(QWidget):
                 company = row//2
                 numberOfStations = self.stationList[company]
                 if numberOfStations >= (2*(row%2)) + col + 1:
-                    sName = str("stn " + str(company) + str(col+(2*(row%2))))
+                    sName = str("stn " + str(company+1) + str(col+(2*(row%2))))
                     sButton = QPushButton(sName, self)
                     sButton.setObjectName(sName)
                     sButton.setGeometry(1360 + (col*60),pad+(row * 60), 60, 60)
                     sButton.clicked.connect(self.stationButtonClicked)
                     sButton.setText("")
                     sButton.setStyleSheet("border: none;")
-                    icon = QIcon(self.getImage(str("s" + str(row//2))))
+                    icon = QIcon(self.getImage(str("s" + str((row//2)+1))))
                     sButton.setIconSize(button.size())
                     sButton.setIcon(icon)
                     self.stationButtons.append(sButton)
                     
                 # train buttons
-                tName = str("t" + str(row//2) + str(col+(2*(row%2))))
+                tName = str("t" + str((row//2)+1) + str(col+(2*(row%2))))
                 tButton = QPushButton(tName, self)
                 tButton.setObjectName(tName)
                 tButton.setGeometry(1480 + (col*107),pad+(row * 60), 100, 60)
@@ -174,10 +174,10 @@ class MainWindow(QWidget):
         
     def checkForCity(self, location, col, row, shift):
         oneCityAdj = [(0,0), (2,0), (0,0), (0,0), (0,0), (2,-2), (5,-5), (2,-1), (2,-2), (5,-5), (0,5), (-15,-15)]  
-        hex = self.board.findHexName(location)
-        if hex and hex.city_count == 1:
+        hexag = self.board.findhexagName(location)
+        if hexag and hexag.city_count == 1:
             print("city found at: " + str(location))
-            if hex.rr_start == 100:
+            if hexag.rr_start == 100:
                 for i in range(2):
                     if i == 1:
                         adjX = oneCityAdj[self.oneCityIndex][0]
@@ -185,16 +185,14 @@ class MainWindow(QWidget):
                     else:
                         adjX = 0
                         adjY = 0
-                    cityName = str("city" + str(location) + str(i))
+                    cityName = str("city" + str(location) + "2" + str(i))
+                    print(cityName)
                     cityButton = QPushButton(cityName, self)
                     cityButton.setObjectName(cityName)
                     cityButton.setGeometry(12+(100*col)+shift+adjX, 53+(87 * row)+ adjY, 40, 40)
                     cityButton.clicked.connect(self.cityButtonClicked)    
                     cityButton.setText("")  
-                    if i == 0:
-                        cityButton.setStyleSheet("border: 2px solid red;")
-                    else:
-                        cityButton.setStyleSheet("border: 2px solid blue;")
+                    cityButton.setStyleSheet("border: 2px solid red;")
                     icon = QIcon()
                     cityButton.setIconSize(cityButton.size())
                     cityButton.setIcon(icon)
@@ -204,19 +202,22 @@ class MainWindow(QWidget):
                     if i > 0:
                         self.oneCityIndex +=1
         twoCityAdj =[[(-26,16),(-19,-24)], [(-28,5),(15,16)], [(-23,3),(16,-25)], [(-2,17),(18,-25)], [(-12,21),(17,-30)]]
-        if hex and hex.city_count == 2:
+        if hexag and hexag.city_count == 2:
             print(f"2 cities at {location}")
             for i in range(2):
                 adjX = twoCityAdj[self.twoCityIndex][i][0]
                 adjY = twoCityAdj[self.twoCityIndex][i][1]
-                cityName = str("city" + str(location)+ str(i))
-                print(cityName)
+                cityName = str("city" + str(location)+ str(i+3) + str(i))
                 cityButton = QPushButton(cityName, self)
                 cityButton.setObjectName(cityName)
                 cityButton.setGeometry(12+(100*col)+shift+adjX, 53+(87 * row)+ adjY, 40, 40)
                 cityButton.clicked.connect(self.cityButtonClicked)    
                 cityButton.setText("")   
-                cityButton.setStyleSheet("border: 2px solid red;")
+                if i == 0:
+                    cityButton.setStyleSheet("border: 2px solid red;")
+                else:
+                    cityButton.setStyleSheet("border: 2px solid blue;")
+                
                 icon = QIcon()
                 cityButton.setIconSize(cityButton.size())
                 cityButton.setIcon(icon)
@@ -235,14 +236,13 @@ class MainWindow(QWidget):
     
     # method for getting and displaying tiles gotten from theBoard
     def displayTile(self, tileNumber, location, angle):
-        self.resetCityButton()
-        if tileNumber > 0:                                      # if it is a new hex
+        hexag_widget = self.hexagButtons[location]
+        if tileNumber > 0:                                      # if it is a new hexag
             self.currentTile = [tileNumber, location, angle]    # variable to know if any tiles have been clicked and what the tile info is
             tileName = self.tileDictionary[tileNumber]
             icon = QIcon(self.getImage(tileName))
         else:                                                   # if it is an old icon that needs to be made blank
             icon = QIcon()
-        hex_widget = self.hexButtons[location]
         if angle > 0:
             transform = QTransform()
             transform.rotate(angle * 60)
@@ -255,34 +255,36 @@ class MainWindow(QWidget):
             painter = QPainter(final_pixmap)                                # Draw the rotated pixmap onto the final pixmap
             painter.drawPixmap(int(xOffset), int(yOffset), rotated_pixmap)
             painter.end() 
-            hex_widget.setIcon(QIcon(final_pixmap))
-            hex_widget.setIconSize(QSize(115, 115))                         # Set the size of the icon
+            hexag_widget.setIcon(QIcon(final_pixmap))
+            hexag_widget.setIconSize(QSize(115, 115))                         # Set the size of the icon
         else:
-            hex_widget.setIcon(icon)
-            hex_widget.setIconSize(QSize(115, 115))                         # Set the size of the icon
+            hexag_widget.setIcon(icon)
+            hexag_widget.setIconSize(QSize(115, 115))                         # Set the size of the icon
+
         
 
     def stationButtonClicked(self):
         buttonName = self.sender().objectName()                     # find out which station was clicked
         print("Station: ", buttonName)
         print("Current station " + self.currentStation)
-        if int(self.currentCompany) == int(buttonName[4]) + 1:      # check to see if the button clicked matches the current company
+        if int(self.currentCompany) == int(buttonName[4]):          # check to see if the button clicked matches the current company
             self.stationClicked = True
             stationSlot = 100
-            print(self.currentStation[4:])
+            print(f"station number = {self.currentStation[4:]}")
             if int(self.currentStation[4:]) < 100:                  # this lets stations in the same company reset if another station is clicked
                 stationSlot = self.findStation()
                 print("Station slot = " + str(stationSlot))
                 company = self.currentStation[4]
                 icon = QIcon(self.getImage(str("s" + company)))
-                if self.lastcityButton != "": 
+                if self.lastCityButton == "": 
                     self.stationButtons[stationSlot].setIcon(icon)      # resets a station back to its original icon
                     icon = QIcon()
-                    stationSlot = self.findCityButton(self.lastcityButton)
                     self.cityButtons[stationSlot].setIcon(icon)
                     self.currentStation = "stn 100"
-                    self.stationClicked = False
-                    self.lastcityButton = ""
+                    self.stationClicked = False  
+                    if self.lastCityButton != "":
+                        stationSlot = self.findCityButton(self.lastCityButton)
+                    self.lastCityButton = ""
                     return
             self.currentStation = buttonName
             stationSlot = self.findStation()
@@ -298,13 +300,13 @@ class MainWindow(QWidget):
         #print("station slot = " + str(stationSlot))         
         return stationSlot
         
-        
+    
     def trainButtonClicked(self):
         buttonName = self.sender().objectName()
         number = buttonName[1:]
         company = int(number[:1])
         card = int(number[1:])
-        if company == self.currentCompany - 1:
+        if company == self.currentCompany:
             trainList = self.trainList[company]             # get the train list for the company
             activeTrain = trainList[card]                   # get the clicked card for that company and
             activeTrain = activeTrain + 1                   # increment the train value
@@ -312,7 +314,7 @@ class MainWindow(QWidget):
                 activeTrain = 1
      
             self.trainList[company][card] = activeTrain                         # set the value in that company train list for export
-            slot = (company * 4) + card                                         # find which slot in the trainbuttons is active
+            slot = ((company-1) * 4) + card                                         # find which slot in the trainbuttons is active
             icon = QIcon(self.getImage("train" + str(activeTrain)))             # get the new card icon
             self.trainButtons[slot].setIcon(icon)                               # update the pushbutton icon
             if activeTrain > 1:
@@ -323,7 +325,7 @@ class MainWindow(QWidget):
                     if self.trainList[i][j] > self.board.largestTrain:
                         self.board.largestTrain = self.trainList[i][j]
             print("Largest Train = " + str(self.board.largestTrain))
-            self.endTurn = True         # this forced the method to choose new hex rather than same hex since there may be upgrade tiles now available
+            self.endTurn = True         # this forced the method to choose new hexag rather than same hexag since there may be upgrade tiles now available
             
             
     def companyButtonClicked(self):
@@ -340,8 +342,8 @@ class MainWindow(QWidget):
             self.currentCompany = company
             
             # this is where the code to let the board know that the tile has been finalized would go
-            self.lastcityButton = ""                               # set the station token back to blank as the "turn" is ended
-            self.lastHex = -1                                   # set to -1 not 0 so that if hex 0 is clicked it will register as a new hex and not be rejected
+            self.lastCityButton = ""                               # set the station token back to blank as the "turn" is ended
+            self.lastHexag = -1                                   # set to -1 not 0 so that if hexag 0 is clicked it will register as a new hexag and not be rejected
             self.endTurn = True
             
             if self.stationClicked == True and self.stationPlaced == False:  # if a station was clicked and not placed then replace it
@@ -357,7 +359,7 @@ class MainWindow(QWidget):
                 print("angle = " + str(self.currentTile[2]))
                 station = int(self.currentStation[4:])
                 print("station = " + str(station))
-                self.board.updateHexWithTile(self.currentTile[0], self.currentTile[1] , self.currentTile[2], self.currentStationNumber, station)
+                self.board.updatehexagWithTile(self.currentTile[0], self.currentTile[1] , self.currentTile[2], self.currentStationNumber, station)
                 self.currentTile = [0,0,0]
             self.currentStation = "stn 100"
             
@@ -365,58 +367,63 @@ class MainWindow(QWidget):
     def cityButtonClicked(self, company):
         buttonName = self.sender().objectName()
         print("buttonName: " + str(buttonName))
-        print("lastcityButton =  " + str(self.lastcityButton))
-        if self.lastcityButton != "":                           # used to blank out a station icon if another station is clicked before finalizing with company
-            self.resetCityButton()
+        print("lastCityButton =  " + str(self.lastCityButton))
+        if self.lastCityButton != "":                           # used to blank out a station icon if another station is clicked before finalizing with company
+            hexagName = buttonName[4:8]
+            self.resetCityButton(self.board.findhexagName(hexagName))
         if int(self.currentStation[4:]) < 100:                  # if a station icon was clicked set the station token to that icon
-            hexName = buttonName[4:8]
-            hex = self.board.findHexName(hexName)               # get the hex for the loaction of the station
-            hexName = hex.hex_name                              # find the name of the hex
+            hexagName = buttonName[4:8]
+            hexag = self.board.findhexagName(hexagName)               # get the hexag for the loaction of the station
+            hexagName = hexag.hexag_name                              # find the name of the hexag
             curTile = self.currentTile[1]                       # get the current tile's numeric value (ie 58)
-            curHex = self.board.hexDictionary[curTile]          # use the dictionary to find the corresponding name
-            if curHex == hexName:                               # if the two match then the tile we just selected is the one with the station on it
-                self.setCityButton(buttonName)                     # if so set the icon, this method section is needed since the hex's tile has not been set yet            
-            if hex.hexTile:                                     # if there's a tile here
-                for hList in hex.entryExitStation:              # check to see if the hex's station has been set yet
+            curhexag = self.board.hexagDictionary[curTile]          # use the dictionary to find the corresponding name
+            if curhexag == hexagName:                               # if the two match then the tile we just selected is the one with the station on it
+                self.setCityButton(buttonName)                  # if so set the icon, this method section is needed since the hexag's tile has not been set yet            
+            if hexag.hexagTile:                                     # if there's a tile here
+                for hList in hexag.entryExitStation:              # check to see if the hexag's station has been set yet
                     if int(hList[3]) == 100:                    # if 100 then no station has been placed yet, prevents overwritting previous stations
                         self.setCityButton(buttonName)
                 
                         
     def setCityButton(self, buttonName):                        # method for setting the icon of a station token
         if self.currentStation != "stn 100":
+            print(f"currentStation {self.currentStation}")
             stationSlot = self.findCityButton(buttonName)
             icon = QIcon(self.getImage(str("s" + self.currentStation[4])))
             self.cityButtons[stationSlot].setIcon(icon)
-            self.lastcityButton = buttonName                     # used to reset this station t0 blank if another station is clicked before finalized
+            self.lastCityButton = buttonName                     # used to reset this station t0 blank if another station is clicked before finalized
             self.stationPlaced = True
            
             
-    def resetCityButton(self):
+    def resetCityButton(self, hexag):
         print("in reset token")
         icon = QIcon()
-        if self.lastcityButton != "":
-            stationSlot = self.findCityButton(self.lastcityButton)
-            self.cityButtons[stationSlot].setIcon(icon)
+        if self.lastCityButton != "":
+            stationSlot = self.findCityButton(self.lastCityButton)
+            print(f"hexag color = {hexag.color}")
+            if self.lastCityButton[8] == "2" and hexag.color != "yellow":
+                icon2 = QIcon(self.getImage("redDot"))
+                self.cityButtons[stationSlot].setIcon(icon2)
+            else:
+                self.cityButtons[stationSlot].setIcon(icon)
             self.stationPlaced = False
-            self.lastcityButton = ""
+            self.lastCityButton = ""
             
             
-    def activateSecondCity(self, hex, tileNumber):
-        print(f"Hex {hex} and tileNumber {tileNumber}")
-        print(f"hexPB name = {hex.name}")
-        city0 = self.findCityObj(str("city" + hex.name + "0"))
-        print(f" ******* {city0}")
+    def activateSecondCity(self, hexag, tileNumber):
+        city0 = self.findCityObj(str("city" + hexag.name + "20"))
         city0.setEnabled(True)
-        city1 = self.findCityObj(str("city" + hex.name + "1"))
-        hexCol =int( hex.name[-2:])-1
-        hexRow = int(hex.name[:2])-1
-        print(f"col =  {hexCol} row = {hexRow}")
+        city1 = self.findCityObj(str("city" + hexag.name + "21"))
+        hexagCol =int( hexag.name[-2:])-1
+        hexagRow = int(hexag.name[:2])-1
         shift = 0
-        if (hexRow) % 2 == 0:
+        if (hexagRow) % 2 == 0:
             shift = 50
-        city0.setGeometry(12+(50*hexCol)+shift, 33+(87 * hexRow), 40, 40)
-        city1.setGeometry(12+(50*hexCol)+shift, 73+(87 * hexRow), 40, 40)
-        
+        city0.setGeometry(12+(50*hexagCol)+shift, 33+(87 * hexagRow), 40, 40)
+        icon = QIcon(self.getImage("redDot"))
+        city0.setIcon(icon)              
+        city1.setGeometry(12+(50*hexagCol)+shift, 73+(87 * hexagRow), 40, 40)
+        city1.setIcon(icon)        
         
                         
     def findCityButton(self, cityButton):
@@ -458,7 +465,7 @@ class MainWindow(QWidget):
         color = QColor(*colorList[train])
         tileName = self.tileDictionary[tileNumber]
         icon = QIcon(self.getImage(tileName))
-        hex_widget = self.hexButtons[location]
+        hexag_widget = self.hexagButtons[location]
         # Blend the color with the icon pixmap       
         pixmap = icon.pixmap(icon.availableSizes()[0])                   # Get the first available size
         pixmap_with_color = QPixmap(pixmap.size())
@@ -470,7 +477,7 @@ class MainWindow(QWidget):
         painter.fillRect(pixmap.rect(), color)
         painter.end()
         
-        hex_widget.setIcon(QIcon(pixmap_with_color)) 
-        hex_widget.setIconSize(QSize(115, 115))                         # Set the size of the icon
+        hexag_widget.setIcon(QIcon(pixmap_with_color)) 
+        hexag_widget.setIconSize(QSize(115, 115))                         # Set the size of the icon
         
         
