@@ -21,6 +21,7 @@ class MainWindow(QWidget):
         self.board = Board()
         self.hexagButtons = []                   # set up these global variables before the initUI
         self.stationButtons = []
+        self.stationButtonUsed = []
         self.trainButtons = []
         self.companyButtons = []
         self.trainList = []
@@ -140,6 +141,7 @@ class MainWindow(QWidget):
                     sButton.setIconSize(button.size())
                     sButton.setIcon(icon)
                     self.stationButtons.append(sButton)
+                    self.stationButtonUsed.append([sName, 0])
                     
                 # train buttons
                 tName = str("t" + str((row//2)+1) + str(col+(2*(row%2))))
@@ -153,6 +155,8 @@ class MainWindow(QWidget):
                 tButton.setIconSize(button.size())
                 tButton.setIcon(icon)
                 self.trainButtons.append(tButton)
+                
+        print(self.stationButtonUsed)
         
         for i in range(10):
             self.trainList.append([1,1,1,1])
@@ -268,6 +272,9 @@ class MainWindow(QWidget):
         print("Station: ", buttonName)
         print("Current station " + self.currentStation)
         if int(self.currentCompany) == int(buttonName[4]):          # check to see if the button clicked matches the current company
+            for slot in self.stationButtonUsed:
+                if slot[0] == buttonName and slot[1] == 1:
+                    return
             self.stationClicked = True
             stationSlot = 100
             print(f"station number = {self.currentStation[4:]}")
@@ -286,6 +293,17 @@ class MainWindow(QWidget):
                         stationSlot = self.findCityButton(self.lastCityButton)
                     self.lastCityButton = ""
                     return
+            
+                if self.currentStation == buttonName:
+                    print("******In attempt to reset station button")
+                    self.stationButtons[stationSlot].setIcon(icon) 
+                    icon = QIcon()
+                    stationSlot = self.findCityButton(self.lastCityButton)
+                    self.cityButtons[stationSlot].setIcon(icon)
+                    self.currentStation = "stn 100"
+                    self.stationClicked = False
+                    return
+            
             self.currentStation = buttonName
             stationSlot = self.findStation()
             self.stationButtons[stationSlot].setIcon(QIcon())
@@ -348,17 +366,20 @@ class MainWindow(QWidget):
             
             if self.stationClicked == True and self.stationPlaced == False:  # if a station was clicked and not placed then replace it
                 stationSlot = self.findStation()
-                print("Station slot = " + str(stationSlot))
                 company = self.currentStation[4]
                 icon = QIcon(self.getImage(str("s" + company)))
                 self.stationButtons[stationSlot].setIcon(icon)
                 self.currentStation = "stn 100"
-            if self.currentTile != [0,0,0]:
+            if self.currentTile != [0,0,0]:                                 # this is where the board hex gets updated to the new tile and city station
                 print("tile = " + str(self.currentTile[0]))
                 print ("location =  " + str(self.currentTile[1]))
                 print("angle = " + str(self.currentTile[2]))
                 station = int(self.currentStation[4:])
-                print("station = " + str(station))
+                print(f"station = {self.currentStation}")
+                for slot in self.stationButtonUsed:
+                    if slot[0] == self.currentStation:
+                        print(f"station slot = {slot}")
+                        slot[1] = 1
                 self.board.updatehexagWithTile(self.currentTile[0], self.currentTile[1] , self.currentTile[2], self.currentStationNumber, station)
                 self.currentTile = [0,0,0]
             self.currentStation = "stn 100"
