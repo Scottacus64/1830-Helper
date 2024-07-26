@@ -259,7 +259,6 @@ class MainWindow(QWidget):
         else:
             hexagPB.setIcon(icon)
             hexagPB.setIconSize(QSize(115, 115))                           # Set the size of the icon
-        print(f"@@@@@ Location = {location} tileNumber {tileNumber}")
         if location > -1:
             self.displayStations(tileNumber, location)
 
@@ -268,17 +267,19 @@ class MainWindow(QWidget):
     def displayStations(self, tileNumber, location):   # location is a number 0 - 76, city names are like city081021
         hexag = self.board.findByNumber(location)
         tile = self.board.allTilesLookUp(tileNumber)
-        hexCityCount = tile.city_count
-        print(f"city count {hexCityCount} HEESC {hexag.entryExitStation}")
-        for city in range(hexCityCount):
-            for hexagEESC in hexag.entryExitStation:
-                if hexagEESC[2] == city and hexagEESC[3] < 100:
-                    buttonName = str("city" + hexag.hexag_name + str(city))
-                    print(f"display stations {buttonName}")
-                    self.setCityButton(buttonName, hexagEESC[3])          
-                    break
+        if tile:
+            hexCityCount = tile.city_count
+            if hexCityCount > 0:
+                print(f"city count {hexCityCount} HEESC {hexag.entryExitStation}")
+                for city in range(hexCityCount):
+                    for hexagEESC in hexag.entryExitStation:
+                        if hexagEESC[2] == city and hexagEESC[3] < 100:
+                            buttonName = str("city" + hexag.hexag_name + str(city))
+                            print(f"display stations {buttonName}")
+                            self.setCityButton(buttonName, hexagEESC[3])          
+                            break
+                
         
-    
     # called if a station QPushButton is clicked
     def stationButtonClicked(self):
         buttonName = self.sender().objectName()                                 # find out which station was clicked
@@ -302,9 +303,6 @@ class MainWindow(QWidget):
                     self.cityButtons[stationSlot].setIcon(icon)
                     self.currentStation = "stn 100"
                     self.stationClicked = False  
-                    #if self.currentCityButton != "":
-                    #    stationSlot = self.findCityButton(self.currentCityButton)
-                    #self.currentCityButton = ""
                     return        
                 if self.currentStation == buttonName:
                     print("******In attempt to reset station button")
@@ -387,8 +385,8 @@ class MainWindow(QWidget):
                 if self.currentCityButton:
                     cityNumber = int(self.currentCityButton[9])
                 else:
-                    cityNumber = 0
-                    stationCompany = 0
+                    cityNumber = 100
+                    stationCompany = 100
                 print(f"station = {self.currentStation}")
                 for slot in self.stationButtonUsed:
                     if slot[0] == self.currentStation:
@@ -408,24 +406,37 @@ class MainWindow(QWidget):
         buttonName = self.sender().objectName()
         print("buttonName: " + str(buttonName))
         print("currentCityButton =  " + str(self.currentCityButton))
+        print(f"CurrentStation {self.currentStation}")
         if self.currentCityButton != "":                                # used to blank out a station icon if another station is clicked before finalizing with company
             hexagName = buttonName[4:8]
             self.resetCityButton(self.board.findhexagName(hexagName))
         if int(self.currentStation[4:]) < 100:                          # if a station icon was clicked set the station token to that icon
             hexagName = buttonName[4:8]
             hexag = self.board.findhexagName(hexagName)                 # get the hexag for the loaction of the station
-            hexagName = hexag.hexag_name                                # find the name of the hexag
-            curTile = self.currentTile[1]                               # get the current tile's numeric value (ie 58)
-            curhexag = self.board.hexagDictionary[curTile]              # use the dictionary to find the corresponding name
-            if curhexag == hexagName:                                   # if the two match then the tile we just selected is the one with the station on it
-                self.setCityButton(buttonName, self.currentStation[4])                          # if so set the icon, this method section is needed since the hexag's tile has not been set yet            
+            #hexagName = hexag.hexag_name                                # find the name of the hexag
+            #curTile = self.currentTile[1]                               # get the current tile's numeric value (ie 58)
+            #curhexag = self.board.hexagDictionary[curTile]              # use the dictionary to find the corresponding name
+            #if curhexag == hexagName:                                   # if the two match then the tile we just selected is the one with the station on it
+            #    self.setCityButton(buttonName, self.currentStation[4])  # if so set the icon, this method section is needed since the hexag's tile has not been set yet            
+            print(f"hexagTile {hexag.hexagTile}")
+            stationSet = 0
+            buttonNumber = buttonName[9]
             if hexag.hexagTile:                                         # if there's a tile here
-                for hList in hexag.entryExitStation:                    # check to see if the hexag's station has been set yet
-                    if int(hList[3]) == 100:                            # if 100 then no station has been placed yet, prevents overwritting previous stations
+                print(f"hexag EES {hexag.entryExitStation}")
+                if hexag.entryExitStation:
+                    for hList in hexag.entryExitStation:                    # check to see if the hexag's station has been set yet
+                        print(f"hList {hList}")
+                        if buttonNumber == hList[2]:   
+                            stationSet = 1
+                    if stationSet == 0:        
                         self.setCityButton(buttonName, self.currentStation[4])
+                else:
+                    self.setCityButton(buttonName, self.currentStation[4])
+            else:
+                self.setCityButton(buttonName, self.currentStation[4])
                 
     
-    # method for setting the icon of a station token                    
+    # method for setting the statiob icon of a city                   
     def setCityButton(self, buttonName, company):                                
         if self.currentStation != "stn 100":
             print(f"currentStation {self.currentStation}")
