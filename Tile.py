@@ -10,6 +10,8 @@ class Tile:
         self.city_count = city_count
         self.color = color
     
+    def getCityCount(self):
+        return self.city_count
 
     def printTile(self):
         print(f"if {self.tile_id} color {self.color}")

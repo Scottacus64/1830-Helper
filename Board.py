@@ -5,6 +5,7 @@ from TilePile import TilePile
 class Board:
     def __init__(self):
         self.unplayedTiles = TilePile().getTiles()
+        self.allTiles = TilePile().getTiles()
         self.playedTiles = []
         self.board_hexagons = []
         self.tiles_on_the_board = []
@@ -390,6 +391,7 @@ class Board:
         return hexagList
     
     
+    # find the hexag by its id (5,5)
     def findhexagTuple(self, id):
         print("In tuple")
         for hexagObj in self.board_hexagons:
@@ -399,6 +401,7 @@ class Board:
         return None                                 #If there was no match, return None
     
     
+    # find the hexag by its name (0505)
     def findhexagName(self, name):
         for hexagObj in self.board_hexagons:
             if hexagObj.hexag_name == name:
@@ -406,6 +409,7 @@ class Board:
         return None                                 #If there was no match, return None
     
     
+    # find the hexag by receiving the number (the dictionary is number:name)
     def findByNumber(self, number):
         hexagLocation = self.hexagDictionary[number]
         locationFirst = int(hexagLocation[:2])                    # parsing out the tuple for board to use
@@ -414,6 +418,7 @@ class Board:
         return self.findhexagTuple(boardLocation)                 # get the hexag object...
     
     
+    # find a hexag by the tile associated with it
     def findByhexagTile(self, hexagTile):
         for hexagObj in self.board_hexagons:
             if hexagObj.hexagTile == hexagTile:
@@ -431,49 +436,49 @@ class Board:
         return None
             
     
-    def updatehexagWithTile(self, tileNumber, location, angle, stationNumber, stationCompany): # this is run after a hexag is finalized
+    def updatehexagWithTile(self, tileNumber, location, angle, cityNumber, stationCompany): # this is run after a hexag is finalized
         hexag = self.findByNumber(location)
-
         oldTile = hexag.hexagTile
         if oldTile > 0:
             swapTile = self.addTileBackOnUnplayedList(oldTile)
             if swapTile:
                 self.unplayedTiles.append(swapTile)
         
-        tile = self.removeTileFromUnplayedTiles(tileNumber)         # remove the tile from the unplayed list and add to played list
+        tile = self.removeTileFromUnplayedTiles(tileNumber)             # remove the tile from the unplayed list and add to played list
         hexag.hexagTile = tileNumber                                    # get the tile number assigned to the hexag
         tileStations = tile.station_list
+        print("")
         print("tile station list = " + str(tileStations))
+        print(f"city number {cityNumber} and stationCompany {stationCompany}")
         tileEntryExit = tile.path_pairs
         print("hexagPathPairs = " + str (tileEntryExit))
+        print(f"Heag EESC = {hexag.entryExitStation}")
         rotatedEntryExit = []
-
-        #if angle > 0:                                              # if the angle is greater than zero then rotate the tile...
         
-        for pair in tileEntryExit:                                  # entry and exit by the rotation angle
-            index = 0
-            tEntry = int(pair[0])
-            tExit = int(pair[1])
-            tEntry += angle
-            if tEntry > 6:                                          # if the angles are greater than 6 get them back into the...
-                tEntry -= 6                                         # range of zero to six
-            tExit += angle
-            if tExit > 6:
-                tExit -= 6
-            if tileStations == ():                                  # need to add entry/exit/station to the hexag so add the...
-                rotatedEntryExit.append([tEntry, tExit, 100, 100])        # station to the entry/exit pair 0=no company 10=no station
-            else:
-                for station in tileStations:
-                    if int(station[1]) == stationNumber:
-                        if [tEntry, tExit, index] not in rotatedEntryExit:
-                            rotatedEntryExit.append([tEntry, tExit, stationNumber, stationCompany])   
-                    else:
-                        if [tEntry, tExit, index] not in rotatedEntryExit:
-                            rotatedEntryExit.append([tEntry, tExit, 100, 100])
-                    index +=1
-            
-        #else:
-        #    rotatedEntryExit = tileEntryExit                     
+        exitCityCompany = []    
+        for slot in hexag.entryExitStation:
+            if slot[3] < 100:
+                if slot[2] not in exitCityCompany:
+                    exitCityCompany.append([slot[2], slot[3]])
+        if stationCompany > 0:
+            exitCityCompany.append([cityNumber, stationCompany])
+                    
+        print(f"******** EEC {exitCityCompany}")
+         
+        for ccPair in exitCityCompany:            
+            for pair in tileEntryExit:                                  # entry and exit by the rotation angle
+                index = 0
+                tEntry = int(pair[0])
+                tExit = int(pair[1])
+                tEntry += angle
+                if tEntry > 6:                                          # if the angles are greater than 6 get them back into the...
+                    tEntry -= 6                                         # range of zero to six
+                tExit += angle
+                if tExit > 6:
+                    tExit -= 6
+                
+                if [tEntry, tExit, ccPair[0], ccPair[1]] not in rotatedEntryExit:
+                    rotatedEntryExit.append([tEntry, tExit, ccPair[0], ccPair[1]])
 
         hexag.entryExitStation = rotatedEntryExit                         # set the hexag's ees value
         hexag.angle = angle                                               # set the hexag's angle value
@@ -514,6 +519,11 @@ class Board:
                 return tile
 
 
+    def allTilesLookUp(self, tileNumber):
+        for tile in self.allTiles:
+            if tile.tile_id == tileNumber:
+                return tile
+
     def checkTileColor(self, tileNumber):
         green = [14,15,16,18,19,20,23,24,25,26,27,28,29,53,54,59]
         brown = [39,40,41,42,43,44,45,46,47,61,62,63,64,65,66,67,68,70]
@@ -521,6 +531,26 @@ class Board:
             return True
         else:   
             return False
+        
+        
+    def getHexStations(self, hexag):
+        stationList = []
+        print(f"Hexag = {hexag}")
+        print(f"HexagEES = {hexag.entryExitStation}")
+        for station in hexag.entryExitStation:
+            if station[2] < 100:                    # there us a station
+                if stationList:
+                    for sCheck in stationList:
+                        if sCheck[0] == station[2]:
+                            break
+                        else:             
+                            stationList.append([station[2], station[3]])
+                else:
+                    stationList.append([station[2], station[3]])
+        return stationList
+                
+            
+        
 
 
 

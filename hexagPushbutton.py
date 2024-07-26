@@ -4,7 +4,7 @@ from PyQt5.QtGui import  QPolygon, QTransform, QIcon
 from PyQt5.QtCore import QPoint, Qt
 from Board import Board
 
-class hexagPushButton(QPushButton):
+class HexagPushButton(QPushButton):
     
     def __init__(self, name, main_window, board, parent=None):
         super().__init__(parent)
@@ -57,16 +57,16 @@ class hexagPushButton(QPushButton):
         }        
 
         if hexagon.containsPoint(event.pos(), Qt.OddEvenFill):
-            location = hexagDictionary[self.name]
+            location = hexagDictionary[self.name]                           # location is an int between 0 and 76
             newLoc = ""
             print(location)
-            if location != self.MainWindow.lastHexag or self.MainWindow.endTurn:
+            if location != self.MainWindow.currentHexag or self.MainWindow.endTurn:
                 self.newLocationClicked(location)
                 self.MainWindow.endTurn = False
             else:
                 self.sameLocationClicked(location)
-        elif len(overlapping_buttons) > 0:
-            if len(overlapping_buttons) == 2:
+        elif len(overlapping_buttons) > 0:                                  # code designed to check if lower portion with overlapping buttons in clicked
+            if len(overlapping_buttons) == 2:   
                 newLoc = self.cellAbove(overlapping_buttons[1].name,0)
                 print("correctlocation " + newLoc)
             else:
@@ -81,7 +81,7 @@ class hexagPushButton(QPushButton):
             else:
                 location = 100
             if location < 100:
-                if location != self.MainWindow.lastHexag or self.MainWindow.endTurn:
+                if location != self.MainWindow.currentHexag or self.MainWindow.endTurn:
                     self.newLocationClicked(location)
                     self.MainWindow.endTurn = False
                 else:
@@ -118,29 +118,28 @@ class hexagPushButton(QPushButton):
         return newLoc
        
             
-    def newLocationClicked(self, location):
+    def newLocationClicked(self, location):                 # location is an int between 0 and 76
         print("******** New Location")
-        # check if the player clicked on a second tile this turn, if so we need toe ither blank out the previous tile or reset it to its original tile
-        if self.MainWindow.lastHexag > -1:                                    # this case there was a previous tile, -1 because there is a '0' hexag
-            lastHexagNumber = self.MainWindow.lastHexag                         # restore the last hexag's tile
-            hexagLocation = self.theBoard.hexagDictionary[lastHexagNumber]
-            locationFirst = int(hexagLocation[:2])                            # parsing out the tuple for board to use
+        # check if the player clicked on a second tile this turn, if so we need to either blank out the previous tile or reset it to its original tile
+        if self.MainWindow.currentHexag > -1:                                       # this case there was a previous tile, -1 because there is a '0' hexag
+            currentHexagNumber = self.MainWindow.currentHexag                       # restore the last hexag's tile
+            hexagLocation = self.theBoard.hexagDictionary[currentHexagNumber]
+            locationFirst = int(hexagLocation[:2])                                  # parsing out the tuple for board to use
             locationSecond = int(hexagLocation[2:])
             boardLocation = (locationFirst, locationSecond)
-            lastHexag = self.theBoard.findhexagTuple(boardLocation)
-            self.MainWindow.resetCityButton(lastHexag)
-            if lastHexag:
-                self.MainWindow.displayTile(lastHexag.hexagTile, lastHexagNumber, lastHexag.angle,) # tile number, location,angle
+            currentHexag = self.theBoard.findhexagTuple(boardLocation)
+            self.MainWindow.resetCityButton(currentHexag)
+            if currentHexag:
+                self.MainWindow.displayTile(currentHexag.hexagTile, currentHexagNumber, currentHexag.angle) # tile number, location,angle
             else:
-                self.MainWindow.displayTile(0, lastHexagNumber, 0)            # set the previous hexag to blank  
-        else:                                                               # this case there was no previous tile so just blank it out
-            self.MainWindow.displayTile(0, self.MainWindow.lastHexag, 0)      # set the previous hexag to blank
-            
-        self.MainWindow.lastHexag = location                                  # set the lastHexag to this new location
+                self.MainWindow.displayTile(0, currentHexagNumber, 0) # set the previous hexag to blank  
+        else:                                                                       # this case there was no previous tile so just blank it out
+            self.MainWindow.displayTile(0, self.MainWindow.currentHexag, 0)      # set the previous hexag to blank 
+        self.MainWindow.currentHexag = location                                     # set the currentHexag to this new location
         company = self.MainWindow.currentCompany
         trainList = self.MainWindow.trainList[company]
         name = self.theBoard.hexagDictionary[location]
-        locationFirst = int(name[:2])                                  # parsing out the tuple for board to use
+        locationFirst = int(name[:2])                                               # parsing out the tuple for board to use
         locationSecond = int(name[2:])
         boardLocation = (locationFirst, locationSecond)
         hexag = self.theBoard.findhexagTuple(boardLocation)
@@ -151,13 +150,12 @@ class hexagPushButton(QPushButton):
             tile = self.theBoard.unplayedTileLookUp(self.theBoard.tileList[0][0])
             cityCount = tile.city_count
             print(f"City count = {cityCount}")
-            if cityCount == 2 and tile.color == "green":
-                self.MainWindow.activateSecondCity(self, tile.tile_id)      # if there is a second city that appears with this tile, activate it
+            if cityCount == 2 and (tile.color == "green"):
+                self.MainWindow.activateSecondCity(self, hexag, tile.tile_id)      # if there is a second city that appears with this tile, activate it
 
         
         
     def sameLocationClicked(self, location):
-
         print("******** Same Location")
         if self.theBoard.tileList:
             self.theBoard.tileListIndex +=1
