@@ -119,7 +119,7 @@ class HexagPushButton(QPushButton):
        
             
     def newLocationClicked(self, location):                 # location is an int between 0 and 76
-        print("******** New Location")
+        print(f"******** New Location {location}")
         # check if the player clicked on a second tile this turn, if so we need to either blank out the previous tile or reset it to its original tile
         if self.MainWindow.currentHexag > -1:                                       # this case there was a previous tile, -1 because there is a '0' hexag
             currentHexagNumber = self.MainWindow.currentHexag                       # restore the last hexag's tile
@@ -151,7 +151,7 @@ class HexagPushButton(QPushButton):
             cityCount = tile.city_count
             print(f"City count = {cityCount}")
             if cityCount == 2 and (tile.color == "green"):
-                self.MainWindow.activateSecondCity(self, hexag, tile.tile_id)      # if there is a second city that appears with this tile, activate it
+                self.MainWindow.setCityGeometry(hexag, 2, 1)      # if there is a second city that appears with this tile, activate it
 
         
         

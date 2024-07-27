@@ -410,7 +410,8 @@ class Board:
     
     
     # find the hexag by receiving the number (the dictionary is number:name)
-    def findByNumber(self, number):
+    def findHexagByNumber(self, number):
+        print(f"Number = {number}")
         hexagLocation = self.hexagDictionary[number]
         locationFirst = int(hexagLocation[:2])                    # parsing out the tuple for board to use
         locationSecond = int(hexagLocation[2:])
@@ -437,7 +438,7 @@ class Board:
             
     
     def updatehexagWithTile(self, tileNumber, location, angle, cityNumber, stationCompany): # this is run after a hexag is finalized
-        hexag = self.findByNumber(location)
+        hexag = self.findHexagByNumber(location)
         oldTile = hexag.hexagTile
         if oldTile > 0:
             swapTile = self.addTileBackOnUnplayedList(oldTile)
