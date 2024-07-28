@@ -86,6 +86,19 @@ class MainWindow(QWidget):
             70:"t70", 80:"t80", 81:"t81", 82:"t82", 83:"t83"
             }
         
+        self.hexagDictionary = {
+            "0210": 0, "0212": 1, "0214": 2, "0216": 3, "0218": 4, "0220": 5, "0222": 6, 
+            "0307": 7, "0309": 8, "0311": 9, "0313": 10, "0317": 11, "0319": 12, "0321": 13, "0323": 14,
+            "0402": 15, "0404": 16, "0406": 17, "0408": 18, "0410": 19, "0412": 20, "0414": 21, "0416": 22, "0418": 23, "0420": 24, "0422": 25, 
+            "0503": 26, "0505": 27, "0507": 28, "0511": 29, "0513": 30, "0515": 31, "0517": 32, "0519": 33, "0521": 34, "0523": 35,
+            "0604": 36, "0608": 37, "0610": 38, "0612": 39, "0614": 40, "0616": 41, "0618": 42, "0620": 43, "0622": 44, 
+            "0703": 45, "0705": 46, "0707": 47, "0709": 48, "0711": 49, "0713": 50, "0715": 51, "0717": 52, "0719": 53,
+            "0802": 54, "0804": 55, "0806": 56, "0808": 57, "0810": 58, "0814": 59, "0816": 60, "0818": 61, 
+            "0903": 62, "0905": 63, "0907": 64, "0909": 65, "0911": 66, "0913": 67, "0915": 68, "0917": 69, 
+            "1004": 70, "1006": 71, "1008": 72, "1010": 73, "1012": 74, "1014": 75, 
+            "1115": 76
+        } 
+        
         # this is the number of stations per company
         self.stationList = [2,3,3,4,3,4,2,4]
         
@@ -328,32 +341,55 @@ class MainWindow(QWidget):
                 cButton.setIcon(icon)
             self.sender().setIcon(pixmap)
             self.currentCompany = company
+            
             if self.stationClicked == True and self.stationPlaced == False:  # if a station was clicked and not placed then replace it
                 stationSlot = self.findStation()
                 company = self.currentStation[4]
                 icon = QIcon(self.getImage(str("s" + company)))
                 self.stationButtons[stationSlot].setIcon(icon)
                 self.currentStation = "stn 100"
+                
             if self.currentTile != [0,0,0]:                                 # this is where the board hex gets updated to the new tile and city station
+                location = self.currentTile[1]
+                hexag = self.board.findHexagByNumber(location)
+                print("&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+                print(f"Current tile = {self.currentTile}")
+                print(f"hexag = {hexag}")
+                print(f"hexagName {hexag.hexag_name}")
                 print("tile = " + str(self.currentTile[0]))
-                print ("location =  " + str(self.currentTile[1]))
+                print (f"location = {location}")
                 print("angle = " + str(self.currentTile[2]))
                 stationCompany = int(self.currentStation[4])
-                print(f"currentCityButton {self.currentCityButton}")
-                cityObj = self.findCityObj(self.currentCityButton)
-                cityObj.setText("1")
+                
                 if self.currentCityButton:
                     cityNumber = int(self.currentCityButton[8])
-                else:
-                    cityNumber = 100
-                    stationCompany = 100
+                    cityObj = self.findCityObj(self.currentCityButton)
+                    cityObj.setText("1")
+
                 print(f"station = {self.currentStation}")
                 for slot in self.stationButtonUsed:
                     if slot[0] == self.currentStation:
                         print(f"station slot = {slot}")
                         slot[1] = 1
-                self.board.updatehexagWithTile(self.currentTile[0], self.currentTile[1] , self.currentTile[2], cityNumber, stationCompany)
+                
+                cityButtonName =  self.currentCityButton[4:8] 
+                print(f"currentCityButton {cityButtonName}")
+                if hexag.hexag_name == cityButtonName:
+                    self.board.updatehexagWithTile(self.currentTile[0], self.currentTile[1] , self.currentTile[2], cityNumber, stationCompany)
+                elif cityButtonName != "":
+                    self.board.updatehexagWithTile(self.currentTile[0], self.currentTile[1] , self.currentTile[2], 100, 100)
+                    cbHexag = self.board.findhexagName(cityButtonName)
+                    cbHexagName = cbHexag.hexag_name
+                    cbHexagTile = cbHexag.hexagTile
+                    cbHexagAngle = cbHexag.angle
+                    print(f"hex tile {cbHexagTile} hex angle {cbHexagAngle}")
+                    cbHexagLocation = self.hexagDictionary[cbHexagName]
+                    print(f"cbHexagLocation {cbHexagLocation}")
+                    self.board.updatehexagWithTile(cbHexagTile, cbHexagLocation ,cbHexagAngle, cityNumber, stationCompany)
+                else:
+                    self.board.updatehexagWithTile(self.currentTile[0], self.currentTile[1] , self.currentTile[2], 100, 100)
                 self.currentTile = [0,0,0]
+                
             # this is where the code to let the board know that the tile has been finalized would go
             self.currentCityButton = ""                     # set the station token back to blank as the "turn" is ended
             self.currentHexag = -1                          # set to -1 not 0 so that if hexag 0 is clicked it will register as a new hexag and not be rejected

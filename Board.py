@@ -485,6 +485,7 @@ class Board:
         hexag.angle = angle                                               # set the hexag's angle value
         print(f" tile Color {tile.color}")
         hexag.color = tile.color
+        print("******************************")
         print ("hexagTile = " + str(hexag.hexagTile))
         print ("hexag EE = " + str(hexag.entryExitStation))
               

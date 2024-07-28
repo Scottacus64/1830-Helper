@@ -26,6 +26,19 @@ class HexagPushButton(QPushButton):
             "t53", "t54,", "t55", "t56", "t57", "t58", "t59",
             "t61", "t62", "t63", "t64", "t65", "t66", "t67", "t68", "t69", "t70"
             ]
+        
+        self.hexagDictionary = {
+            "0210": 0, "0212": 1, "0214": 2, "0216": 3, "0218": 4, "0220": 5, "0222": 6, 
+            "0307": 7, "0309": 8, "0311": 9, "0313": 10, "0317": 11, "0319": 12, "0321": 13, "0323": 14,
+            "0402": 15, "0404": 16, "0406": 17, "0408": 18, "0410": 19, "0412": 20, "0414": 21, "0416": 22, "0418": 23, "0420": 24, "0422": 25, 
+            "0503": 26, "0505": 27, "0507": 28, "0511": 29, "0513": 30, "0515": 31, "0517": 32, "0519": 33, "0521": 34, "0523": 35,
+            "0604": 36, "0608": 37, "0610": 38, "0612": 39, "0614": 40, "0616": 41, "0618": 42, "0620": 43, "0622": 44, 
+            "0703": 45, "0705": 46, "0707": 47, "0709": 48, "0711": 49, "0713": 50, "0715": 51, "0717": 52, "0719": 53,
+            "0802": 54, "0804": 55, "0806": 56, "0808": 57, "0810": 58, "0814": 59, "0816": 60, "0818": 61, 
+            "0903": 62, "0905": 63, "0907": 64, "0909": 65, "0911": 66, "0913": 67, "0915": 68, "0917": 69, 
+            "1004": 70, "1006": 71, "1008": 72, "1010": 73, "1012": 74, "1014": 75, 
+            "1115": 76
+        }  
 
     def mousePressEvent(self, event):
         hexagon = QPolygon([
@@ -43,21 +56,10 @@ class HexagPushButton(QPushButton):
             print(cButton.name)
 
          
-        hexagDictionary = {
-            "0210": 0, "0212": 1, "0214": 2, "0216": 3, "0218": 4, "0220": 5, "0222": 6, 
-            "0307": 7, "0309": 8, "0311": 9, "0313": 10, "0317": 11, "0319": 12, "0321": 13, "0323": 14,
-            "0402": 15, "0404": 16, "0406": 17, "0408": 18, "0410": 19, "0412": 20, "0414": 21, "0416": 22, "0418": 23, "0420": 24, "0422": 25, 
-            "0503": 26, "0505": 27, "0507": 28, "0511": 29, "0513": 30, "0515": 31, "0517": 32, "0519": 33, "0521": 34, "0523": 35,
-            "0604": 36, "0608": 37, "0610": 38, "0612": 39, "0614": 40, "0616": 41, "0618": 42, "0620": 43, "0622": 44, 
-            "0703": 45, "0705": 46, "0707": 47, "0709": 48, "0711": 49, "0713": 50, "0715": 51, "0717": 52, "0719": 53,
-            "0802": 54, "0804": 55, "0806": 56, "0808": 57, "0810": 58, "0814": 59, "0816": 60, "0818": 61, 
-            "0903": 62, "0905": 63, "0907": 64, "0909": 65, "0911": 66, "0913": 67, "0915": 68, "0917": 69, 
-            "1004": 70, "1006": 71, "1008": 72, "1010": 73, "1012": 74, "1014": 75, 
-            "1115": 76
-        }        
+              
 
         if hexagon.containsPoint(event.pos(), Qt.OddEvenFill):
-            location = hexagDictionary[self.name]                           # location is an int between 0 and 76
+            location = self.hexagDictionary[self.name]                           # location is an int between 0 and 76
             newLoc = ""
             print(location)
             if location != self.MainWindow.currentHexag or self.MainWindow.endTurn:
@@ -76,8 +78,8 @@ class HexagPushButton(QPushButton):
                 else:
                     newLoc = self.cellAbove(overlapping_buttons[0].name,1)
                     print("correct location " + newLoc)
-            if newLoc in hexagDictionary:
-                location = hexagDictionary[newLoc]
+            if newLoc in self.hexagDictionary:
+                location = self.hexagDictionary[newLoc]
             else:
                 location = 100
             if location < 100:
@@ -164,6 +166,7 @@ class HexagPushButton(QPushButton):
                 self.theBoard.tileListIndex = 0
             ind = self.theBoard.tileListIndex
             self.MainWindow.displayTile(self.theBoard.tileList[ind][0], location, self.theBoard.tileList[ind][1])
+            
 
 
 
