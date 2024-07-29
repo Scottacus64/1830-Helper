@@ -278,7 +278,7 @@ class MainWindow(QWidget):
                 if self.currentStation == buttonName:
                     print("******In attempt to reset station button")
                     self.stationButtons[stationSlot].setIcon(icon) 
-                    icon = QIcon()
+                    icon = QIcon(self.getImage("greyDot"))
                     stationSlot = self.findCityButton(self.currentCityButton)
                     self.cityButtons[stationSlot].setIcon(icon)
                     self.currentStation = "stn 100"
@@ -409,7 +409,7 @@ class MainWindow(QWidget):
             
             if self.currentCityButton != "":                                # used to blank out a station icon if another station is clicked before finalizing with company
                 cityObj = self.findCityObj(self.currentCityButton)
-                if cityObj.text() == 0:
+                if cityObj and cityObj.text() == 0:
                     hexagName = buttonName[4:8]
                     self.resetCityButton(self.board.findhexagName(hexagName))
             if int(self.currentStation[4:]) < 100:                          # if a station icon was clicked set the station token to that icon
@@ -446,10 +446,14 @@ class MainWindow(QWidget):
     
     # method to set a city button back to grey or clear depending on if two or one cities
     def resetCityButton(self, hexag):
-        print("in reset cityButton")
+        print(f"in reset cityButton Color = {hexag.color}")
         icon = QIcon()
         if hexag.color == "yellow":
             self.drawCity(hexag, 1, 1)
+        if hexag.color == "":
+            self.drawCity(hexag, 1, 0)
+        if hexag.color == "green":
+            self.drawCity(hexag, 2, 1)
         if self.currentCityButton != "":
             stationSlot = self.findCityButton(self.currentCityButton)
             print(f"hexag color = {hexag.color}")
@@ -510,25 +514,33 @@ class MainWindow(QWidget):
                     cityList.append(cityObj)
                 else:
                     cityList.append("0")
-        print(f"^^^^^cityList {cityList}")
+        print(f"^^^^^cityList {cityList} num of cities {numberOfCities} tile present {tilePresent}")
                                     
-        index = 0        
+        index = 0 
+        cityExists = 0
         if numberOfCities == 1 and tilePresent == 0:
             for city in oneCityHexag:
+                print(f"city {city} hex name {hexag.hexag_name}")
                 if hexag.hexag_name == city:
                     cityIndex = index
+                    cityExists = 1
                     break
                 index +=1
-            adjX = oneCityAdj[cityIndex][0]
-            adjY = oneCityAdj[cityIndex][1]
-            cityList[0].setGeometry((50*hexagCol)-38+adjX, (87*hexagRow)-35+adjY, 40, 40)
-            cityList[1].setGeometry((50*hexagCol)-38+adjX, (87*hexagRow)-35+adjY, 40, 40)
+            if cityExists == 1:
+                print(f"city index {cityIndex}")
+                adjX = oneCityAdj[cityIndex][0]
+                adjY = oneCityAdj[cityIndex][1]
+                for i in range (2):
+                    cityList[i].setGeometry((50*hexagCol)-38+adjX, (87*hexagRow)-35+adjY, 40, 40)
+                    cityList[i].setIcon(QIcon())
+            self.currentCityButton = ""
             
         if numberOfCities == 1 and tilePresent == 1:
+            icon = QIcon(self.getImage("greyDot"))
             for i in range (2):
                 cityList[i].setGeometry((50*hexagCol)-38, (87*hexagRow)-35, 40, 40)
-                if cityList[i].text() == 0:
-                    cityList[i].setIcon(QIcon())
+                if cityList[i].text() == "0":
+                    cityList[i].setIcon(icon)
             
         if numberOfCities == 2 and tilePresent == 0:
             for i in range(2):
@@ -559,6 +571,9 @@ class MainWindow(QWidget):
                         cityList[1].setIcon(icon1)
                     else:
                         cityList[1].setIcon(icon) 
+            else:
+                cityList[0].setIcon(icon) 
+                cityList[1].setIcon(icon)
         
         
     
