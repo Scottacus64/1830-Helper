@@ -556,7 +556,6 @@ class MainWindow(QWidget):
         if numberOfCities == 2 and tilePresent == 1:
             cityList[0].setGeometry((50*hexagCol)-38, (87*hexagRow)-55, 40, 40)             
             cityList[1].setGeometry((50*hexagCol)-38, (87*hexagRow)-15, 40, 40)    
-            icon = QIcon(self.getImage("greyDot"))
             if stationList:
                 for sSlot in stationList:
                     if sSlot[0] == 0:
@@ -564,16 +563,16 @@ class MainWindow(QWidget):
                         icon0 = QIcon(self.getImage(str("s" + slotCompany[0])))
                         cityList[0].setIcon(icon0)
                     else:
-                        cityList[0].setIcon(icon) 
+                        cityList[0].setIcon(QIcon(self.getImage("whiteDot"))) 
                     if sSlot[0] == 1:      
                         slotCompany = str(sSlot[1])
                         icon1 = QIcon(self.getImage(str("s" + slotCompany[0])))
                         cityList[1].setIcon(icon1)
                     else:
-                        cityList[1].setIcon(icon) 
+                        cityList[1].setIcon(QIcon(self.getImage("blackDot"))) 
             else:
-                cityList[0].setIcon(icon) 
-                cityList[1].setIcon(icon)
+                cityList[0].setIcon(QIcon(self.getImage("whiteDot"))) 
+                cityList[1].setIcon(QIcon(self.getImage("blackDot")))
         
         
     
