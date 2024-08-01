@@ -153,9 +153,9 @@ class HexagPushButton(QPushButton):
             cityCount = tile.city_count
             print(f"City count = {cityCount}")
             if cityCount == 1:
-                self.MainWindow.drawCity(hexag, 1, 1)
+                self.MainWindow.drawCity(hexag, 1, 1, False)
             if cityCount == 2 and (tile.color == "green"):
-                self.MainWindow.drawCity(hexag, 2, 1)      # if there is a second city that appears with this tile, activate it
+                self.MainWindow.drawCity(hexag, 2, 1, False)      # if there is a second city that appears with this tile, activate it
 
         
     def sameLocationClicked(self, location):

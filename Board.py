@@ -121,7 +121,7 @@ class Board:
                             ((5,5), [[0,0,0,100], [0,0,1,100]]), ((5,11), [[0,0,0,100], [0,0,1,100]]), ((5,9), [[6,1,0,10]]), ((5,19), [[0,0,0,7]]), ((5,23), [[1,3,0,1]]),
                             ((6,2),[[1,0,0,100], [2,0,0,100], [3,0,0,100]]), ((6,4), [[0,0,0,100]]), ((6,6), [[3,4,0,3]]), ((6,16), [[0,0,0,100]]), ((6,22), [[0,0,0,100]]), ((6,24),[[5,6,100,100]]),
                             ((7,19), [[1,0,0,7], [4,0,1,100]]),
-                            ((8,4),[[0,0,0,100]]), ((8,10), [[0,0,0,100]]), ((8,12), [[2,5,0,8], [2,5,100,100]]),
+                            ((8,4),[[0,0,0,100]]), ((8,10), [[0,0,0,100]]), ((8,12), [[2,5,0,8], [2,5,100,100]]), ((8,18), [[0,0,0,100], [0,0,1,100]]),
                             ((9,1),[[2,0,100,100]]), ((9,15), [[2,4,0,2]]), ((9,19), [[5,6,100,100]]),
                             ((10,2), [[1,0,0,100], [2,0,0,100]]), ((10,14), [[0,0,0,100]]),
                             ((11,13), [[1,0,0,100], [6,0,0,100]]), ((11,15), [[6,0,0,100]])
@@ -437,7 +437,7 @@ class Board:
         return None
             
     
-    def updatehexagWithTile(self, tileNumber, location, angle, cityNumber, stationCompany): # this is run after a hexag is finalized
+    def updateHexagWithTile(self, tileNumber, location, angle, cityNumber, stationCompany): # this is run after a hexag is finalized
         hexag = self.findHexagByNumber(location)
         oldTile = hexag.hexagTile
         if oldTile > 0:
@@ -465,21 +465,20 @@ class Board:
             exitCityCompany.append([cityNumber, stationCompany])
                     
         print(f"******** EEC {exitCityCompany}")
-         
-        for ccPair in exitCityCompany:            
-            for pair in tileEntryExit:                                  # entry and exit by the rotation angle
-                index = 0
-                tEntry = int(pair[0])
-                tExit = int(pair[1])
-                tEntry += angle
-                if tEntry > 6:                                          # if the angles are greater than 6 get them back into the...
-                    tEntry -= 6                                         # range of zero to six
+        
+        index = 0
+        for ccPair in exitCityCompany:                              # equal to number of active cities        
+            tEntry = int(tileEntryExit[index][0])
+            tExit =  int(tileEntryExit[index][1])
+            tEntry += angle
+            if tEntry > 6:                                          # if the angles are greater than 6 get them back into the...
+                tEntry -= 6                                         # range of zero to six
+            if tExit > 0:
                 tExit += angle
-                if tExit > 6:
-                    tExit -= 6
-                
-                if [tEntry, tExit, ccPair[0], ccPair[1]] not in rotatedEntryExit:
-                    rotatedEntryExit.append([tEntry, tExit, ccPair[0], ccPair[1]])
+            if tExit > 6:
+                tExit -= 6
+            rotatedEntryExit.append([tEntry, tExit, ccPair[0], ccPair[1]])
+            index +=1
 
         hexag.entryExitStation = rotatedEntryExit                         # set the hexag's ees value
         hexag.angle = angle                                               # set the hexag's angle value
@@ -537,8 +536,8 @@ class Board:
         
     def getHexStations(self, hexag):
         stationList = []
-        print(f"Hexag = {hexag}")
-        print(f"HexagEES = {hexag.entryExitStation}")
+        #print(f"Hexag = {hexag}")
+        #print(f"HexagEES = {hexag.entryExitStation}")
         for station in hexag.entryExitStation:
             if station[2] < 100:                    # there us a station
                 if stationList:
