@@ -71,15 +71,15 @@ class Board:
                           ]
         
         # ----- one_city_hexages -----
-        one_city_hexages = [[(1, 19),"0"],
-                          [(2, 10), 1], [(2, 16), 3],
-                          [(4, 2), 15], [(4, 14), 21],
-                          [(5, 19), 33], [(5, 23), "Boston"],
-                          [(6, 4), 35], [(6, 6), "0"], [(6, 16), 41], [(6, 22), 44],
-                          [(8, 4), 55], [(8, 10), 58], [(8, 12), "0"], [(8, 16), 60],
-                          [(9, 15), "Baltimore"],
-                          [(10, 14), 75],
-                          [(11, 15), 76]
+        one_city_hexages = [  [(1, 19), 4],
+                              [(2, 10), 0], [(2, 16), 0],
+                              [(4, 2), 0], [(4, 14), 0],
+                              [(5, 19), 6], [(5, 23), 1],
+                              [(6, 4), 0], [(6, 6), 3], [(6, 16), 0], [(6, 22), 0],
+                              [(8, 4), 0], [(8, 10), 0], [(8, 12), 8], [(8, 16), 0],
+                              [(9, 15), 2],
+                              [(10, 14), 0],
+                              [(11, 15), 0]
                           ]
         
         # ----- two_city_hexages -----
@@ -101,30 +101,26 @@ class Board:
                              (7, 7), (7, 17)]
         
         # ----- rr_start_hexages -----
-        rr_start_hexages = [((1, 19), 3),
-                          ((5, 11), 4), ((5, 19), 5), ((5, 23), 0),
-                          ((6, 6), 2),
-                          ((7, 19), 6),
-                          ((8, 12), 7),
-                          ((9, 15), 1)]
+        rr_start_hexages = [((1, 19), 4),
+                          ((5, 11), 5), ((5, 19), 6), ((5, 23), 1),
+                          ((6, 6), 3),
+                          ((7, 19), 7),
+                          ((8, 12), 8),
+                          ((9, 15), 2)]
         
-        '''
-        Redo eesc so that no station = 100, stations 0,1,2,3 are possible and companies are set 1-8 or 0-7 whichever is right, this will effect 10 or 0 for no company
-        
-        '''
-        # ----- entryExitStation -----
-        # (row, column), [[entry, exit, station, company]] exit == 0 for no exit, station == 100 for no station, company == 100 no company
-        entryExitStationList = [((1,9), [[3,0,0,100]]), ((1,11), [[3,0,0,100],[4,0,0,100]]),  ((1,17),[[3,4,100,100]]), ((1,19), [[3,4,0,4]]),
-                            ((2,10), [[0,0,0,100]]), ((2,16), [[0,0,0,100]]), ((2,24), [[4,0,0,100], [5,0,0,100]]),
-                            ((3,15), [[1,5,100,100]]),
-                            ((4,2), [[2,3,0,100]]), ((4,10), [[0,0,0,100], [0,0,1,100]]), ((4,14), [[2,5,0,100], [2,4,0,100], [4,5,0,100]]), ((4,24),[[4,5,100,100]]),
-                            ((5,5), [[0,0,0,100], [0,0,1,100]]), ((5,11), [[0,0,0,100], [0,0,1,100]]), ((5,9), [[6,1,0,10]]), ((5,19), [[0,0,0,7]]), ((5,23), [[1,3,0,1]]),
-                            ((6,2),[[1,0,0,100], [2,0,0,100], [3,0,0,100]]), ((6,4), [[0,0,0,100]]), ((6,6), [[3,4,0,3]]), ((6,16), [[0,0,0,100]]), ((6,22), [[0,0,0,100]]), ((6,24),[[5,6,100,100]]),
-                            ((7,19), [[1,0,0,7], [4,0,1,100]]),
-                            ((8,4),[[0,0,0,100]]), ((8,10), [[0,0,0,100]]), ((8,12), [[2,5,0,8], [2,5,100,100]]), ((8,18), [[0,0,0,100], [0,0,1,100]]),
-                            ((9,1),[[2,0,100,100]]), ((9,15), [[2,4,0,2]]), ((9,19), [[5,6,100,100]]),
-                            ((10,2), [[1,0,0,100], [2,0,0,100]]), ((10,14), [[0,0,0,100]]),
-                            ((11,13), [[1,0,0,100], [6,0,0,100]]), ((11,15), [[6,0,0,100]])
+        # ----- companySides -----
+        # (row,column), [[company0, side0, side1 ...][company1, side0, side 1...]]  100 = no station, 71-77 for red off map, 50 for unassigned station, 1-8 for assigned companies
+        companySidesList =  [((1,9), [[71,3]]), ((1,11), [[72,3,4]]),  ((1,17),[[100,3,4]]), ((1,19), [[4,3,4]]),
+                            ((2,10), [[50]]), ((2,16), [[50]]), ((2,24), [[73,4,5]]),
+                            ((3,15), [[100,1,5]]),
+                            ((4,2), [[50,2,3]]), ((4,10), [[50], [50]]), ((4,14), [[50,2,4,5]]), ((4,24),[[100,4,5]]),
+                            ((5,5), [[50], [50]]), ((5,9), [[100,6,1]]), ((5,11), [[50], [50]]),  ((5,19), [[6]]), ((5,23), [[1,1,3]]),
+                            ((6,2), [[74,1,2,3]]), ((6,4), [[50]]), ((6,6), [[3,3,4]]), ((6,16), [[50]]), ((6,22), [[50]]), ((6,24),[[100,5,6]]),
+                            ((7,19), [[7,1], [50,4]]),
+                            ((8,4),[[50]]), ((8,10), [[50]]), ((8,12), [[8,2,5], [100,2,5]]), ((8,16),[[50]]), ((8,18), [[50], [50]]),
+                            ((9,1),[[75,2]]), ((9,15), [[2,2,4]]), ((9,19), [[100,5,6]]),
+                            ((10,2), [[76,1,2]]), ((10,14), [[50]]),
+                            ((11,13), [[77,1,6]]), ((11,15), [[50]])
                             ]
         # ----- voidSides_hexages -----
         # (row, column), [void sides]
@@ -175,10 +171,10 @@ class Board:
             for cityList in one_city_hexages:
                 if cityList[0] == hexag: # Case for checking if there is only one city
                     city_count = 1
-                    if cityList[1] == "Boston":
-                        hexagTile = 81
-                    elif cityList[1] == "Baltimore":
+                    if cityList[1] == 2:
                         hexagTile = 80
+                    elif cityList[1] == 1:
+                        hexagTile = 81
             
             for twoCityList in two_city_hexages: # Find if there is matching hexag and get its ind
                 if twoCityList[0] == hexag:
@@ -206,17 +202,15 @@ class Board:
             else:
                 rr_start = rr_start_hexages[hexag_rr_ind][1]
                 
-            #-----EntryExitStation-----
-            entryExit = None                        # list that contains the entry and exit sides of a hexag and station associated with thsoe sides
-            for item in entryExitStationList:       # station = 0 for station without a company assigned to it station = 10 for no station
-                if item[0] == hexag:
-                    entryExit = item[1]
+            #-----companySides-----
+            companySides = None                     # list that contains the [company, side0, side1],[company1, side0, side 1]
+            for cs in companySidesList:
+                if cs[0] == hexag:
+                    companySides = cs[1]
                     break
-            if entryExit is None:
-                entryExitStation = []
-            else:
-                entryExitStation = entryExit
-            
+            if companySides is None:
+                companySides = []
+
             #-----VoidSides-----
             hexagVoidSides = None                     # void sides are sides that are illegal to send rails to like off ap or water
             for item in voidSidesList:
@@ -231,7 +225,7 @@ class Board:
             angle = 0
             
             # Initialize the hexag object
-            hexag_to_append = Hexagon(hexag_id, hexag_name, vil_count, city_count, station_count, rr_start, entryExitStation, voidSides, hexagTile, angle, "")
+            hexag_to_append = Hexagon(hexag_id, hexag_name, vil_count, city_count, station_count, rr_start, companySides, voidSides, hexagTile, angle, "")
             self.board_hexagons.append(hexag_to_append)
             
         # add city tiles to playedTile list
@@ -244,7 +238,7 @@ class Board:
 
     def print_board(self):
         for a_hexag in self.board_hexagons:
-            print(a_hexag.hexag_id, "v =", a_hexag.vil_count, "c =", a_hexag.city_count, "stn = ", a_hexag.station_count, "ees =", a_hexag.entryExitStation, "hv =", a_hexag.voidSides, "t =", a_hexag.hexagTile,  a_hexag.rr_start)
+            print(a_hexag.hexag_id, "rr =", a_hexag.rr_start, " v =", a_hexag.vil_count, "c =", a_hexag.city_count, "stn = ", a_hexag.station_count, "cs =", a_hexag.companySides, "hv =", a_hexag.voidSides, "t =", a_hexag.hexagTile,  )
             print("---------------")  
         foundTile = self.checkThroughUnplayedTiles(57)
         print("Found Tile " + str(foundTile.tile_id))
@@ -256,23 +250,26 @@ class Board:
         # for example the first hexag returned by findAdjacenthexages is above and to the left, if that hexag has a rail on
         # side 3 then that correspnds to side 6 on the location hexag [(3,6), ...]
         listOfPairedSides = [(3,6),(4,1),(2,5),(5,2),(1,4),(6,3)]   # top left, top right, left, right, lower left, lower right
+        listOfSides = [3,4,2,5,1,6]
         self.possibleTiles = []
         railInDirection = []
-        hexagList = self.findAdjacenthexages(location)
+        hexagList = self.findAdjacentHexages(location)
         self.lastLocation = location
         
         # check for rail lines leading into hexag
         index = 0
+        print(f"********adjacent Hexagons = {hexagList}")
         for hexag in hexagList:
             hexagObject = self.findhexagTuple(hexag) 
             if hexagObject is not None: 
-                print("hexag EES = " + str(hexagObject.entryExitStation))
-                for loc in hexagObject.entryExitStation:
-                    # [[3,0,10],[4,0,10]]
-                    entrySide = loc[0]
-                    exitSide = loc[1]
-                    if entrySide == listOfPairedSides[index][0] or exitSide == listOfPairedSides[index][0]:
-                        if listOfPairedSides[index][1] not in railInDirection:
+                print("hexag CS = " + str(hexagObject.companySides))
+                sidesList = []
+                for csList in hexagObject.companySides:
+                    cslLength = len(csList)
+                    for i in range (cslLength-1):
+                        sidesList.append(csList[i+1])
+                for side in sidesList:
+                    if side == listOfSides[index]:
                             railInDirection.append(listOfPairedSides[index][1])
             index +=1
         print("Rail in direction = " + str(railInDirection))  
@@ -284,7 +281,7 @@ class Board:
         upgradeTile = False
 
         # check to see if a hexag has a tile placed to upgreade
-        if locationhexag.hexagTile == 0:                                        # hexag with no tile to upgrade
+        if locationhexag.hexagTile == 0:                                    # hexag with no tile to upgrade
             if railInDirection:                                             # since this is a hexag with no tiles check to see if rails lead into the hexag
                 startTiles = [1, 2, 3, 4, 7, 8, 9, 55, 56, 57, 58, 69]      # base yellow tiles to upgrade to         
                 for tileNumber in startTiles:                               # go through each of these tiles and choose tiles that match vil and city cts
@@ -309,10 +306,10 @@ class Board:
                     angle = tTile[1]
                     tileSides = self.findSides(tile, angle)                         # get a list of all sides of the tile that have a rail on them 
                     if upgradeTile == False:                                        # this is a hexag with no previous tile on it
-                        for hexagRailDirection in railInDirection:                    # look at each hexag side that faces a rail
+                        for hexagRailDirection in railInDirection:                  # look at each hexag side that faces a rail
                             for eeSide in tileSides:                                # look at each rail side for the tile
                                 validRotation = True                                # flag to tell if the rotation being tested is valid
-                                offset = hexagRailDirection - eeSide                  # find the number of rotation steps needed to line up the rails
+                                offset = hexagRailDirection - eeSide                # find the number of rotation steps needed to line up the rails
                                 if offset < 0:                                      # tile entry/exit is left of hexag rail direction
                                     offset += 6  
                                 for tSide in tileSides:  
@@ -345,6 +342,7 @@ class Board:
                     if validRotation == True:
                         if (tile.tile_id, offset) not in self.possibleTiles:
                             self.possibleTiles.append((tile.tile_id, offset))   # add the tile number and rotation to the list
+                    print(f"possible tiles = {self.possibleTiles}")
             return self.possibleTiles
         
         
@@ -363,7 +361,7 @@ class Board:
         
     
     # method to find hexages that surround the target hexag
-    def findAdjacenthexages(self, location):
+    def findAdjacentHexages(self, location):
         testList = []
         hexagList = []
         locationFirst = location[0]
@@ -447,46 +445,59 @@ class Board:
         
         tile = self.removeTileFromUnplayedTiles(tileNumber)             # remove the tile from the unplayed list and add to played list
         hexag.hexagTile = tileNumber                                    # get the tile number assigned to the hexag
-        tileStations = tile.station_list
+        tileStationList = tile.station_list
         print("")
-        print("tile station list = " + str(tileStations))
+        print("tile Station List = " + str(tileStationList))
         print(f"city number {cityNumber} and stationCompany {stationCompany}")
-        tileEntryExit = tile.path_pairs
-        print("hexagPathPairs = " + str (tileEntryExit))
-        print(f"Heag EESC = {hexag.entryExitStation}")
-        rotatedEntryExit = []
+        tilePathPairs = tile.path_pairs
+        print("tile path pairs = " + str (tilePathPairs))
+        print(f"Heag CS = {hexag.companySides}")
         
-        exitCityCompany = []    
-        for slot in hexag.entryExitStation:
-            if slot[3] < 100:
-                if slot[2] not in exitCityCompany:
-                    exitCityCompany.append([slot[2], slot[3]])
-        if stationCompany > 0:
-            exitCityCompany.append([cityNumber, stationCompany])
+        rotatedStationList = []
+        hCitySides = [] 
+        cityCompany = []
+        
+        if hexag.companySides:
+            index = 0
+            for slot in hexag.companySides:
+                if slot[0] < 50:
+                    cityCompany.append([index, slot[0]])
+                else:
+                    cityCompany.append([cityNumber, stationCompany])
+                index +=1
+        else:
+            cityCompany = [[0,100]]
                     
-        print(f"******** EEC {exitCityCompany}")
-        
+        print(f"******** EEC {cityCompany}")
+      
+                 
+        hexag.companySides = []
         index = 0
-        for ccPair in exitCityCompany:                              # equal to number of active cities        
-            tEntry = int(tileEntryExit[index][0])
-            tExit =  int(tileEntryExit[index][1])
-            tEntry += angle
-            if tEntry > 6:                                          # if the angles are greater than 6 get them back into the...
-                tEntry -= 6                                         # range of zero to six
-            if tExit > 0:
-                tExit += angle
-            if tExit > 6:
-                tExit -= 6
-            rotatedEntryExit.append([tEntry, tExit, ccPair[0], ccPair[1]])
-            index +=1
-
-        hexag.entryExitStation = rotatedEntryExit                         # set the hexag's ees value
+        for stn in tileStationList:
+            sideList = []
+            for i in range(len(stn)):
+                if i>0:
+                    rSide = stn[i] + angle
+                    if rSide > 6:
+                        rSide -=6
+                    rotatedStationList.append(rSide)
+        print(f"rotated station list = {rotatedStationList}") 
+        print(f"index = {index}")
+        print(f"city company = {cityCompany[index][1]}")            
+        sideList.append(cityCompany[index][1])
+        for item in rotatedStationList:
+            sideList.append(item)
+ 
+        hexag.companySides.append(sideList)
+        index +=1
+           
+           
         hexag.angle = angle                                               # set the hexag's angle value
-        print(f" tile Color {tile.color}")
+        print(f"tile Color {tile.color}")
         hexag.color = tile.color
         print("******************************")
         print ("hexagTile = " + str(hexag.hexagTile))
-        print ("hexag EE = " + str(hexag.entryExitStation))
+        print ("hexag Cs = " + str(hexag.companySides))
               
         
     def removeTileFromUnplayedTiles(self, tileNumber):
@@ -536,18 +547,11 @@ class Board:
         
     def getHexStations(self, hexag):
         stationList = []
-        #print(f"Hexag = {hexag}")
-        #print(f"HexagEES = {hexag.entryExitStation}")
-        for station in hexag.entryExitStation:
-            if station[2] < 100:                    # there us a station
-                if stationList:
-                    for sCheck in stationList:
-                        if sCheck[0] == station[2]:
-                            break
-                        else:             
-                            stationList.append([station[2], station[3]])
-                else:
-                    stationList.append([station[2], station[3]])
+        print(f"Hexag = {hexag}")
+        print(f"HexagEES = {hexag.companySides}")
+        for slot in hexag.companySides:
+            if slot[0] < 100:                    # there is a station
+                stationList.append(slot)
         return stationList
                 
             

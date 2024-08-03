@@ -55,9 +55,6 @@ class HexagPushButton(QPushButton):
         for cButton in overlapping_buttons:
             print(cButton.name)
 
-         
-              
-
         if hexagon.containsPoint(event.pos(), Qt.OddEvenFill):
             location = self.hexagDictionary[self.name]                           # location is an int between 0 and 76
             newLoc = ""
