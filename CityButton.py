@@ -33,6 +33,9 @@ class CityButton(QPushButton):
         
     def setCitySet(self, status):
         self.citySet = status
+        
+    def printCityButton(self):
+        print(f"Button {self.name} active {self.getActive()} set {self.getCitySet()} company {self.getCompany()}")
 
 
        

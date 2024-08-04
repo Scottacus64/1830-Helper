@@ -129,7 +129,7 @@ class MainWindow(QWidget):
                     self.hexagButtons.append(button) 
                     location = str(sRow + sCol)
                     self.checkForCity(location, col+1, row+1)     # check to see if the hexag has a city on it
- 
+
         pad = 0 
         
         for button in self.cityButtons:
@@ -198,9 +198,11 @@ class MainWindow(QWidget):
             self.companyButtons.append(cButton)
         specialCity = [["city01190",4],["city06060",3],["city08120",8]]
         for city in specialCity:
-            cityButton = CityButton(city[0], self, True, True, city[1])
+            cityButton = CityButton(city[0], self, False, True, city[1])
             self.cityButtons.append(cityButton)
         self.show()
+        for city in self.cityButtons:
+            city.printCityButton()
 
 
     # used to show if a hexag has a city on it    
@@ -211,12 +213,11 @@ class MainWindow(QWidget):
             #if hexag.rr_start == 100:
             for i in range(1, -1, -1):
                 cityName = str("city" + str(location) + str(i))
-                cityButton = CityButton("City Button", self, False, False, "0", self)
+                cityButton = CityButton(cityName, self, False, False, "0", self)
                 cityButton.setObjectName(cityName)
                 cityButton.clicked.connect(self.cityButtonClicked)  
                 cityButton.setText("")
                 cityButton.setStyleSheet("QPushButton { color: transparent; border: 2px solid red; }")
-                cityButton.setActive(False)                 # note, text is used to carry data to show if a city has been set "1" or not "0", QPushbuttons cannot have new variables assigned to them without subclassing them
                 icon = QIcon()
                 cityButton.setIconSize(QSize (38,38))
                 cityButton.setIcon(icon)
@@ -225,8 +226,9 @@ class MainWindow(QWidget):
                     if hexag.rr_start < 100:
                         cityButton.setCompany(hexag.rr_start)
                         print(f"RR start on {location} of company {hexag.rr_start}")
-                    if location == "0523" or location == "0719" or location == "0915":
-                        cityButton.setActive(True) 
+                    if location == "0523" or location == "0719" or location == "0915" or location == "0519":
+                        cityButton.setCitySet(True) 
+
                         
             
     
@@ -277,14 +279,14 @@ class MainWindow(QWidget):
         if tile:
             hexCityCount = tile.city_count
             if hexCityCount > 0:
-                print(f"city count {hexCityCount} HEESC {hexag.companySides}")
+                print(f"city count {hexCityCount} CS = {hexag.companySides}")
                 for city in range(hexCityCount):
                     index = 0
                     for hexagCS in hexag.companySides:
                         if index == city and hexagCS[0] < 50:
                             buttonName = str("city" + hexag.hexag_name + str(city))
                             print(f"display stations {buttonName}")
-                            self.setCityButton(buttonName, hexagCS[1], cityCount)          
+                            self.setCityButton(buttonName, hexagCS[0], cityCount)          
                             break
                         index += 1
                 
@@ -530,6 +532,8 @@ class MainWindow(QWidget):
             self.drawCity(hexag, 1, 0, True)
         if hexag.color == "yellow" and numberOfStations == 1:
             self.drawCity(hexag, 1, 1, True)
+        if hexag.color == "yellow" and numberOfStations == 2:
+            self.drawCity(hexag, 2, 1, True)
         
         if (hexag.color == "green" or hexag.color == "brown") and numberOfStations == 1:
             self.drawCity(hexag, 2, 1, True)
@@ -540,6 +544,7 @@ class MainWindow(QWidget):
             
     
     def drawCity(self, hexag, numberOfCities, tilePresent, reset):
+        print("{{{{{{{{{{{{{Draw city}}}}}}}}}}}}}")
         oneCityHexag = ["0210", "0216", "0402", "0414", "0604", "0616", "0622", "0804", "0810", "0816", "1014", "1115"]
         twoCityHexag = ["0410", "0505", "0511", "0719", "0818"]              
         oneCityAdj = [(0,0), (2,0), (0,0), (0,0), (0,0), (2,-2), (5,-5), (2,-1), (2,-2), (5,-5), (0,10), (-15,-15)] 
@@ -574,7 +579,7 @@ class MainWindow(QWidget):
                     cityList.append(cityObj)
                 else:
                     cityList.append("0")
-        print(f"^^^^^cityList {cityList} num of cities {numberOfCities} tile present {tilePresent} location {location}")
+        print(f"^^^^^cityList {cityList} num of cities {numberOfCities} tile present {tilePresent} location {location} reset = {reset}")
                                     
         index = 0 
         cityExists = 0
@@ -589,16 +594,17 @@ class MainWindow(QWidget):
             icon = QIcon(self.getImage("greyDot"))
             for i in range (2):
                 cityList[i].setGeometry((50*hexagCol)-38, (87*hexagRow)-35, 40, 40)
-                print(f"city number {i} text is {cityList[i].getActive()}")
-                if cityList[i].getActive() == False:
+                print(f"city number {i} set is {cityList[i].getCitySet()}")
+                if cityList[i].getActive() == False and cityList[i].getCitySet() == False:
                     print("active is False")
                     cityList[i].setIcon(icon)
-                    if i == 0:
+                    if i == 0 and cityList[i].getCitySet() == False:
                         cityList[i].setActive(True)
+                    print(f"active is now {cityList[i].getActive()}")
                 else:
                     index = 0
                     for sSlot in stationList:
-                        if (index == 0 and specialFlag == False) or (index == 0 and specialFlag == True and reset == False):
+                        if (index == 0 and specialFlag == False) or (index == 0 and specialFlag == True and reset == False) or cityList[0].getCitySet() == True:
                             slotCompany = str(sSlot[0])
                             icon0 = QIcon(self.getImage(str("s" + slotCompany[0])))
                             #print (str("s" + slotCompany[0]))
@@ -616,7 +622,41 @@ class MainWindow(QWidget):
                 cityList[i].setIcon(icon)
                 cityList[i].setActive(False)
             
-        if numberOfCities == 2 and tilePresent == 1:
+        if numberOfCities == 2 and tilePresent == 1 and reset == True:
+            for i in range(2):
+                cityList[i].setGeometry((50*hexagCol)-38, (87*hexagRow)-35, 40, 40)
+                if cityList[0].getCitySet() == True:
+                    company = stationList[0][0]
+                    icon = QIcon(self.getImage(str("s" + str(company))))
+                else:
+                    icon = QIcon()
+                cityList[0].setIcon(icon)
+                cityList[1].setIcon(QIcon())
+                
+        if numberOfCities == 2 and tilePresent == 1 and reset == False:
+            cityList[0].setGeometry((50*hexagCol)-38, (87*hexagRow)-55, 40, 40)             
+            cityList[1].setGeometry((50*hexagCol)-38, (87*hexagRow)-15, 40, 40) 
+            if cityList[0].getCitySet() == True:
+                company = stationList[0][0]
+                icon = QIcon(self.getImage(str("s" + str(company))))
+            else:
+                if hexag.city_count == 1:
+                    icon = QIcon(self.getImage("greyDot"))
+                else:
+                    icon = QIcon(self.getImage("whiteDot"))
+            cityList[0].setActive(True)        
+            cityList[0].setIcon(icon)
+            if cityList[1].getCitySet() == True:
+                company = stationList[1][0]
+                icon = QIcon(self.getImage(str("s" + str(company))))
+            else:
+                if hexag.city_count == 1:
+                    icon = QIcon(self.getImage("greyDot"))
+                else:
+                    icon = QIcon(self.getImage("blackDot"))
+            cityList[1].setActive(True)        
+            cityList[1].setIcon(icon)
+            '''
             cityList[0].setGeometry((50*hexagCol)-38, (87*hexagRow)-55, 40, 40)             
             cityList[1].setGeometry((50*hexagCol)-38, (87*hexagRow)-15, 40, 40)    
             if stationList:
@@ -624,7 +664,7 @@ class MainWindow(QWidget):
                 index = 0
                 for sSlot in stationList:
                     print(f"cityListObj Name {cityList[0].objectName()[8]}")
-                    if index == 0 and sSlot[0] < 50:
+                    if index == 0 and cityList[0].getCitySet() == True:
                         slotCompany = str(sSlot[0])
                         print(f"slot company = {slotCompany}")
                         if hexag.city_count == 1:
@@ -637,7 +677,8 @@ class MainWindow(QWidget):
                         cityList[0].setIcon(icon0)
                     else:
                         cityList[0].setIcon(QIcon(self.getImage("whiteDot"))) 
-                    if index == 1 and sSlot[0] < 100:      
+                        cityList[0].setActive(True)
+                    if index == 1 and cityList[1].getCitySet() == True:      
                         slotCompany = str(sSlot[0])
                         if hexag.city_count == 1:
                             icon1 = QIcon(self.getImage(str("s" + slotCompany)))
@@ -647,12 +688,16 @@ class MainWindow(QWidget):
                             else:
                                 icon1 = QIcon(self.getImage(str("s" + slotCompany) + "b"))  
                         cityList[1].setIcon(icon1)
-                    else:
+                    elif index == 1 and cityList[1].getActive == True:
                         cityList[1].setIcon(QIcon(self.getImage("blackDot"))) 
+                    else:
+                        city
             else:
+                for i in range(2):
+                    cityList[i].setActive(True)
                 cityList[0].setIcon(QIcon(self.getImage("whiteDot"))) 
                 cityList[1].setIcon(QIcon(self.getImage("blackDot")))
-            
+            '''
         self.currentCityButton = ""
         
         
