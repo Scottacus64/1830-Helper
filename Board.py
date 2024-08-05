@@ -111,16 +111,16 @@ class Board:
         # ----- companySides -----
         # (row,column), [[company0, side0, side1 ...][company1, side0, side 1...]]  100 = no station, 71-77 for red off map, 50 for unassigned station, 1-8 for assigned companies
         companySidesList =  [((1,9), [[71,3]]), ((1,11), [[72,3,4]]),  ((1,17),[[100,3,4]]), ((1,19), [[4,3,4]]),
-                            ((2,10), [[50]]), ((2,16), [[50]]), ((2,24), [[73,4,5]]),
+                            ((2,10), [[50,0,0],[50,0,0]]), ((2,16), [[50,0,0],[50,0,0]]), ((2,24), [[73,4,5]]),
                             ((3,15), [[100,1,5]]),
-                            ((4,2), [[50,2,3]]), ((4,10), [[50], [50]]), ((4,14), [[50,2,4,5]]), ((4,24),[[100,4,5]]),
-                            ((5,5), [[50], [50]]), ((5,9), [[100,6,1]]), ((5,11), [[50], [50]]),  ((5,19), [[6]]), ((5,23), [[1,1,3]]),
-                            ((6,2), [[74,1,2,3]]), ((6,4), [[50]]), ((6,6), [[3,3,4]]), ((6,16), [[50]]), ((6,22), [[50]]), ((6,24),[[100,5,6]]),
+                            ((4,2), [[50,2,3],[100,0,0]]), ((4,10), [[50,0,0], [50,0,0]]), ((4,14), [[50,2,4,5],[100,0,0]]), ((4,24),[[100,4,5]]),
+                            ((5,5), [[50,0,0], [50,0,0]]), ((5,9), [[100,6,1]]), ((5,11), [[50,0,0], [50,0,0]]),  ((5,19), [[6],[50]]), ((5,23), [[1,1,3],[50,0,0]]),
+                            ((6,2), [[74,1,2,3]]), ((6,4), [[50],[50]]), ((6,6), [[3,3,4]]), ((6,16), [[50,0,0],[50,0,0]]), ((6,22), [[50,0,0],[50,0,0]]), ((6,24),[[100,5,6]]),
                             ((7,19), [[7,1], [50,4]]),
-                            ((8,4),[[50]]), ((8,10), [[50]]), ((8,12), [[8,2,5], [100,2,5]]), ((8,16),[[50]]), ((8,18), [[50], [50]]),
-                            ((9,1),[[75,2]]), ((9,15), [[2,2,4]]), ((9,19), [[100,5,6]]),
-                            ((10,2), [[76,1,2]]), ((10,14), [[50]]),
-                            ((11,13), [[77,1,6]]), ((11,15), [[50]])
+                            ((8,4),[[50,0,0],[50,0,0]]), ((8,10), [[50,0,0],[50,0,0]]), ((8,12), [[8,2,5], [100,2,5]]), ((8,16),[[50,0,0],[50,0,0]]), ((8,18), [[50,0,0],[50,0,0]]),
+                            ((9,1),[[75,2]]), ((9,15), [[2,2,4],[100,0,0]]), ((9,19), [[100,5,6]]),
+                            ((10,2), [[76,1,2]]), ((10,14), [[50,0,0],[50,0,0]]),
+                            ((11,13), [[77,1,6]]), ((11,15), [[50],[100,0,0]])
                             ]
         # ----- voidSides_hexages -----
         # (row, column), [void sides]
@@ -460,18 +460,20 @@ class Board:
         if hexag.companySides:
             index = 0
             for slot in hexag.companySides:
-                if slot[0] < 50:
+                if slot[0] < 100:
                     cityCompany.append([index, slot[0]])
                 else:
                     cityCompany.append([cityNumber, stationCompany])
                 index +=1
         else:
-            cityCompany = [[0,100]]
+            for station in tileStationList:
+                cityCompany.append([0,stationCompany])
                     
-        print(f"******** EEC {cityCompany}")
+        print(f"******** EEC = {cityCompany}")
       
                  
         hexag.companySides = []
+ 
         index = 0
         for stn in tileStationList:
             sideList = []
@@ -481,21 +483,23 @@ class Board:
                     if rSide > 6:
                         rSide -=6
                     rotatedStationList.append(rSide)
-        print(f"rotated station list = {rotatedStationList}") 
-        print(f"index = {index}")
-        print(f"city company = {cityCompany[index][1]}")            
-        sideList.append(cityCompany[index][1])
-        for item in rotatedStationList:
-            sideList.append(item)
- 
-        hexag.companySides.append(sideList)
-        index +=1
-           
-           
+            print(f"rotated station list = {rotatedStationList}") 
+            print(f"city company = {cityCompany[index][1]}")            
+            sideList.append(cityCompany[index][1])
+            for item in rotatedStationList:
+                sideList.append(item)  
+            rotatedStationList = []
+            hexag.companySides.append(sideList)
+            index +=1
+            
+        if len(hexag.companySides) < 2:
+            hexag.companySides.append([100,0,0])
+
         hexag.angle = angle                                               # set the hexag's angle value
         print(f"tile Color {tile.color}")
         hexag.color = tile.color
         print("******************************")
+        print(f"hexag color = {hexag.color}")
         print ("hexagTile = " + str(hexag.hexagTile))
         print ("hexag Cs = " + str(hexag.companySides))
               
@@ -545,15 +549,16 @@ class Board:
             return False
         
         
-    def getHexStations(self, hexag):
-        stationList = []
-        print(f"Hexag = {hexag}")
-        print(f"HexagEES = {hexag.companySides}")
+    def getHexCompanySides(self, hexag):
+        csList = []
         for slot in hexag.companySides:
-            if slot[0] < 100:                    # there is a station
-                stationList.append(slot)
-        return stationList
+            csList.append(slot)
+        return csList
                 
+    def setColor(self, hexag, color):
+        hexag.color = color
+        
+
             
         
 

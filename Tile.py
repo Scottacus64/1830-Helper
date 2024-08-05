@@ -18,6 +18,12 @@ class Tile:
     
     def printhexag(self):
         print(self.name_id, " is a hexag!")
+        
+    def getId(self):
+        return self.tile_id
+        
+    def getCompany(self):
+        return self.station_list[0]
     
     
     

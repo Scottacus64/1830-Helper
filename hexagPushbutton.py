@@ -127,13 +127,14 @@ class HexagPushButton(QPushButton):
             locationSecond = int(hexagLocation[2:])
             boardLocation = (locationFirst, locationSecond)
             currentHexag = self.theBoard.findhexagTuple(boardLocation)
+            print(f"new location reset {currentHexag.hexag_name}")
             self.MainWindow.resetCityButton(currentHexag)
             if currentHexag:
                 self.MainWindow.displayTile(currentHexag.hexagTile, currentHexagNumber, currentHexag.angle) # tile number, location,angle
             else:
-                self.MainWindow.displayTile(0, currentHexagNumber, 0) # set the previous hexag to blank  
+                self.MainWindow.displayTile(0, currentHexagNumber, 0)               # set the previous hexag to blank  
         else:                                                                       # this case there was no previous tile so just blank it out
-            self.MainWindow.displayTile(0, self.MainWindow.currentHexag, 0)      # set the previous hexag to blank 
+            self.MainWindow.displayTile(0, self.MainWindow.currentHexag, 0)         # set the previous hexag to blank 
         self.MainWindow.currentHexag = location                                     # set the currentHexag to this new location
         company = self.MainWindow.currentCompany
         trainList = self.MainWindow.trainList[company]
@@ -147,12 +148,26 @@ class HexagPushButton(QPushButton):
         if self.theBoard.tileList:
             self.MainWindow.displayTile(self.theBoard.tileList[0][0], location, self.theBoard.tileList[0][1])
             tile = self.theBoard.unplayedTileLookUp(self.theBoard.tileList[0][0])
-            cityCount = tile.city_count
+            cityCount = hexag.city_count
             print(f"City count = {cityCount}")
-            if cityCount == 1:
-                self.MainWindow.drawCity(hexag, 1, 1, False)
-            if cityCount == 2 and (tile.color == "green"):
-                self.MainWindow.drawCity(hexag, 2, 1, False)      # if there is a second city that appears with this tile, activate it
+            # cityCount of 0 means blank to rail with no cities, can have vilages though
+            if cityCount == 1:                                      # single city or Boston or Baltimore
+                if hexag.color == "":
+                    self.MainWindow.drawCity(hexag, 1, 0, False)    # blank to Y1C
+                    self.theBoard.setColor(hexag, "yellow")
+                else:
+                    self.MainWindow.drawCity(hexag, 1, 1, False)    # Y1C to G1C and G1C to B1C
+                    self.theBoard.setColor(hexag, "green")
+            if cityCount == 2:                                      # 00 hexag doesn't matter if blank or green
+                self.MainWindow.drawCity(hexag, 2, 0, False)        # blank to G2C and G2C to B2C
+                self.theBoard.setColor(hexag, "green")
+            if cityCount == 4:
+                if hexag.color == "":
+                    self.MainWindow.drawCity(hexag, 4, 0, False)    # blank to NY2  
+                    self.theBoard.setColor(hexag, "green")
+                else:
+                    self.MainWindow.drawCity(hexag, 4, 1, False)    # NY2 to NY4
+                    self.theBoard.setColor(hexag, "brown")
 
         
     def sameLocationClicked(self, location):
