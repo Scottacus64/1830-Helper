@@ -83,9 +83,10 @@ class TilePile():
         for i in range(4):
             self.pile.append(Tile(83, [(59,0), (59,1), (59,2), (59,3), (59,4), (59,5)], [[]], [[50],[50]], 0, 0, ""))   # blank "00"
             
-        #----- special tiles for empty cities with rails -----
+        #----- special tiles for empty cities with rails attached -----
         self.pile.append(Tile(85, (), [(2,3)], [[50,2,3]], 0, 1, ""))
         self.pile.append(Tile(86, (), [6,0], [[50,6]], 0, 1, ""))
+        self.pile.append(Tile(87, (),[[2,4], [2,5], [4,5]], [[50,2,4,5]], 0, 1, ""))
         
         
     def getTiles(self):

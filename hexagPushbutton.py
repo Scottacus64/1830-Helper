@@ -6,10 +6,10 @@ from Board import Board
 
 class HexagPushButton(QPushButton):
     
-    def __init__(self, name, main_window, board, parent=None):
+    def __init__(self, name, board, parent=None):
         super().__init__(parent)
         self.name = name
-        self.MainWindow = main_window
+        self.MainWindow = parent
         self.setFlat(True)
         self.rotation_angle = 0
         self.setStyleSheet("background-color: transparent; border: none; padding: 0;")
@@ -52,18 +52,19 @@ class HexagPushButton(QPushButton):
         
         overlapping_buttons = self.findOverlappingButtons(event.pos())
         print("..........")
+        print(f"sender is {self}")
         for cButton in overlapping_buttons:
             print(cButton.name)
 
         if hexagon.containsPoint(event.pos(), Qt.OddEvenFill):
             location = self.hexagDictionary[self.name]                           # location is an int between 0 and 76
             newLoc = ""
-            print(location)
+            print(f"location = {location} name = {self.name}")
             if location != self.MainWindow.currentHexag or self.MainWindow.endTurn:
-                self.newLocationClicked(location)
+                self.newLocationClicked(location, self)
                 self.MainWindow.endTurn = False
             else:
-                self.sameLocationClicked(location)
+                self.sameLocationClicked(location, self)
         elif len(overlapping_buttons) > 0:                                  # code designed to check if lower portion with overlapping buttons in clicked
             if len(overlapping_buttons) == 2:   
                 newLoc = self.cellAbove(overlapping_buttons[1].name,0)
@@ -81,10 +82,10 @@ class HexagPushButton(QPushButton):
                 location = 100
             if location < 100:
                 if location != self.MainWindow.currentHexag or self.MainWindow.endTurn:
-                    self.newLocationClicked(location)
+                    self.newLocationClicked(location, self)
                     self.MainWindow.endTurn = False
                 else:
-                    self.sameLocationClicked(location)
+                    self.sameLocationClicked(location, self)
         else:
             print("not a hexag")
             super().mousePressEvent(event)
@@ -117,24 +118,24 @@ class HexagPushButton(QPushButton):
         return newLoc
        
             
-    def newLocationClicked(self, location):                 # location is an int between 0 and 76
-        print(f"******** New Location {location}")
+    def newLocationClicked(self, location, hexPB):                 # location is an int between 0 and 76
+        print(f"******** New Location {location} currentHexag = {self.MainWindow.currentHexag}")
         # check if the player clicked on a second tile this turn, if so we need to either blank out the previous tile or reset it to its original tile
         if self.MainWindow.currentHexag > -1:                                       # this case there was a previous tile, -1 because there is a '0' hexag
+            oldHPB = self.MainWindow.currentHPB
             currentHexagNumber = self.MainWindow.currentHexag                       # restore the last hexag's tile
             hexagLocation = self.theBoard.hexagDictionary[currentHexagNumber]
             locationFirst = int(hexagLocation[:2])                                  # parsing out the tuple for board to use
             locationSecond = int(hexagLocation[2:])
             boardLocation = (locationFirst, locationSecond)
-            currentHexag = self.theBoard.findhexagTuple(boardLocation)
+            currentHexag = self.theBoard.findHexagTuple(boardLocation)
             print(f"new location reset {currentHexag.hexag_name}")
             #self.MainWindow.resetCityButton(currentHexag)
             if currentHexag:
-                self.MainWindow.displayTile(currentHexag.hexagTile, currentHexagNumber, currentHexag.angle) # tile number, location,angle
+                self.MainWindow.displayTile(currentHexag.hexagTile, currentHexagNumber, currentHexag.angle, oldHPB) # tile number, location,angle
             else:
-                self.MainWindow.displayTile(0, currentHexagNumber, 0)               # set the previous hexag to blank  
-        #else:                                                                       # this case there was no previous tile so just blank it out
-        #    self.MainWindow.displayTile(0, self.MainWindow.currentHexag, 0)         # set the previous hexag to blank 
+                self.MainWindow.displayTile(0, currentHexagNumber, 0, oldHPB)               # set the previous hexag to blank  
+        self.MainWindow.currentHPB = hexPB
         self.MainWindow.currentHexag = location                                     # set the currentHexag to this new location
         company = self.MainWindow.currentCompany
         trainList = self.MainWindow.trainList[company]
@@ -142,52 +143,25 @@ class HexagPushButton(QPushButton):
         locationFirst = int(name[:2])                                               # parsing out the tuple for board to use
         locationSecond = int(name[2:])
         boardLocation = (locationFirst, locationSecond)
-        hexag = self.theBoard.findhexagTuple(boardLocation)
+        print(f"location {location} boardLocation {boardLocation}")
+        hexag = self.theBoard.findHexagTuple(boardLocation)
         self.theBoard.tileList = self.theBoard.checkForPlayableTile(boardLocation, company, trainList)    # ask theBoard for a list of playable tiles to display 
         self.theBoard.tileListIndex = 0
+        print(f"the board tile list {self.theBoard.tileList}")
         if self.theBoard.tileList:
             tileNumber = self.theBoard.tileList[0][0]
             angle = self.theBoard.tileList[0][1]
-            self.MainWindow.displayTile(tileNumber, location, angle)
-            '''
-            tile = self.theBoard.unplayedTileLookUp(self.theBoard.tileList[0][0])
-            cityCount = hexag.city_count
-            print(f"City count = {cityCount}")
-            # cityCount of 0 means blank to rail with no cities, can have vilages though
-            if cityCount == 1:                                      # single city or Boston or Baltimore
-                if hexag.color == "":
-                    self.MainWindow.drawCity(hexag, 1, 0, False, False)    # blank to Y1C
-                    self.theBoard.setColor(hexag, "yellow")
-                elif hexag.color == "yellow":
-                    self.MainWindow.drawCity(hexag, 1, 1, False, False)    # Y1C to G1C and G1C to B1C
-                    self.theBoard.setColor(hexag, "green")
-                else:
-                    self.theBoard.setColor(hexag, "brown")
-            if cityCount == 2:                                      # 00 hexag doesn't matter if blank or green
-                self.MainWindow.drawCity(hexag, 2, 0, False, False)        # blank to G2C and G2C to B2C
-                if hexag.color == "":
-                    self.theBoard.setColor(hexag, "green")
-                else:
-                    self.theBoard.setColor(hexag, "brown")
-            if cityCount == 4:
-                print(f"Hexag color = {hexag.color}")
-                if hexag.color == "":
-                    self.MainWindow.drawCity(hexag, 4, 1, False, False)    # blank to NY2  
-                    self.theBoard.setColor(hexag, "green")
-                else:
-                    self.MainWindow.drawCity(hexag, 4, 2, False, False)    # NY2 to NY4
-                    self.theBoard.setColor(hexag, "brown")
-            '''
+            self.MainWindow.displayTile(tileNumber, location, angle, hexPB)
 
         
-    def sameLocationClicked(self, location):
+    def sameLocationClicked(self, location, hexPB):
         print("******** Same Location")
         if self.theBoard.tileList:
             self.theBoard.tileListIndex +=1
             if self.theBoard.tileListIndex >= len(self.theBoard.tileList):
                 self.theBoard.tileListIndex = 0
             ind = self.theBoard.tileListIndex
-            self.MainWindow.displayTile(self.theBoard.tileList[ind][0], location, self.theBoard.tileList[ind][1])
+            self.MainWindow.displayTile(self.theBoard.tileList[ind][0], location, self.theBoard.tileList[ind][1], hexPB)
             
 
 

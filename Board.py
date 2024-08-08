@@ -74,7 +74,7 @@ class Board:
         # ----- one_city_hexages -----
         one_city_hexages = [  [(1, 19), 4],
                               [(2, 10), 0], [(2, 16), 0],
-                              [(4, 2), 9], [(4, 14), 0],
+                              [(4, 2), 9], [(4, 14), 11],
                               [(5, 19), 6], [(5, 23), 1],
                               [(6, 4), 0], [(6, 6), 3], [(6, 16), 0], [(6, 22), 0],
                               [(8, 4), 0], [(8, 10), 0], [(8, 12), 8], [(8, 16), 0],
@@ -182,6 +182,8 @@ class Board:
                         hexagTile = 85
                     elif oneCityList[1] == 10:
                         hexagTile = 86
+                    elif oneCityList[1] == 11:
+                        hexagTile = 87
             
             for twoCityList in two_city_hexages: # Find if there is matching hexag and get its ind
                 if twoCityList[0] == hexag:
@@ -267,7 +269,7 @@ class Board:
         index = 0
         print(f"********adjacent Hexagons = {hexagList}")
         for hexag in hexagList:
-            hexagObject = self.findhexagTuple(hexag) 
+            hexagObject = self.findHexagTuple(hexag) 
             if hexagObject is not None: 
                 print("hexag CS = " + str(hexagObject.companySides))
                 sidesList = []
@@ -281,7 +283,7 @@ class Board:
             index +=1
         print("Rail in direction = " + str(railInDirection))  
         # check for void sides on the location hexag
-        locationhexag = self.findhexagTuple(location)
+        locationhexag = self.findHexagTuple(location)
         voidInDirection = []
         voidInDirection = locationhexag.voidSides
         possibleTiles = []
@@ -397,7 +399,7 @@ class Board:
     
     
     # find the hexag by its id (5,5)
-    def findhexagTuple(self, id):
+    def findHexagTuple(self, id):
         print("In  Find Hexag by tuple")
         for hexagObj in self.board_hexagons:
             if hexagObj.hexag_id == id:
@@ -407,7 +409,7 @@ class Board:
     
     
     # find the hexag by its name (0505)
-    def findhexagName(self, name):
+    def findHexagName(self, name):
         for hexagObj in self.board_hexagons:
             if hexagObj.hexag_name == name:
                 return hexagObj                       #return the hexag upon a match
@@ -421,7 +423,7 @@ class Board:
         locationFirst = int(hexagLocation[:2])                    # parsing out the tuple for board to use
         locationSecond = int(hexagLocation[2:])
         boardLocation = (locationFirst, locationSecond)
-        return self.findhexagTuple(boardLocation)                 # get the hexag object...
+        return self.findHexagTuple(boardLocation)                 # get the hexag object...
     
     
     # find a hexag by the tile associated with it
@@ -489,7 +491,7 @@ class Board:
             rotatedStationList = []
             for i in range(len(stn)):
                 if i>0:
-                    rSide = stn[1] + angle
+                    rSide = stn[i] + angle
                     if rSide > 6:
                         rSide -=6
                     rotatedStationList.append(rSide)
