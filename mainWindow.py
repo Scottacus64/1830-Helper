@@ -579,90 +579,91 @@ class MainWindow(QWidget):
         for i in range(csLen):
             cityList.append(self.findCityObj("city" + hexagName + str(i)))
             comp = self.findCityObj("city" + hexagName + str(i))
-            print(f"Company = {comp.company}")
-        
-        if numberOfCities == 0:                                                         # going from (1 to 0) or (20 to 0)
-            for i in range(csLen):
-                cityList[i].setGeometry((50*hexagCol)-38, (87*hexagRow)-35, 40, 40)
-                cityList[i].setActive(False)
-                cityList[i].setIcon(QIcon())
-                self.stationPlaced = False
-        elif numberOfCities == 1:                                                       # going from (0 to 1) or (2 to 1)
-            for i in range(csLen):   
-                cityList[i].setGeometry((50*hexagCol)-38, (87*hexagRow)-35, 40, 40)
-                if hexagName == "1115":
-                    cityList[i].setGeometry((50*hexagCol)-52, (87*hexagRow)-50, 40, 40)
-            if startUp == False:
-                if int(cityList[0].company) < 50:                                                # there's a company here
-                    cityList[0].setActive(False)
-                    icon = self.getCompanyIcon(cityList[0].company, 2)
-                    cityList[0].setIcon(icon)
-                else:                                                                       # there's no company here
-                    cityList[0].setActive(True)
-                    cityList[0].setIcon(QIcon(self.getImage("greyDot")))
-                    self.stationPlaced = False
-        elif numberOfCities == 2:                                                       # going from (1 to 2)     
-            cityList[0].setGeometry((50*hexagCol)-38, (87*hexagRow)-55, 40, 40)         # space out the cities        
-            cityList[1].setGeometry((50*hexagCol)-38, (87*hexagRow)-15, 40, 40) 
-            if startUp == False:
-                for i in range(2):
-                    print(f"Comp = {cityList[i].company}")
-                    if int(cityList[i].company) < 50:                                            # there's a company here
-                        cityList[i].setActive(False)
-                        icon = self.getCompanyIcon(cityList[i].company, 2)
-                        cityList[i].setIcon(icon)
-                    else:                                                                  # there's no company here
-                        cityList[i].setActive(True)
-                        cityList[i].setIcon(QIcon(self.getImage("greyDot")))
-                        self.stationPlaced = False
-        elif numberOfCities == 20:                                                      # going from (0 to 20) or (40 to 20)
-            cityList[0].setGeometry((50*hexagCol)-38, (87*hexagRow)-55, 40, 40)         # space out the cities        
-            cityList[1].setGeometry((50*hexagCol)-38, (87*hexagRow)-15, 40, 40) 
-            if startUp == False:
-                for i in range(csLen):
-                    if int(cityList[i].company) < 50:                                            # there's a company here
-                        cityList[i].setActive(False)
-                        icon = self.getCompanyIcon(cityList[i].company, (i))
-                        cityList[i].setIcon(icon)
-                    else:                                                                   # there's no company here
-                        cityList[i].setActive(True)
-                        if i == 0:
-                            cityList[i].setIcon(QIcon(self.getImage("w")))
-                        elif i == 1:
-                            cityList[i].setIcon(QIcon(self.getImage("b")))
-                        else:
-                            cityList[i].setIcon(QIcon())
-                            cityList[i].setActive(False)
-                        self.stationPlaced = False
-        else:                                                                           # going from (20 to 40)
-            if startUp == True:
-                cityList[0].setGeometry((50*hexagCol)-38, (87*hexagRow)-55, 40, 40)         # space out the cities        
-                cityList[1].setGeometry((50*hexagCol)-38, (87*hexagRow)-15, 40, 40)
-                cityList[2].setGeometry((50*hexagCol)-38, (87*hexagRow)-55, 40, 40)               
-                cityList[3].setGeometry((50*hexagCol)-38, (87*hexagRow)-15, 40, 40)
+        print(f"City List = {cityList}")    
             
-            else:
-                cityList[0].setGeometry((50*hexagCol)-55, (87*hexagRow)-55, 40, 40)         # space out the cities        
-                cityList[1].setGeometry((50*hexagCol)-15, (87*hexagRow)-55, 40, 40)
-                cityList[2].setGeometry((50*hexagCol)-55, (87*hexagRow)-15, 40, 40)               
-                cityList[3].setGeometry((50*hexagCol)-15, (87*hexagRow)-15, 40, 40)
-                for i in range(4):
-                    if i % 2 == 0:
-                        color = 0
-                    else:
-                        color = 1
-                    if int(cityList[i].company) < 50:
-                        cityList[i].setActive(False)
-                        icon = self.getCompanyIcon(cityList[i].company, color)
-                        cityList[i].setIcon(icon)
-                    else:
-                        cityList[i].setActive(True)
-                        if color == 0:
-                            cityList[i].setIcon(QIcon(self.getImage("w")))
-                        else:
-                            cityList[i].setIcon(QIcon(self.getImage("b")))
+        if cityList != [None, None]:
+            if numberOfCities == 0:                                                         # going from (1 to 0) or (20 to 0)
+                for i in range(csLen):
+                    cityList[i].setGeometry((50*hexagCol)-38, (87*hexagRow)-35, 40, 40)
+                    cityList[i].setActive(False)
+                    cityList[i].setIcon(QIcon())
+                    self.stationPlaced = False
+            elif numberOfCities == 1:                                                       # going from (0 to 1) or (2 to 1)
+                for i in range(csLen):   
+                    cityList[i].setGeometry((50*hexagCol)-38, (87*hexagRow)-35, 40, 40)
+                    if hexagName == "1115":
+                        cityList[i].setGeometry((50*hexagCol)-52, (87*hexagRow)-50, 40, 40)
+                if startUp == False:
+                    if int(cityList[0].company) < 50:                                                # there's a company here
+                        cityList[0].setActive(False)
+                        icon = self.getCompanyIcon(cityList[0].company, 2)
+                        cityList[0].setIcon(icon)
+                    else:                                                                       # there's no company here
+                        cityList[0].setActive(True)
+                        cityList[0].setIcon(QIcon(self.getImage("greyDot")))
                         self.stationPlaced = False
-                        
+            elif numberOfCities == 2:                                                       # going from (1 to 2)     
+                cityList[0].setGeometry((50*hexagCol)-38, (87*hexagRow)-55, 40, 40)         # space out the cities        
+                cityList[1].setGeometry((50*hexagCol)-38, (87*hexagRow)-15, 40, 40) 
+                if startUp == False:
+                    for i in range(2):
+                        print(f"Comp = {cityList[i].company}")
+                        if int(cityList[i].company) < 50:                                            # there's a company here
+                            cityList[i].setActive(False)
+                            icon = self.getCompanyIcon(cityList[i].company, 2)
+                            cityList[i].setIcon(icon)
+                        else:                                                                  # there's no company here
+                            cityList[i].setActive(True)
+                            cityList[i].setIcon(QIcon(self.getImage("greyDot")))
+                            self.stationPlaced = False
+            elif numberOfCities == 20:                                                      # going from (0 to 20) or (40 to 20)
+                cityList[0].setGeometry((50*hexagCol)-38, (87*hexagRow)-55, 40, 40)         # space out the cities        
+                cityList[1].setGeometry((50*hexagCol)-38, (87*hexagRow)-15, 40, 40) 
+                if startUp == False:
+                    for i in range(csLen):
+                        if int(cityList[i].company) < 50:                                            # there's a company here
+                            cityList[i].setActive(False)
+                            icon = self.getCompanyIcon(cityList[i].company, (i))
+                            cityList[i].setIcon(icon)
+                        else:                                                                   # there's no company here
+                            cityList[i].setActive(True)
+                            if i == 0:
+                                cityList[i].setIcon(QIcon(self.getImage("w")))
+                            elif i == 1:
+                                cityList[i].setIcon(QIcon(self.getImage("b")))
+                            else:
+                                cityList[i].setIcon(QIcon())
+                                cityList[i].setActive(False)
+                            self.stationPlaced = False
+            else:                                                                           # going from (20 to 40)
+                if startUp == True:
+                    cityList[0].setGeometry((50*hexagCol)-38, (87*hexagRow)-55, 40, 40)         # space out the cities        
+                    cityList[1].setGeometry((50*hexagCol)-38, (87*hexagRow)-15, 40, 40)
+                    cityList[2].setGeometry((50*hexagCol)-38, (87*hexagRow)-55, 40, 40)               
+                    cityList[3].setGeometry((50*hexagCol)-38, (87*hexagRow)-15, 40, 40)
+                
+                else:
+                    cityList[0].setGeometry((50*hexagCol)-55, (87*hexagRow)-55, 40, 40)         # space out the cities        
+                    cityList[1].setGeometry((50*hexagCol)-15, (87*hexagRow)-55, 40, 40)
+                    cityList[2].setGeometry((50*hexagCol)-55, (87*hexagRow)-15, 40, 40)               
+                    cityList[3].setGeometry((50*hexagCol)-15, (87*hexagRow)-15, 40, 40)
+                    for i in range(4):
+                        if i % 2 == 0:
+                            color = 0
+                        else:
+                            color = 1
+                        if int(cityList[i].company) < 50:
+                            cityList[i].setActive(False)
+                            icon = self.getCompanyIcon(cityList[i].company, color)
+                            cityList[i].setIcon(icon)
+                        else:
+                            cityList[i].setActive(True)
+                            if color == 0:
+                                cityList[i].setIcon(QIcon(self.getImage("w")))
+                            else:
+                                cityList[i].setIcon(QIcon(self.getImage("b")))
+                            self.stationPlaced = False
+                            
                 
     def getCompanyIcon(self, company, bw):
         if bw == 0:
