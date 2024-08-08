@@ -16,6 +16,7 @@ class Board:
         self.largestTrain = 0
         self.tileList = []
         self.tileListIndex = 0
+        self.tempHexag = []
         
         self.hexagDictionary = {
             0: "0210",  1:"0212",  2:"0214",  3:"0216",  4:"0218",  5:"0220",  6:"0222", 
@@ -73,20 +74,22 @@ class Board:
         # ----- one_city_hexages -----
         one_city_hexages = [  [(1, 19), 4],
                               [(2, 10), 0], [(2, 16), 0],
-                              [(4, 2), 0], [(4, 14), 0],
+                              [(4, 2), 9], [(4, 14), 0],
                               [(5, 19), 6], [(5, 23), 1],
                               [(6, 4), 0], [(6, 6), 3], [(6, 16), 0], [(6, 22), 0],
                               [(8, 4), 0], [(8, 10), 0], [(8, 12), 8], [(8, 16), 0],
                               [(9, 15), 2],
                               [(10, 14), 0],
-                              [(11, 15), 0]
+                              [(11, 15), 10]
                           ]
         
         # ----- two_city_hexages -----
         two_city_hexages = [((4, 10), 19),
                           ((5, 5), 27), ((5, 11), 29),
-                          ((7, 19), "NY"),
                           ((8, 18), 61)]
+        
+        # ------ four_city_hexag -------
+        four_city_hexag = [(7, 19), "NY"]
         
         # ----- one_village_hexages -----
         one_village_hexages = [(2, 20),
@@ -102,7 +105,7 @@ class Board:
         
         # ----- rr_start_hexages -----
         rr_start_hexages = [((1, 19), 4),
-                          ((5, 11), 5), ((5, 19), 6), ((5, 23), 1),
+                          ((5, 19), 6), ((5, 23), 1),
                           ((6, 6), 3),
                           ((7, 19), 7),
                           ((8, 12), 8),
@@ -116,7 +119,7 @@ class Board:
                             ((4,2), [[50,2,3],[100,0,0]]), ((4,10), [[50,0,0], [50,0,0]]), ((4,14), [[50,2,4,5],[100,0,0]]), ((4,24),[[100,4,5]]),
                             ((5,5), [[50,0,0], [50,0,0]]), ((5,9), [[100,6,1]]), ((5,11), [[50,0,0], [50,0,0]]),  ((5,19), [[6],[50]]), ((5,23), [[1,1,3],[50,0,0]]),
                             ((6,2), [[74,1,2,3]]), ((6,4), [[50],[50]]), ((6,6), [[3,3,4]]), ((6,16), [[50,0,0],[50,0,0]]), ((6,22), [[50,0,0],[50,0,0]]), ((6,24),[[100,5,6]]),
-                            ((7,19), [[7,1], [50,4]]),
+                            ((7,19), [[7,1], [50,4], [50,4], [50,4]]),
                             ((8,4),[[50,0,0],[50,0,0]]), ((8,10), [[50,0,0],[50,0,0]]), ((8,12), [[8,2,5], [100,2,5]]), ((8,16),[[50,0,0],[50,0,0]]), ((8,18), [[50,0,0],[50,0,0]]),
                             ((9,1),[[75,2]]), ((9,15), [[2,2,4],[100,0,0]]), ((9,19), [[100,5,6]]),
                             ((10,2), [[76,1,2]]), ((10,14), [[50,0,0],[50,0,0]]),
@@ -168,21 +171,26 @@ class Board:
             
             #-----City Count-----
             city_count = 0
-            for cityList in one_city_hexages:
-                if cityList[0] == hexag: # Case for checking if there is only one city
+            for oneCityList in one_city_hexages:
+                if oneCityList[0] == hexag: # Case for checking if there is only one city
                     city_count = 1
-                    if cityList[1] == 2:
+                    if oneCityList[1] == 2:
                         hexagTile = 80
-                    elif cityList[1] == 1:
+                    elif oneCityList[1] == 1:
                         hexagTile = 81
+                    elif oneCityList[1] == 9:
+                        hexagTile = 85
+                    elif oneCityList[1] == 10:
+                        hexagTile = 86
             
             for twoCityList in two_city_hexages: # Find if there is matching hexag and get its ind
                 if twoCityList[0] == hexag:
                     city_count = 2
-                    if twoCityList[1]  == "NY":
-                        hexagTile = 82
-                    else:
-                        hexagTile = 83
+                    hexagTile = 83
+                        
+            if four_city_hexag[0] == hexag:
+                city_count = 4
+                hexagTile = 82
                         
             #-----Station Count-----
             station_count = 0
@@ -233,7 +241,6 @@ class Board:
         for tileNumber in cityTiles:
             tile = self.removeTileFromUnplayedTiles(tileNumber) 
             self.playedTiles.append(tile)
-
 
 
     def print_board(self):
@@ -391,7 +398,7 @@ class Board:
     
     # find the hexag by its id (5,5)
     def findhexagTuple(self, id):
-        print("In tuple")
+        print("In  Find Hexag by tuple")
         for hexagObj in self.board_hexagons:
             if hexagObj.hexag_id == id:
                 print("ID = " + str(id))
@@ -409,7 +416,7 @@ class Board:
     
     # find the hexag by receiving the number (the dictionary is number:name)
     def findHexagByNumber(self, number):
-        print(f"Number = {number}")
+        print(f"Find Hexag by Number, Number = {number}")
         hexagLocation = self.hexagDictionary[number]
         locationFirst = int(hexagLocation[:2])                    # parsing out the tuple for board to use
         locationSecond = int(hexagLocation[2:])
@@ -432,8 +439,8 @@ class Board:
                 return self.unplayedTiles[ind]
             else:
                 ind += 1
-        return None
-            
+        return None 
+    
     
     def updateHexagWithTile(self, tileNumber, location, angle, cityNumber, stationCompany): # this is run after a hexag is finalized
         hexag = self.findHexagByNumber(location)
@@ -460,10 +467,13 @@ class Board:
         if hexag.companySides:
             index = 0
             for slot in hexag.companySides:
-                if slot[0] < 100:
+                if slot[0] < 50:
                     cityCompany.append([index, slot[0]])
                 else:
-                    cityCompany.append([cityNumber, stationCompany])
+                    if index == cityNumber:
+                        cityCompany.append([cityNumber, stationCompany])
+                    else:
+                        cityCompany.append([cityNumber, 50])
                 index +=1
         else:
             for station in tileStationList:
@@ -502,6 +512,7 @@ class Board:
         print(f"hexag color = {hexag.color}")
         print ("hexagTile = " + str(hexag.hexagTile))
         print ("hexag Cs = " + str(hexag.companySides))
+        print("")
               
         
     def removeTileFromUnplayedTiles(self, tileNumber):
