@@ -410,23 +410,20 @@ class MainWindow(QWidget):
                 print("tile = " + str(self.currentTile[0]))
                 print (f"location = {location}")
                 print("angle = " + str(self.currentTile[2]))
-                stationCompany = int(self.currentStation[4])
-                
+                stationCompany = int(self.currentStation[4])                
                 if self.currentCityButton:
                     cityNumber = int(self.currentCityButton[8])
                     print(f"=====current city button = {self.currentCityButton}")
                     cityObj = self.findCityObj(self.currentCityButton)
                     cityObj.setCitySet(True)
                     cityObj.setCompany(stationCompany)
-
                 print(f"station = {self.currentStation}")
                 for slot in self.stationMarkerUsed:
                     if slot[0] == self.currentStation:
                         print(f"station slot = {slot}")
-                        slot[1] = 1
-                
+                        slot[1] = 1               
                 cityButtonName =  self.currentCityButton[4:8] 
-                print(f"currentCityButton {cityButtonName}")
+                print(f"currentCityButton = {cityButtonName}")
                 if hexag.hexag_name == cityButtonName:
                     self.board.updateHexagWithTile(self.currentTile[0], self.currentTile[1] , self.currentTile[2], cityNumber, stationCompany)
                 elif cityButtonName != "":                 
@@ -445,6 +442,7 @@ class MainWindow(QWidget):
                     tileCompany = tile.station_list[0][0]
                     self.board.updateHexagWithTile(self.currentTile[0], self.currentTile[1] , self.currentTile[2], 100, tileCompany)
                 self.currentTile = [0,0,0]
+                
             elif self.currentCityButton != "":
                 stationCompany = int(self.currentStation[4])
                 cityNumber = int(self.currentCityButton[8])
@@ -456,7 +454,11 @@ class MainWindow(QWidget):
                 print(f"hex tile {cbHexagTile} hex angle {cbHexagAngle}")
                 cbHexagLocation = self.hexagDictionary[cbHexagName]
                 print(f"cbHexagLocation {cbHexagLocation}")
+                cityObj = self.findCityObj(self.currentCityButton)
+                cityObj.setCitySet(True)
+                cityObj.setCompany(stationCompany)
                 self.board.updateHexagWithTile(cbHexagTile, cbHexagLocation ,cbHexagAngle, cityNumber, stationCompany)
+                
             else:
                 print("nothing to update")
                 

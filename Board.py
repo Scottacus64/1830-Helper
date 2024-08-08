@@ -119,7 +119,7 @@ class Board:
                             ((4,2), [[50,2,3],[100,0,0]]), ((4,10), [[50,0,0], [50,0,0]]), ((4,14), [[50,2,4,5],[100,0,0]]), ((4,24),[[100,4,5]]),
                             ((5,5), [[50,0,0], [50,0,0]]), ((5,9), [[100,6,1]]), ((5,11), [[50,0,0], [50,0,0]]),  ((5,19), [[6],[50]]), ((5,23), [[1,1,3],[50,0,0]]),
                             ((6,2), [[74,1,2,3]]), ((6,4), [[50],[50]]), ((6,6), [[3,3,4]]), ((6,16), [[50,0,0],[50,0,0]]), ((6,22), [[50,0,0],[50,0,0]]), ((6,24),[[100,5,6]]),
-                            ((7,19), [[7,1], [50,4], [50,4], [50,4]]),
+                            ((7,19), [[7,1], [50,4], [50,1], [50,4]]),
                             ((8,4),[[50,0,0],[50,0,0]]), ((8,10), [[50,0,0],[50,0,0]]), ((8,12), [[8,2,5], [100,2,5]]), ((8,16),[[50,0,0],[50,0,0]]), ((8,18), [[50,0,0],[50,0,0]]),
                             ((9,1),[[75,2]]), ((9,15), [[2,2,4],[100,0,0]]), ((9,19), [[100,5,6]]),
                             ((10,2), [[76,1,2]]), ((10,14), [[50,0,0],[50,0,0]]),
@@ -473,7 +473,7 @@ class Board:
                     if index == cityNumber:
                         cityCompany.append([cityNumber, stationCompany])
                     else:
-                        cityCompany.append([cityNumber, 50])
+                        cityCompany.append([index, 50])
                 index +=1
         else:
             for station in tileStationList:
@@ -481,15 +481,15 @@ class Board:
                     
         print(f"******** EEC = {cityCompany}")
       
-                 
         hexag.companySides = []
  
         index = 0
         for stn in tileStationList:
             sideList = []
+            rotatedStationList = []
             for i in range(len(stn)):
                 if i>0:
-                    rSide = stn[i] + angle
+                    rSide = stn[1] + angle
                     if rSide > 6:
                         rSide -=6
                     rotatedStationList.append(rSide)
@@ -498,7 +498,6 @@ class Board:
             sideList.append(cityCompany[index][1])
             for item in rotatedStationList:
                 sideList.append(item)  
-            rotatedStationList = []
             hexag.companySides.append(sideList)
             index +=1
             

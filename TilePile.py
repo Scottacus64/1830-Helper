@@ -79,7 +79,7 @@ class TilePile():
         #----- special tiles for cities and OO -----
         self.pile.append(Tile(80, [(53,1)], [[1,3]], [[1, 1, 3]], 0, 0, ""))     # Baltimore
         self.pile.append(Tile(81, [(53,0)], [[2,4]], [[2, 2, 4]], 0, 0, "") )    # Boston
-        self.pile.append(Tile(82, [(54,5)], [[1,0], [4,0]], [[7, 1], [50, 4]], 0, 0, ""))   # New York
+        self.pile.append(Tile(82, [(54,5)], [[1,0], [4,0]], [[7, 1], [50, 4], [50,1], [50,4]], 0, 0, ""))   # New York
         for i in range(4):
             self.pile.append(Tile(83, [(59,0), (59,1), (59,2), (59,3), (59,4), (59,5)], [[]], [[50],[50]], 0, 0, ""))   # blank "00"
             
