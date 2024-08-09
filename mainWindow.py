@@ -495,6 +495,7 @@ class MainWindow(QWidget):
             self.currentHexag = -1                          # set to -1 not 0 so that if hexag 0 is clicked it will register as a new hexag and not be rejected
             self.endTurn = True
             self.stationClicked = False
+            self.stationPlaced = False
             self.currentStation = "stn 100"
             print(f"current city button = {self.currentCityButton}")
            
@@ -511,9 +512,11 @@ class MainWindow(QWidget):
             print(f"CurrentStation {self.currentStation}")
             
             if self.currentCityButton != "":                                # used to blank out a station icon if another station is clicked before finalizing with company
+                print("In city reset")
                 cityObj = self.findCityObj(self.currentCityButton)
                 numCities = 0
                 if cityObj and cityObj.getActive() == False:
+                    print("in inner loop")
                     cityObj.setActive(True)             
                     hexagName = buttonName[4:8]
                     hexag = self.board.findHexagName(hexagName)
@@ -523,15 +526,16 @@ class MainWindow(QWidget):
                     else:
                         numCities = hexag.city_count
                 if numCities == 0:
-                    button.setIcon(QIcon())
+                    cityObj.setIcon(QIcon())
                 elif numCities == 1 or numCities == 2:
-                    button.setIcon(QIcon(self.getImage("greyDot")))
+                    cityObj.setIcon(QIcon(self.getImage("greyDot")))
                 else:
-                    buttonSlot = buttonName[8]
+                    objName = cityObj.name
+                    buttonSlot = objName[8]
                     if buttonSlot % 2 == 0:
-                        button.setIcon(QIcon(self.getImage("w")))
+                        cityObj.setIcon(QIcon(self.getImage("w")))
                     else:
-                        button.setIcon(QIcon(self.getImage("b")))
+                        cityObj.setIcon(QIcon(self.getImage("b")))
             if int(self.currentStation[4:]) < 100:                          # if a station icon was clicked set the station token to that icon
                 hexagName = buttonName[4:8]
                 hexag = self.board.findHexagName(hexagName)                 # get the hexag for the loaction of the station
@@ -578,10 +582,16 @@ class MainWindow(QWidget):
         cityList = []
         for i in range(csLen):
             cityList.append(self.findCityObj("city" + hexagName + str(i)))
-            comp = self.findCityObj("city" + hexagName + str(i))
-        print(f"City List = {cityList}")    
+            comp = self.findCityObj("city" + hexagName + str(i))  
             
-        if cityList != [None, None]:
+        if cityList == [None, None]:
+            return
+            
+        for i in range(len(cityList)):
+            comp = cityList[i].company 
+            print(f"slot = {i} company = {comp}")              
+            
+        if cityList != [None, None]:                                                        # this is needed because village tiles have no upgrade
             if numberOfCities == 0:                                                         # going from (1 to 0) or (20 to 0)
                 for i in range(csLen):
                     cityList[i].setGeometry((50*hexagCol)-38, (87*hexagRow)-35, 40, 40)

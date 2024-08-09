@@ -453,6 +453,9 @@ class Board:
                 self.unplayedTiles.append(swapTile)
         
         tile = self.removeTileFromUnplayedTiles(tileNumber)             # remove the tile from the unplayed list and add to played list
+        print(f"Tile = {tile}")
+        if tile == None:
+            return
         hexag.hexagTile = tileNumber                                    # get the tile number assigned to the hexag
         tileStationList = tile.station_list
         print("")
