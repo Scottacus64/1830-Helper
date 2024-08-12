@@ -5,16 +5,15 @@ Created on Sun May  5 07:55:38 2024
 @author: scottmiller
 """
 
-
 import os
 import pdb
-from PyQt5.QtWidgets import QWidget, QLabel, QPushButton
-from PyQt5.QtGui import QPixmap, QTransform, QIcon, QPalette, QColor, QPainter
+from PyQt5.QtWidgets import QWidget, QLabel, QPushButton, QApplication
+from PyQt5.QtGui import QPixmap, QTransform, QIcon, QPalette, QColor, QPainter,  QPen
 from HexagPushButton import HexagPushButton
 from Board import Board
+from MouseClickFilter import MouseClickFilter
 from CityButton import CityButton
 from PyQt5.QtCore import Qt, QSize
-
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -41,7 +40,10 @@ class MainWindow(QWidget):
         self.startUp = True
         self.currentHPB = None
         self.initUI()
-        
+        self.mouse_filter = MouseClickFilter(self)
+        QApplication.instance().installEventFilter(self.mouse_filter)
+        self.mouse_filter.mouseClicked.connect(self.onMouseClick)
+
  
         
     def initUI(self):
@@ -82,7 +84,7 @@ class MainWindow(QWidget):
 
         # this is a list of all tile names from 1 to 70 in ascending order
         self.tileDictionary = {
-            1:"t1", 2:"t2", 3:"t3", 4:"t4", 7:"t7", 8:"t8", 9:"t9", 
+            1:"t1",   2:"t2",   3:"t3",   4:"t4",   7:"t7",   8:"t8",   9:"t9", 
             14:"t14", 15:"t15", 16:"t16", 18:"t18", 19:"t19",
             20:"t20", 23:"t23", 24:"t24", 25:"t25", 26:"t26", 27:"t27", 28:"t28", 29:"t29", 
             39:"t39", 40:"t40", 41:"t41", 42:"t42", 43:"t43", 44:"t44", 45:"t45", 46:"t46", 47:"t47",
@@ -92,8 +94,8 @@ class MainWindow(QWidget):
             }
         
         self.hexagDictionary = {
-            "0210": 0, "0212": 1, "0214": 2, "0216": 3, "0218": 4, "0220": 5, "0222": 6, 
-            "0307": 7, "0309": 8, "0311": 9, "0313": 10, "0317": 11, "0319": 12, "0321": 13, "0323": 14,
+            "0210": 0,  "0212": 1,  "0214": 2,  "0216": 3,  "0218": 4,  "0220": 5,  "0222": 6, 
+            "0307": 7,  "0309": 8,  "0311": 9,  "0313": 10, "0317": 11, "0319": 12, "0321": 13, "0323": 14,
             "0402": 15, "0404": 16, "0406": 17, "0408": 18, "0410": 19, "0412": 20, "0414": 21, "0416": 22, "0418": 23, "0420": 24, "0422": 25, 
             "0503": 26, "0505": 27, "0507": 28, "0511": 29, "0513": 30, "0515": 31, "0517": 32, "0519": 33, "0521": 34, "0523": 35,
             "0604": 36, "0608": 37, "0610": 38, "0612": 39, "0614": 40, "0616": 41, "0618": 42, "0620": 43, "0622": 44, 
@@ -103,6 +105,121 @@ class MainWindow(QWidget):
             "1004": 70, "1006": 71, "1008": 72, "1010": 73, "1012": 74, "1014": 75, 
             "1115": 76
         } 
+        
+        self.hexagDiag = [  ["1004"],			
+                            ["0913",	"1006"],			
+                            ["0802",	"0905",	    "1008"],	
+                            ["0804",	"0907",    	"1010"],	
+                            ["0707",    "0806",     "0909",     "1012"], 
+                            ["0705",    "0808",     "0911",     "1014"],	
+                            ["0604",    "0707",     "0810",     "0913"], 
+                            ["0502",    "0606",     "0709",     "0812",     "0915"], 
+                            ["0505",    "0608",     "0711",     "0814",     "0917"],
+                            ["0404",    "0507",     "0610",     "0713",     "0818"], 
+                            ["0406",    "0509",     "0612",     "0715",     "0818"],  
+                            ["4008",    "0511",     "0614",     "0717"],	
+                            ["0307",    "0410",     "0513",     "0616",    "0719"],
+                            ["0309",    "0412",     "0515",     "0618"], 	
+                            ["0311",    "0414",     "0517",     "0620"], 	
+                            ["0210",    "0313",     "0416",     "0519",    "0622"], 
+                            ["0212",    "0315",     "0418",     "0521"], 
+                            ["0214",    "0317",     "0420",     "0523"], 
+                            ["0216",    "0319",     "0422"],		
+                            ["0218",    "0321"],			
+                            ["0220",    "0323"], 		
+                            ["0222"]    ]
+        
+        self.posDiagList = [
+                ["1004"],
+                ["0903", "1004", "1006"], 
+                ["0802", "0903", "0905", "1006", "1008"],
+                ["0802", "0804", "0905", "0907", "1008", "1010"],
+                ["0703", "0804", "0806", "0907", "0909", "1010", "1012"],
+                ["0703", "0705", "0806", "0808", "0909", "0911", "1012", "1014"],
+                ["0604", "0705", "0707", "0808", "0810", "0911", "0913", "1014"],
+                ["0503", "0604", "0606", "0707", "0709", "0810", "0913", "0915"],
+                ["0503", "0905", "0608", "0709", "0711", "0814", "0915", "0917"],
+                ["0404", "0505", "0608", "0610", "0711", "0713", "0814", "0816", "0917"],
+                ["0404", "0406", "0507", "0610", "0612", "0713", "0715", "0816", "0818"],
+                ["0406", "0408", "0511", "0612", "0614", "0715", "0717", "0818"],
+                ["0307", "0408", "0410", "0511", "0513", "0614", "0616", "0717", "0719"],
+                ["0307", "0309", "0410", "0412", "0513", "0515", "0616", "0618", "0719"],
+                ["0309", "0311", "0412", "0515", "0517", "0618", "0620"],
+                ["0210", "0311", "0313", "0416", "0517", "0519", "0620", "0622"],
+                ["0210", "0212", "0313", "0416", "0418", "0519", "0521", "0622"],
+                ["0212", "0214", "0317", "0418", "0420", "0521", "0523"],
+                ["0214", "0216", "0317", "0319", "0420", "0422", "0523"],
+                ["0216", "0218", "0319", "0321", "0422"],
+                ["0218", "0220", "0321", "0323"],
+                ["0220", "0222", "0323"],
+                ["0222"]
+            ]
+        
+        self.negDiagList = [
+                ["1014", "0917"],
+                ["1012", "1014", "0915", "0917", "0818"],
+                ["1010", "1012", "0913", "0915", "0816", "0818", "0719", "0622"],
+                ["1008", "1010", "0911", "0913", "0814", "0816", "0717", "0719", "0620", "0622", "0523"],
+                ["1006", "1008", "0909", "0911", "0814", "0715", "0717", "0618", "0620", "0521", "0523"],
+                ["1004", "1006", "0907", "0909", "0810", "0713", "0715", "0616", "0618", "0519", "0521", "0422"],
+                ["1004", "0905", "0907", "0808", "0810", "0711", "0713", "0614", "0616", "0517", "0519", "0420", "0422", "0323"],
+                ["0903", "0905", "0806", "0808", "0709", "0713", "0612", "0614", "0515", "0517", "0418", "0420", "0321", "0323"],
+                ["0903", "0804", "0806", "0707", "0709", "0610", "0612", "0513", "0515", "0416", "0418", "0319", "0321", "0222"],
+                ["0802", "0804", "0705", "0707", "0608", "0610", "0511", "0513", "0416", "0317", "0319", "0220", "0222"],
+                ["0802", "0703", "0705", "0608", "0511", "0412", "0317", "0218", "0220"],
+                ["0703", "0604", "0507", "0410", "0412", "0313", "0216", "0218"],
+                ["0604", "0505", "0507", "0408", "0410", "0311", "0313", "0214", "0216"],
+                ["0503", "0505", "0406", "0408", "0309", "0311", "0212", "0214"],
+                ["0503", "0404", "0406", "0307", "0309", "0210", "0212"],
+                ["0404", "0307", "0210"]
+            ]
+        
+        self.negDiagLine = [
+                [-0.569,    1302],
+                [-0.590,	1259],
+                [-0.586,	1199],
+                [-0.584,	1138],
+                [-0.586,	1082],
+                [-0.581,	1020],
+                [-0.582,	962],
+                [-0.584,	905],
+                [-0.584,	848],
+                [-0.583,	789],
+                [-0.582,	730],
+                [-0.583,	674],
+                [-0.580,	614],
+                [-0.580,	556],
+                [-0.579,	499],
+                [-0.581,	441],
+                [-0.582,    383]
+                ]
+        
+        
+        self.posDiagLine = [
+                [0.577,	748],
+                [0.562,	694],
+                [0.566,	634],
+                [0.570,	578],
+                [0.567,	520],
+                [0.570,	460],
+                [0.575,	402],
+                [0.570,	347],
+                [0.573,	289],
+                [0.570,	232],
+                [0.571,	173],
+                [0.565,	119],
+                [0.568,	58],
+                [0.566,	0],
+                [0.570,	-56],
+                [0.569,	-112],
+                [0.567,	-168],
+                [0.569,	-228],
+                [0.571,	-286],
+                [0.564,	-337],
+                [0.566,	-395],
+                [0.563,	-451],
+                [0.585,	-532]      
+            ]
         
         # this is the number of stations per company
         self.stationList = [2,3,3,4,3,4,2,4]
@@ -150,7 +267,7 @@ class MainWindow(QWidget):
             self.displayCity(locationName, location, numberOfCities, True)
 
         print("(((((((((((()))))))))))))")
-                    
+                   
         # set uo side bar train and company buttons
         for row in range(16):
             for col in range(2):
@@ -207,10 +324,9 @@ class MainWindow(QWidget):
         for city in specialCity:
             cityButton = CityButton(city[0], self, False, True, city[1])
             self.cityButtons.append(cityButton)
+            
         self.show()
         self.startUp = False
-        for city in self.cityButtons:
-            city.printCityButton()
         self.currentHexag = -1
 
 
@@ -247,7 +363,51 @@ class MainWindow(QWidget):
                         cityButton.setActive(True)
                 if i == 1 and location == "0719":
                     cityButton.setActive(True)
-                self.cityButtons.append(cityButton)       
+                self.cityButtons.append(cityButton)     
+            
+                
+    def onMouseClick(self):
+        # Get the mouse coordinates
+        x = self.mouse_filter.getLocalX()
+        y = self.mouse_filter.getLocalY()
+        print(f"*******Mouse clicked at: {x}, {y}")
+        posDiag = 0
+        negDiag = 0
+        for i in range(24):
+            if 31 + (i*50) > x:
+                col = i
+                break
+        for i in range(23):  
+            #print(self.posDiagLine[i])  
+            diag = ((self.posDiagLine[i][0]) * x) + self.posDiagLine[i][1]
+            #diag = (.569 * x) +  808 - (i * 57.6) 
+            if  diag  < y:
+                posDiag= i+1
+                print(f"posDiag = {posDiag}")
+                break
+        for i in range(17):
+            #print(self.negDiagLine[i])  
+            diag = ((self.negDiagLine[i][0]) * x) + self.negDiagLine[i][1]
+            #diag = (-.569 * x) + 1314 - (i * 57.6)
+            if diag < y:
+                negDiag = i
+                print(f"negDiag = {negDiag}")
+                break
+        if posDiag > 0:
+            print(f"posDiag = {posDiag}")
+            posList = self.posDiagList[posDiag-1]
+        if negDiag > 0:
+            print(f"negDiag = {negDiag}")
+            negList = self.negDiagList[negDiag-1]
+        if posDiag > 0 and negDiag > 0:
+            for pSlot in posList:
+                for nSlot in negList:
+                    if pSlot == nSlot:
+                        if int(pSlot[-2:]) == col or int(pSlot[-2:]) == col+1:
+                            print(f"Hex {nSlot} was clicked with Col of {col}")
+                        break
+      
+            
                         
 
     # method for getting the image files
@@ -742,5 +902,7 @@ class MainWindow(QWidget):
         
         hexagPB.setIcon(QIcon(pixmap_with_color)) 
         hexagPB.setIconSize(QSize(115, 115))                         # Set the size of the icon
+
+        
         
         

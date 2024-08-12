@@ -14,8 +14,18 @@ These is also a MainWindow UI that is populated with many different types of QPu
 import sys
 from PyQt5.QtWidgets import QApplication
 from MainWindow import MainWindow
+from MouseClickFilter import MouseClickFilter
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+    
     window = MainWindow()
+    
+    # Install the global event filter on the MainWindow instance
+    mouse_filter = MouseClickFilter(window)
+    app.installEventFilter(mouse_filter)
+    
+    window.show()
+    
     sys.exit(app.exec_())

@@ -3,10 +3,12 @@ from PyQt5.QtWidgets import QPushButton
 from PyQt5.QtGui import  QPolygon, QTransform, QIcon
 from PyQt5.QtCore import QPoint, Qt
 from Board import Board
+from MouseClickFilter import MouseClickFilter
+
 
 class HexagPushButton(QPushButton):
-    
-    def __init__(self, name, board, parent=None):
+    def __init__(self, name, board, mouse_filter, parent=None):
+    #def __init__(self, name, board, parent=None):
         super().__init__(parent)
         self.name = name
         self.MainWindow = parent
@@ -15,6 +17,7 @@ class HexagPushButton(QPushButton):
         self.setStyleSheet("background-color: transparent; border: none; padding: 0;")
         self.theBoard = board  # Use the shared Board object
         self.rotationAngle = 0
+        self.mouse_filter = mouse_filter
        
         
         # this is a list of all tile names from 1 to 70 in ascending order
@@ -39,6 +42,12 @@ class HexagPushButton(QPushButton):
             "1004": 70, "1006": 71, "1008": 72, "1010": 73, "1012": 74, "1014": 75, 
             "1115": 76
         }  
+        
+    def mousePressEvent(self, event):
+        xLoc = self.mouse_filter.getLocalX()  # Use the reference here
+        yLoc = self.mouse_filter.getLocalY()
+        print(f"HexagPushButton clicked at ({xLoc}, {yLoc})")
+        super().mousePressEvent(event)
 
     def mousePressEvent(self, event):
         hexagon = QPolygon([
@@ -89,6 +98,9 @@ class HexagPushButton(QPushButton):
         else:
             print("not a hexag")
             super().mousePressEvent(event)
+        xLoc = self.MouseClickFilter.getLocalX()
+        yLoc = self.MouseClickFilter.getLocalY()
+        print(f"******* x = {xLoc} y = {yLoc}")
             
             # This might be used to color in tiles that are a part of a train route
             # self.MainWindow.colorTiles(tileList[0], location, tileList[1], 0)
