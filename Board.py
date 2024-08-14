@@ -17,6 +17,7 @@ class Board:
         self.tileList = []
         self.tileListIndex = 0
         self.tempHexag = []
+        self.companyStations = []
         
         self.hexagDictionary = {
             0: "0210",  1:"0212",  2:"0214",  3:"0216",  4:"0218",  5:"0220",  6:"0222", 
@@ -453,7 +454,6 @@ class Board:
                 self.unplayedTiles.append(swapTile)
         
         tile = self.removeTileFromUnplayedTiles(tileNumber)             # remove the tile from the unplayed list and add to played list
-        print(f"Tile = {tile}")
         if tile == None:
             return
         hexag.hexagTile = tileNumber                                    # get the tile number assigned to the hexag
@@ -466,7 +466,6 @@ class Board:
         print(f"Heag CS = {hexag.companySides}")
         
         rotatedStationList = []
-        hCitySides = [] 
         cityCompany = []
         
         if hexag.companySides:
@@ -504,6 +503,9 @@ class Board:
             for item in rotatedStationList:
                 sideList.append(item)  
             hexag.companySides.append(sideList)
+            if cityCompany[index][1] < 10:
+                if [cityCompany[index][1], name] not in self.companyStations:
+                    self.companyStations.append([cityCompany[index][1], name])      # appends the company name and the hexag name to the list for latee recursive methods
             index +=1
             
         if len(hexag.companySides) < 2:
@@ -516,6 +518,7 @@ class Board:
         print(f"hexag color = {hexag.color}")
         print ("hexagTile = " + str(hexag.hexagTile))
         print ("hexag Cs = " + str(hexag.companySides))
+        print (f"company station list = {self.companyStations}")
         print("")
               
         

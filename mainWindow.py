@@ -286,6 +286,7 @@ class MainWindow(QWidget):
         specialCity = [["city01190",4],["city06060",3],["city08120",8]]
         for city in specialCity:
             cityButton = CityButton(city[0], self, False, True, city[1])
+            self.board.companyStations.append([city[1], city[0][4:8]])
             self.cityButtons.append(cityButton)
             
         self.show()
@@ -430,13 +431,8 @@ class MainWindow(QWidget):
     # method for getting and displaying tiles gotten from board
     def displayTile(self, tileNumber, angle, tileHexagClicked):
         name = tileHexagClicked.objectName() if tileHexagClicked else ""
-        numberOfCities = -1
-    
+        numberOfCities = -1   
         print(f"\ntileNumber: {tileNumber}, name: {name}, angle: {angle}")
-        
-        if name:
-            hexag = self.board.findHexagByName(name)
-    
         if tileNumber > 0:  # Display tile
             self.currentTile = [tileNumber, name, angle]
             tileName = self.tileDictionary.get(tileNumber, "")
@@ -504,7 +500,6 @@ class MainWindow(QWidget):
                     print(f"HexagName = {hexagName}")
                     hexagObj = self.board.findHexagByName(hexagName)
                     hexagTileNumber = hexagObj.hexagTile
-                    tilePlaced= 0
                     if hexagTileNumber:
                         hexagTile = self.board.allTilesLookUp(hexagTileNumber)
                     else:
@@ -646,7 +641,7 @@ class MainWindow(QWidget):
                 stationCompany = int(self.currentStation[4])
                 cityNumber = int(self.currentCityButton[8])
                 cityButtonName =  self.currentCityButton[4:8]
-                cbHexag = self.board.findHexagbyName(cityButtonName)
+                cbHexag = self.board.findHexagByName(cityButtonName)
                 cbHexagName = cbHexag.hexag_name
                 cbHexagTile = cbHexag.hexagTile
                 cbHexagAngle = cbHexag.angle
