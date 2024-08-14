@@ -360,13 +360,13 @@ class Board:
     def findSides(self, tile, angle):
         if tile:
             listOfSides = []
-            for pair in tile.path_pairs:
-                for i in range(2):
-                    pairSide = pair[i]
-                    if pairSide > 6:
-                        pairSide -=6
-                    if pairSide not in listOfSides:
-                        listOfSides.append(pairSide)
+            for station in tile.station_list:
+                for side in station[1:]:
+
+                    if side > 6:
+                        side -=6
+                    if side not in listOfSides:
+                        listOfSides.append(side)
             return listOfSides
         
     
@@ -461,8 +461,6 @@ class Board:
         print("")
         print("tile Station List = " + str(tileStationList))
         print(f"city number {cityNumber} and stationCompany {stationCompany}")
-        tilePathPairs = tile.path_pairs
-        print("tile path pairs = " + str (tilePathPairs))
         print(f"Heag CS = {hexag.companySides}")
         
         rotatedStationList = []
