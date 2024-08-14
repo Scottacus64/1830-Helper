@@ -17,34 +17,17 @@ class MouseClickFilter(QObject):
         self.window = window
         self.local_x = None  
         self.local_y = None 
-        '''
-        'self.counter = 0
-        'self.oldX = 0
-        'self.oldY = 0
-        '''
+
         
     def eventFilter(self, obj, event):
         if isinstance(obj, QPushButton) and event.type() == QEvent.MouseButtonPress:
-            return False  # Let QPushButton handle the click
-
-        
+            return False  # Let QPushButton handle the click 
         if event.type() == QEvent.MouseButtonPress and isinstance(event, QMouseEvent):
             local_pos = self.window.mapFromGlobal(event.globalPos())
             self.local_x = local_pos.x() 
             self.local_y = local_pos.y() 
             self.mouseClicked.emit()
-            '''
-            if self.counter == 1:
-                m = (self.local_y - self.oldY)/(self.local_x - self.oldX)
-                b = self.local_y - (self.local_x * m)
-                print(f"m = {m} and b = {b}")
-            self.oldX = self.local_x
-            self.oldY = self.local_y     
-            self.counter +=1
-            if self.counter > 1:
-                self.counter = 0
-            return True
-            '''
+
         return super().eventFilter(obj, event)
 
     # Method to retrieve the x coordinate

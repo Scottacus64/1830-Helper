@@ -8,7 +8,6 @@ Created on Sun May  5 07:55:38 2024
 import os
 from PyQt5.QtWidgets import QWidget, QLabel, QPushButton
 from PyQt5.QtGui import QPixmap, QTransform, QIcon, QColor, QPainter
-
 from Board import Board
 from MouseClickFilter import MouseClickFilter
 from CityButton import CityButton
@@ -707,7 +706,7 @@ class MainWindow(QWidget):
                         cityObj.setIcon(QIcon(self.getImage("b")))
             if int(self.currentStation[4:]) < 100:                          # if a station icon was clicked set the station token to that icon
                 hexagName = buttonName[4:8]
-                hexag = self.board.findHexagByName(hexagName)                 # get the hexag for the loaction of the station
+                hexag = self.board.findHexagByName(hexagName)               # get the hexag for the loaction of the station
                 if hexagName == self.currentTHName:
                     numCities = self.currentNumberOfCities
                 else:
