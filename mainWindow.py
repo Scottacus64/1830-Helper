@@ -19,7 +19,6 @@ class MainWindow(QWidget):
         super().__init__()
         self.board = Board()
         self.tileHexagList = []
-        #self.hexagButtons = []                   # set up these global variables before the initUI
         self.stationMarkers = []
         self.stationMarkerUsed = []
         self.trainButtons = []
@@ -91,19 +90,6 @@ class MainWindow(QWidget):
             61:"t61", 62:"t62", 63:"t63", 64:"t64", 65:"t65", 66:"t66", 67:"t67", 68:"t68", 69:"t69", 
             70:"t70", 80:"t80", 81:"t81", 82:"t82", 83:"t83"
             }
-        
-        self.hexagDictionary = {
-            "0210": 0,  "0212": 1,  "0214": 2,  "0216": 3,  "0218": 4,  "0220": 5,  "0222": 6, 
-            "0307": 7,  "0309": 8,  "0311": 9,  "0313": 10, "0317": 11, "0319": 12, "0321": 13, "0323": 14,
-            "0402": 15, "0404": 16, "0406": 17, "0408": 18, "0410": 19, "0412": 20, "0414": 21, "0416": 22, "0418": 23, "0420": 24, "0422": 25, 
-            "0503": 26, "0505": 27, "0507": 28, "0511": 29, "0513": 30, "0515": 31, "0517": 32, "0519": 33, "0521": 34, "0523": 35,
-            "0604": 36, "0608": 37, "0610": 38, "0612": 39, "0614": 40, "0616": 41, "0618": 42, "0620": 43, "0622": 44, 
-            "0703": 45, "0705": 46, "0707": 47, "0709": 48, "0711": 49, "0713": 50, "0715": 51, "0717": 52, "0719": 53,
-            "0802": 54, "0804": 55, "0806": 56, "0808": 57, "0810": 58, "0814": 59, "0816": 60, "0818": 61, 
-            "0903": 62, "0905": 63, "0907": 64, "0909": 65, "0911": 66, "0913": 67, "0915": 68, "0917": 69, 
-            "1004": 70, "1006": 71, "1008": 72, "1010": 73, "1012": 74, "1014": 75, 
-            "1115": 76
-        } 
 
         self.posDiagList = [
                 ["1004"],
@@ -201,7 +187,7 @@ class MainWindow(QWidget):
         # this is the number of stations per company
         self.stationList = [2,3,3,4,3,4,2,4]
         
-        # make the QPushbuttons for the hexages
+        # make the Labels for the hexages
         for row in range(11):
             for col in range(12):
                 shift = 0
@@ -219,9 +205,8 @@ class MainWindow(QWidget):
                     sCol = "0" + str(mCol)
                 else:
                     sCol = str(mCol)
-                location = str(sRow + sCol)
                 
-                if map[row][col] == 1:                   
+                if map[row][col] > 0:                   
                     name = sRow + sCol
                     tileHexag = QLabel(self)  
                     #tileHexag.setStyleSheet("background-color: transparent; border: 2px solid red; padding: 0;")
@@ -231,23 +216,20 @@ class MainWindow(QWidget):
                     else:
                         colSize = 101
                     tileHexag.setGeometry(-20 + (colSize * col) + shift, 13+(87 * row), colSize, 115)
-                    #tileHexag.setGeometry(-25+(100*col)+shift, 13+(87 * row), 117, 116)
                     self.tileHexagList.append(tileHexag)
-                    self.checkForCity(location, col+1, row+1)     # check to see if the hexag has a city on it
-                if map[row][col] == 2:
-                    self.checkForCity(location, col+1, row+1)     # check to see if the hexag has a city on it
+                    self.checkForCity(name)             # check to see if the hexag has a city on it
+                #if map[row][col] == 2:
+                    #self.checkForCity(name)              # check to see if the hexag has a city on it
 
         pad = 0 
         
         for button in self.cityButtons:
             hexagName = button.objectName()
             print(f"buttonName = {button.objectName()}")
-            hexagName = hexagName[4:8]
-            hexag = self.board.findHexagByName(hexagName)
+            name = hexagName[4:8]
+            hexag = self.board.findHexagByName(name)
             numberOfCities = hexag.city_count
-            locationName = button.location
-            location = self.hexagDictionary[locationName]
-            self.displayCity(locationName, location, numberOfCities, True)
+            self.displayCity(name, name, numberOfCities, True)
 
         print("(((((((((((()))))))))))))")
                    
@@ -292,7 +274,6 @@ class MainWindow(QWidget):
             self.trainList.append([1,1,1,1])
         
         # set up side bar company QPushbuttons
-        companyList = ["BMlogo", "BOlogo", "COlogo", "CPlogo", "Elogo", "NYClogo", "NYNHlogo", "PRRlogo"]
         for i in range(8):
             cName = str("co" + str(i+1))
             cButton = QPushButton(cName, self)
@@ -314,10 +295,10 @@ class MainWindow(QWidget):
 
 
     # used to show if a hexag has a city on it    
-    def checkForCity(self, location, col, row):
-        hexag = self.board.findHexagByName(location)
+    def checkForCity(self, name):
+        hexag = self.board.findHexagByName(name)
         if hexag and hexag.city_count > 0:
-            print("city found at: " + str(location))
+            print("city found at: " + str(name))
             #if hexag.rr_start == 100:
             start = hexag.city_count
             if hexag.hexag_name == "0719":
@@ -325,8 +306,8 @@ class MainWindow(QWidget):
             if start == 2:
                 start = 1
             for i in range(start, -1, -1):
-                cityName = str("city" + str(location) + str(i))
-                cityButton = CityButton(cityName, self, False, False, location, "100", self)
+                cityName = str("city" + str(name) + str(i))
+                cityButton = CityButton(cityName, self, False, False, name, "100", self)
                 cityButton.setObjectName(cityName)
                 cityButton.clicked.connect(self.cityButtonClicked)  
                 cityButton.setText("")
@@ -338,13 +319,13 @@ class MainWindow(QWidget):
                 if i == 0:
                     if hexag.rr_start < 100:
                         cityButton.setCompany(hexag.rr_start)
-                        print(f"RR start on {location} of company {hexag.rr_start}")
+                        print(f"RR start on {name} of company {hexag.rr_start}")
                         cityButton.setCitySet(True)
-                    if location == "0523" or location == "0719" or location == "0915" or location == "0519":
+                    if name == "0523" or name == "0719" or name == "0915" or name == "0519":
                         cityButton.setCitySet(True) 
-                    if location == "1115" or location == "0402" or location == "0414":
+                    if name == "1115" or name == "0402" or name == "0414":
                         cityButton.setActive(True)
-                if i == 1 and location == "0719":
+                if i == 1 and name == "0719":
                     cityButton.setActive(True)
                 self.cityButtons.append(cityButton)     
             
@@ -355,7 +336,6 @@ class MainWindow(QWidget):
         y = self.mouse_filter.getLocalY()
         posDiag = 0
         negDiag = 0
-        clickedHexag = ""
         for i in range(24):
             if 31 + (i*50) > x:
                 col = i
@@ -399,11 +379,10 @@ class MainWindow(QWidget):
     def newTileHexagClicked(self, tileHexagClicked):
         print(f"******** New Location {tileHexagClicked.objectName()} currentTHName = {self.currentTHName}")
         # check if the player clicked on a second tile this turn, if so we need to either blank out the previous tile or reset it to its original tile
-        if self.currentTHName != "":                                       # this case there was a previous tile, -1 because there is a '0' hexag
+        if self.currentTHName != "":                                        # this case there was a previous tile, -1 because there is a '0' hexag
             oldTH = self.currentTH
-            oldTHName = self.currentTHName                       # restore the last hexag's tile
-            #hexagLocation = self.board.hexagDictionary[currentHexagNumber]
-            locationFirst = int(oldTHName[:2])                                  # parsing out the tuple for board to use
+            oldTHName = self.currentTHName                                  # restore the last hexag's tile
+            locationFirst = int(oldTHName[:2])                              # parsing out the tuple for board to use
             locationSecond = int(oldTHName[2:])
             boardLocation = (locationFirst, locationSecond)
             currentHexag = self.board.findHexagTuple(boardLocation)
@@ -411,17 +390,16 @@ class MainWindow(QWidget):
             if currentHexag:
                 self.displayTile(currentHexag.hexagTile, currentHexag.angle, oldTH) # tile number, location,angle
             else:
-                self.displayTile(0, 0, oldTH)               # set the previous hexag to blank  
+                self.displayTile(0, 0, oldTH)                               # set the previous hexag to blank  
         self.currentTH = tileHexagClicked
         name = tileHexagClicked.objectName()
-        self.currentTHName = name                                    # set the currentHexag to this new location
+        self.currentTHName = name                                           # set the currentHexag to this new location
         company = self.currentCompany
         trainList = self.trainList[company]
-        locationFirst = int(name[:2])                                               # parsing out the tuple for board to use
+        locationFirst = int(name[:2])                                       # parsing out the tuple for board to use
         locationSecond = int(name[2:])
         boardLocation = (locationFirst, locationSecond)
-        print(f"lname {name} boardLocation {boardLocation}")
-        hexag = self.board.findHexagTuple(boardLocation)
+        print(f"name {name} boardLocation {boardLocation}")
         self.board.tileList = self.board.checkForPlayableTile(boardLocation, company, trainList)    # ask board for a list of playable tiles to display 
         self.board.tileListIndex = 0
         print(f"the board tile list {self.board.tileList}")
@@ -492,43 +470,7 @@ class MainWindow(QWidget):
         # Display city information if applicable
         if tileHexagClicked and numberOfCities > -1:
             self.displayCity(name, tileHexagClicked, numberOfCities, False)
-    '''
-    def displayTile(self, tileNumber, angle, tileHexagClicked):       
-        name = tileHexagClicked.objectName()
-        numberOfCities = -1
-        print("")
-        print(f"tileNumber {tileNumber} name {name} angle = {angle}")
-        if name != "":
-            hexag = self.board.findHexagByName(name)
-        if tileNumber > 0:                                      # if it is a hexag     
-            self.currentTile = [tileNumber, name, angle]    # variable to know if any tiles have been clicked and what the tile info is
-            tileName = self.tileDictionary[tileNumber]
-            numberOfCities = self.board.allTilesLookUp(tileNumber).city_count
-            pixmap = QPixmap(self.getImage(tileName))
-        else:                                                   # if it is an old icon that needs to be made blank
-            pixmap = QPixmap()
-            numberOfCities = 0
-        if angle > 0:
-            transform = QTransform()
-            transform.rotate(angle * 60)
-            original_pixmap = pixmap.scaled(115, 115)
-            rotated_pixmap = original_pixmap.transformed(transform, Qt.SmoothTransformation)
-            final_pixmap = pixmap.scaled(115, 115)                              # new QPixmap with the desired size
-            final_pixmap.fill(Qt.transparent)                                   # transparent color
-            xOffset = (final_pixmap.width() - rotated_pixmap.width()) / 2       # draw the rotated pixmap to center it in the final pixmap
-            yOffset = (final_pixmap.height() - rotated_pixmap.height()) / 2
-            painter = QPainter(final_pixmap)                                    # Draw the rotated pixmap onto the final pixmap
-            painter.drawPixmap(int(xOffset), int(yOffset), rotated_pixmap)
-            painter.end() 
-            scaledPixmap = final_pixmap.scaled(115, 115)
-            tileHexagClicked.setPixmap(scaledPixmap)                        # Set the size of the icon
-        else:
-            pixmap = pixmap.scaled(115,115)
-            tileHexagClicked.setPixmap(pixmap)
-        # Set the size of the icon
-        if tileHexagClicked != 0 and numberOfCities > -1:
-            self.displayCity(name, tileHexagClicked, numberOfCities, False)
-        '''        
+        
         
     # called if a station QPushButton is clicked
     def stationMarkerClicked(self):
@@ -643,10 +585,8 @@ class MainWindow(QWidget):
     #    pdb.set_trace() 
         print(" >>>>>company button presssed<<<<<<")
         buttonName = self.sender().objectName()
-        print("Company button: " + buttonName)
         pixmap =QIcon(self.getImage(buttonName))    
         company = int(buttonName[-1])
-        print(f"Current Company = {self.currentCompany}")
         if company != self.currentCompany:
             for cButton in self.companyButtons:
                 icon = QIcon ()
@@ -670,7 +610,7 @@ class MainWindow(QWidget):
                 print(f"hexag = {hexag}")
                 print(f"hexagName {hexag.hexag_name}")
                 print("tile = " + str(self.currentTile[0]))
-                print (f"location = {location}")
+                print (f"name = {name}")
                 print("angle = " + str(self.currentTile[2]))
                 stationCompany = int(self.currentStation[4])                
                 if self.currentCityButton:
@@ -695,9 +635,7 @@ class MainWindow(QWidget):
                     cbHexagTile = cbHexag.hexagTile
                     cbHexagAngle = cbHexag.angle
                     print(f"hex tile {cbHexagTile} hex angle {cbHexagAngle}")
-                    cbHexagLocation = self.hexagDictionary[cbHexagName]
-                    print(f"cbHexagLocation {cbHexagLocation}")
-                    self.board.updateHexagWithTile(cbHexagTile, cbHexagLocation ,cbHexagAngle, cityNumber, stationCompany)
+                    self.board.updateHexagWithTile(cbHexagTile, cbHexagName ,cbHexagAngle, cityNumber, stationCompany)
                 else:
                     currentTileNumber = self.currentTile[0]
                     tile = self.board.allTilesLookUp(currentTileNumber)
@@ -714,12 +652,10 @@ class MainWindow(QWidget):
                 cbHexagTile = cbHexag.hexagTile
                 cbHexagAngle = cbHexag.angle
                 print(f"hex tile {cbHexagTile} hex angle {cbHexagAngle}")
-                cbHexagLocation = self.hexagDictionary[cbHexagName]
-                print(f"cbHexagLocation {cbHexagLocation}")
                 cityObj = self.findCityObj(self.currentCityButton)
                 cityObj.setCitySet(True)
                 cityObj.setCompany(stationCompany)
-                self.board.updateHexagWithTile(cbHexagTile, cbHexagLocation ,cbHexagAngle, cityNumber, stationCompany)
+                self.board.updateHexagWithTile(cbHexagTile, cbHexagName ,cbHexagAngle, cityNumber, stationCompany)
                 
             else:
                 print("nothing to update")
@@ -772,7 +708,6 @@ class MainWindow(QWidget):
             if int(self.currentStation[4:]) < 100:                          # if a station icon was clicked set the station token to that icon
                 hexagName = buttonName[4:8]
                 hexag = self.board.findHexagByName(hexagName)                 # get the hexag for the loaction of the station
-                hexagLocation = self.hexagDictionary[hexagName]
                 if hexagName == self.currentTHName:
                     numCities = self.currentNumberOfCities
                 else:
@@ -792,7 +727,7 @@ class MainWindow(QWidget):
                 self.currentCityButton = buttonName
                     
     
-    def displayCity(self, name, tileHexagClicked, numberOfCities, startUp):                # location is a number 0 - 76
+    def displayCity(self, name, tileHexagClicked, numberOfCities, startUp):                
         hexag = self.board.findHexagByName(name)
         hexagName = hexag.hexag_name
         csLen = len(hexag.companySides)
@@ -825,17 +760,21 @@ class MainWindow(QWidget):
             print(f"slot = {i} company = {comp}")              
             
         if cityList != [None, None]:                                                        # this is needed because village tiles have no upgrade
+            if hexagRow < 7:
+                colSize = 100
+            else:
+                colSize = 101
             if numberOfCities == 0:                                                         # going from (1 to 0) or (20 to 0)
                 for i in range(csLen):
-                    cityList[i].setGeometry((50*hexagCol)-38, (87*hexagRow)-35, 40, 40)
+                    cityList[i].setGeometry(int(colSize*(hexagCol/2))-38, (87*hexagRow)-35, 40, 40)
                     cityList[i].setActive(False)
                     cityList[i].setIcon(QIcon())
                     self.stationPlaced = False
             elif numberOfCities == 1:                                                       # going from (0 to 1) or (2 to 1)
                 for i in range(csLen):   
-                    cityList[i].setGeometry((50*hexagCol)-38, (87*hexagRow)-35, 40, 40)
+                    cityList[i].setGeometry(int(colSize*(hexagCol/2))-38, (87*hexagRow)-35, 40, 40)
                     if hexagName == "1115":
-                        cityList[i].setGeometry((50*hexagCol)-52, (87*hexagRow)-50, 40, 40)
+                        cityList[i].setGeometry(int(colSize*(hexagCol/2))-52, (87*hexagRow)-50, 40, 40)
                 if startUp == False:
                     if int(cityList[0].company) < 50:                                                # there's a company here
                         cityList[0].setActive(False)
@@ -846,8 +785,8 @@ class MainWindow(QWidget):
                         cityList[0].setIcon(QIcon(self.getImage("greyDot")))
                         self.stationPlaced = False
             elif numberOfCities == 2:                                                       # going from (1 to 2)     
-                cityList[0].setGeometry((50*hexagCol)-38, (87*hexagRow)-55, 40, 40)         # space out the cities        
-                cityList[1].setGeometry((50*hexagCol)-38, (87*hexagRow)-15, 40, 40) 
+                cityList[0].setGeometry(int(colSize*(hexagCol/2))-38, (87*hexagRow)-55, 40, 40)         # space out the cities        
+                cityList[1].setGeometry(int(colSize*(hexagCol/2))-38, (87*hexagRow)-15, 40, 40) 
                 if startUp == False:
                     for i in range(2):
                         print(f"Comp = {cityList[i].company}")
@@ -860,8 +799,8 @@ class MainWindow(QWidget):
                             cityList[i].setIcon(QIcon(self.getImage("greyDot")))
                             self.stationPlaced = False
             elif numberOfCities == 20:                                                      # going from (0 to 20) or (40 to 20)
-                cityList[0].setGeometry((50*hexagCol)-38, (87*hexagRow)-55, 40, 40)         # space out the cities        
-                cityList[1].setGeometry((50*hexagCol)-38, (87*hexagRow)-15, 40, 40) 
+                cityList[0].setGeometry(int(colSize*(hexagCol/2))-38, (87*hexagRow)-55, 40, 40)         # space out the cities        
+                cityList[1].setGeometry(int(colSize*(hexagCol/2))-38, (87*hexagRow)-15, 40, 40) 
                 if startUp == False:
                     for i in range(csLen):
                         if int(cityList[i].company) < 50:                                            # there's a company here
@@ -880,16 +819,16 @@ class MainWindow(QWidget):
                             self.stationPlaced = False
             else:                                                                           # going from (20 to 40)
                 if startUp == True:
-                    cityList[0].setGeometry((50*hexagCol)-38, (87*hexagRow)-55, 40, 40)         # space out the cities        
-                    cityList[1].setGeometry((50*hexagCol)-38, (87*hexagRow)-15, 40, 40)
-                    cityList[2].setGeometry((50*hexagCol)-38, (87*hexagRow)-55, 40, 40)               
-                    cityList[3].setGeometry((50*hexagCol)-38, (87*hexagRow)-15, 40, 40)
+                    cityList[0].setGeometry(int(colSize*(hexagCol/2))-38, (87*hexagRow)-55, 40, 40)         # space out the cities        
+                    cityList[1].setGeometry(int(colSize*(hexagCol/2))-38, (87*hexagRow)-15, 40, 40)
+                    cityList[2].setGeometry(int(colSize*(hexagCol/2))-38, (87*hexagRow)-55, 40, 40)               
+                    cityList[3].setGeometry(int(colSize*(hexagCol/2))-38, (87*hexagRow)-15, 40, 40)
                 
                 else:
-                    cityList[0].setGeometry((50*hexagCol)-55, (87*hexagRow)-55, 40, 40)         # space out the cities        
-                    cityList[1].setGeometry((50*hexagCol)-15, (87*hexagRow)-55, 40, 40)
-                    cityList[2].setGeometry((50*hexagCol)-55, (87*hexagRow)-15, 40, 40)               
-                    cityList[3].setGeometry((50*hexagCol)-15, (87*hexagRow)-15, 40, 40)
+                    cityList[0].setGeometry(int(colSize*(hexagCol/2))-55, (87*hexagRow)-55, 40, 40)         # space out the cities        
+                    cityList[1].setGeometry(int(colSize*(hexagCol/2))-15, (87*hexagRow)-55, 40, 40)
+                    cityList[2].setGeometry(int(colSize*(hexagCol/2))-55, (87*hexagRow)-15, 40, 40)               
+                    cityList[3].setGeometry(int(colSize*(hexagCol/2))-15, (87*hexagRow)-15, 40, 40)
                     for i in range(4):
                         if i % 2 == 0:
                             color = 0
@@ -956,14 +895,17 @@ class MainWindow(QWidget):
         train_button.setIcon(QIcon(pixmap_with_color))                   # Set the modified pixmap with color to the button
 
 
-    def colorTiles(self, tileNumber, location, angle, train): 
+    def colorTiles(self, tileNumber, name, angle, train): 
         colorList = [(255,255,0,128), (240,227,25,200), (240,227,25,200),(240,227,25,200)]
         color = QColor(*colorList[train])
         tileName = self.tileDictionary[tileNumber]
-        icon = QIcon(self.getImage(tileName))
-        hexagPB = self.hexagButtons[location]
+        pixmap = QPixmap(self.getImage(tileName))
+        for slot in self.tileHexagList:
+            sName = slot.objectName()
+            if sName == name:
+                hexagTile = slot
         # Blend the color with the icon pixmap       
-        pixmap = icon.pixmap(icon.availableSizes()[0])                   # Get the first available size
+        #pixmap = icon.pixmap(icon.availableSizes()[0])                   # Get the first available size
         pixmap_with_color = QPixmap(pixmap.size())
         pixmap_with_color.fill(Qt.transparent)                           # Fill pixmap with transparency
         painter = QPainter(pixmap_with_color)
@@ -973,8 +915,7 @@ class MainWindow(QWidget):
         painter.fillRect(pixmap.rect(), color)
         painter.end()
         
-        hexagPB.setIcon(QIcon(pixmap_with_color)) 
-        hexagPB.setIconSize(QSize(115, 115))                         # Set the size of the icon
+        hexagTile.setPixmap(pixmap_with_color)
 
         
         
