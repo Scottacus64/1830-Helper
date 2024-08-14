@@ -7,6 +7,7 @@ Created on Sat Aug 10 07:55:20 2024
 """
 from PyQt5.QtCore import QObject, pyqtSignal, QEvent
 from PyQt5.QtGui import QMouseEvent
+from PyQt5.QtWidgets import QPushButton
 
 class MouseClickFilter(QObject):
     mouseClicked = pyqtSignal()  # Define the signal here
@@ -16,11 +17,17 @@ class MouseClickFilter(QObject):
         self.window = window
         self.local_x = None  
         self.local_y = None 
-        self.counter = 0
-        self.oldX = 0
-        self.oldY = 0
-
+        '''
+        'self.counter = 0
+        'self.oldX = 0
+        'self.oldY = 0
+        '''
+        
     def eventFilter(self, obj, event):
+        if isinstance(obj, QPushButton) and event.type() == QEvent.MouseButtonPress:
+            return False  # Let QPushButton handle the click
+
+        
         if event.type() == QEvent.MouseButtonPress and isinstance(event, QMouseEvent):
             local_pos = self.window.mapFromGlobal(event.globalPos())
             self.local_x = local_pos.x() 

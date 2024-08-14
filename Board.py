@@ -409,7 +409,7 @@ class Board:
     
     
     # find the hexag by its name (0505)
-    def findHexagName(self, name):
+    def findHexagByName(self, name):
         for hexagObj in self.board_hexagons:
             if hexagObj.hexag_name == name:
                 return hexagObj                       #return the hexag upon a match
@@ -444,8 +444,8 @@ class Board:
         return None 
     
     
-    def updateHexagWithTile(self, tileNumber, location, angle, cityNumber, stationCompany): # this is run after a hexag is finalized
-        hexag = self.findHexagByNumber(location)
+    def updateHexagWithTile(self, tileNumber, name, angle, cityNumber, stationCompany): # this is run after a hexag is finalized
+        hexag = self.findHexagByName(name)
         oldTile = hexag.hexagTile
         if oldTile > 0:
             swapTile = self.addTileBackOnUnplayedList(oldTile)
