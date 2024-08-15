@@ -255,7 +255,7 @@ class Board:
             
      
     # This method takes in information from the GUI and returns tiles that can be played 
-    def checkForPlayableTile(self, location, company, trainList):
+    def checkForPlayableTile(self, location):
         # this is a list of the hexages rail spurs around the location with the correcponding side of the location in that direction
         # for example the first hexag returned by findAdjacenthexages is above and to the left, if that hexag has a rail on
         # side 3 then that correspnds to side 6 on the location hexag [(3,6), ...]
