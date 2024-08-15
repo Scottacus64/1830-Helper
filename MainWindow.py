@@ -687,7 +687,9 @@ class MainWindow(QWidget):
                     if hexagName == self.currentTHName:
                         numCities = self.currentNumberOfCities
                     else:
-                        numCities = hexag.city_count
+                        tileNumber = hexag.hexagTile
+                        hexagTile = self.board.allTilesLookUp(tileNumber)
+                        numCities = hexagTile.city_count
                 if numCities == 0:
                     cityObj.setIcon(QIcon())
                 elif numCities == 1 or numCities == 2:
@@ -702,12 +704,17 @@ class MainWindow(QWidget):
             if int(self.currentStation[4:]) < 100:                          # if a station icon was clicked set the station token to that icon
                 hexagName = buttonName[4:8]
                 hexag = self.board.findHexagByName(hexagName)               # get the hexag for the loaction of the station
+                print(f"hexagName = {hexagName} self.currentTHName = {self.currentTHName} ")
                 if hexagName == self.currentTHName:
+                    print("top method used")
                     numCities = self.currentNumberOfCities
                 else:
-                    numCities = hexag.city_count
+                    print("bottom method used")
+                    tileNumber = hexag.hexagTile
+                    hexagTile = self.board.allTilesLookUp(tileNumber)
+                    numCities = hexagTile.city_count
                 company = self.currentStation[4]
-                print(f"company = {company}")
+                print(f"company = {company} number of cities = {numCities}")
                 if numCities < 20:
                     bw = 2
                 else:
