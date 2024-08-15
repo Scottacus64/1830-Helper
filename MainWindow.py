@@ -473,8 +473,10 @@ class MainWindow(QWidget):
         print("Station: ", buttonName)
         print("Current station " + self.currentStation)
         print(f"Button Name {buttonName}")
+        if self.stationClicked == True and buttonName != self.currentStation:
+            return
         if int(self.currentCompany) == int(buttonName[4]):                      # check to see if the button clicked matches the current company
-            for slot in self.stationMarkerUsed:
+            for slot in self.stationMarkerUsed:                                 # blocks fro reusing the same station twice
                 if slot[0] == buttonName and slot[1] == 1:
                     return
             self.stationClicked = True
